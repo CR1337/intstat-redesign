@@ -1,0 +1,73 @@
+CREATE PROCEDURE insert_into_{{ table_name }}(
+    {% for col in columns %}
+    IN {{ col.name }}_in {{ col.type }},
+    {% endfor %}
+    {% for fk in foreign_keys %}
+    IN {{ fk.name }}_in INTEGER,
+    {% endfor %}
+    OUT new_{{ table_name }}_id_out INTEGER
+)
+BEGIN
+    DECLARE v_new_id INTEGER;
+    {% if user_tracking %}
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    {% endif %}
+
+    {% if user_tracking %}
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+    {% endif %}
+
+    START TRANSACTION;
+
+    SET v_new_id = (
+        SELECT neue_{{ table_name }}_id
+        FROM view_{{ table_name }}_neue_id
+    );
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_{{ table_name }}(
+        gueltig_seit,
+        ist_aktiv,
+        {% if user_tracking %}
+        ersteller_nutzer_id,
+        {% endif %}
+        {% for col in columns %}
+        {{ col.name }},
+        {% endfor %}
+        {% for fk in foreign_keys %}
+        {{ fk.name }}_id,
+        {% endfor %}
+        {{ table_name }}_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        {% if user_tracking %}
+        v_nutzer_id,
+        {% endif %}
+        {% for col in columns %}
+        {{ col.name }}_in,
+        {% endfor %}
+        {% for fk in foreign_keys %}
+        {{ fk.name }}_in,
+        {% endfor %}
+        v_new_id
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+
+    SET new_{{ table_name }}_id_out = v_new_id;
+    
+    COMMIT;
+END;

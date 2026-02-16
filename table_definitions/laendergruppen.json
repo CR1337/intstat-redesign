@@ -1,0 +1,25 @@
+{
+    "table_name": "laendergruppen",
+    "description": "Enthält Gruppen, zu welchen Länder gehören können, z.B. EU oder G7.",
+    "columns": [
+        {
+            "name": "name_de",
+            "type": "VARCHAR(256)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "name_en",
+            "type": "VARCHAR(256)",
+            "not_null": true,
+            "default": "''"
+        }
+    ],
+    "foreign_keys": [
+       
+    ],
+    "unique_sets": [
+        ["name_de"], 
+        ["name_en"]
+    ]
+}

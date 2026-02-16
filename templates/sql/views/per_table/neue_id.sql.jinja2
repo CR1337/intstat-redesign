@@ -1,0 +1,5 @@
+CREATE OR REPLACE VIEW view_{{ table_name }}_neue_id AS
+SELECT
+    COALESCE(MAX({{ table_name }}_id), 0) + 1 AS neue_{{ table_name }}_id
+FROM tab_{{ table_name }}
+LIMIT 1;

@@ -1,0 +1,70 @@
+{
+    "table_name": "indikatoren",
+    "description": "Enthält alle Indikatoren. Jeder Indikator besizt ein Thema, eine Quelle und eine Einheit. Außerdem enthält er einen Faktor, welcher mit zugehörigen Werten multipliziert werden muss und eine Dezimalstellengenauigkeit. ",
+    "columns": [
+        {
+            "name": "faktor",
+            "type": "DOUBLE",
+            "not_null": true,
+            "default": 0
+        },
+        {
+            "name": "dezimalstellen",
+            "type": "TINYINT UNSIGNED",
+            "not_null": true,
+            "default": 0
+        },
+        {
+            "name": "name_de",
+            "type": "VARCHAR(256)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "name_en",
+            "type": "VARCHAR(256)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "beschreibung_de",
+            "type": "VARCHAR(4096)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "beschreibung_en",
+            "type": "VARCHAR(4096)",
+            "not_null": true
+            ,
+            "default": "''"
+        }
+    ],
+    "foreign_keys": [
+        {
+            "name": "themen",
+            "references": "themen",
+            "min_1": false,
+            "description": "gehört zu Thema",
+            "not_null": true
+        },
+        {
+            "name": "quellen",
+            "references": "quellen",
+            "min_1": false,
+            "description": "von Quelle",
+            "not_null": true
+        },
+        {
+            "name": "einheiten",
+            "references": "einheiten",
+            "min_1": false,
+            "description": "hat Einheit",
+            "not_null": true
+        }
+    ],
+    "unique_sets": [
+        ["name_de"], 
+        ["name_en"]
+    ]
+}

@@ -1,0 +1,5 @@
+ALTER TABLE tab_{{ table_name }}
+ADD CONSTRAINT fk_{{ table_name }}_{{ fk.references }}_{{ uuid() }}  --  {{ fk.description }}
+FOREIGN KEY ({{ fk.name }}_id) REFERENCES tab_{{ fk.references }}({{ fk.references }}_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;

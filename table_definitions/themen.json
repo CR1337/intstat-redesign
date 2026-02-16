@@ -1,0 +1,43 @@
+{
+    "table_name": "themen",
+    "description": "Jedes Thema hat einen deutschen und einen englischen namen und eine Farbe.",
+    "columns": [
+        {
+            "name": "name_de",
+            "type": "VARCHAR(64)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "name_en",
+            "type": "VARCHAR(64)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "farbe_r",
+            "type": "TINYINT UNSIGNED",
+            "not_null": true,
+            "default": 0
+        },
+        {
+            "name": "farbe_g",
+            "type": "TINYINT UNSIGNED",
+            "not_null": true,
+            "default": 0
+        },
+        {
+            "name": "farbe_b",
+            "type": "TINYINT UNSIGNED",
+            "not_null": true,
+            "default": 0
+        }
+    ],
+    "foreign_keys": [
+        
+    ],
+    "unique_sets": [
+        ["name_de"], 
+        ["name_en"]
+    ]
+}

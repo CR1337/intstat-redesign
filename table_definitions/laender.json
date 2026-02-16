@@ -1,0 +1,47 @@
+{
+    "table_name": "laender",
+    "description": "Hier sind die Länder gespeichert. Ein Land hat ISO2- und ISO3-Kennungen. Ein Land kann mehrere Namen haben. Auf die Anzeigenamen verweisen die Fremndschlüssel eines Landes.",
+    "columns": [
+        {
+            "name": "iso2",
+            "type": "VARCHAR(2)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "iso3",
+            "type": "VARCHAR(3)",
+            "not_null": true,
+            "default": "''"
+        }
+    ],
+    "foreign_keys": [
+        {
+            "name": "kontinente",
+            "references": "kontinente",
+            "min_1": false,
+            "description": "gehört zu Kontinent",
+            "not_null": true
+        },
+        {
+            "name": "laendernamen_de",
+            "references": "laendernamen",
+            "min_1": false,
+            "description": "hat dt. Namen",
+            "not_null": true
+        },
+        {
+            "name": "laendernamen_en",
+            "references": "laendernamen",
+            "min_1": false,
+            "description": "hat en. Namen",
+            "not_null": true
+        }
+    ],
+    "unique_sets": [
+        ["laendernamen_de_id"], 
+        ["laendernamen_en_id"],
+        ["iso2"],
+        ["iso3"]
+    ]
+}

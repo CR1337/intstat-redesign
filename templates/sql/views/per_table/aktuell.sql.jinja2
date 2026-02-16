@@ -1,0 +1,11 @@
+CREATE OR REPLACE VIEW view_{{ table_name }}_aktuell AS
+SELECT t.*
+from tab_{{ table_name }} t
+INNER JOIN (
+    SELECT {{ table_name }}_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_{{ table_name }}
+    GROUP BY {{ table_name }}_id
+) latest
+ON t.{{ table_name }}_id = latest.{{ table_name }}_id 
+AND t.gueltig_seit = latest.max_gueltig_seit
+WHERE t.ist_aktiv;

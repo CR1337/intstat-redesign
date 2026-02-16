@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+trap 'echo "Error on line $LINENO. Exit code: $?"; exit 1' ERR
+
+bin/stop
+bin/remove
+bin/build
+python3 make.py
+bin/run
+python3 build_db.py
+bin/test

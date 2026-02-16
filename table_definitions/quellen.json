@@ -1,0 +1,39 @@
+{
+    "table_name": "quellen",
+    "description": "Hier werden die Quellen gespeichert, aus denen die Werte für die Indikatoren stammen.",
+    "columns": [
+        {
+            "name": "name_de",
+            "type": "VARCHAR(256)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "name_en",
+            "type": "VARCHAR(256)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "name_kurz_de",
+            "type": "VARCHAR(16)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "name_kurz_en",
+            "type": "VARCHAR(16)",
+            "not_null": true,
+            "default": "''"
+        }
+    ],
+    "foreign_keys": [
+
+    ],
+    "unique_sets": [
+        ["name_de"], 
+        ["name_en"],
+        ["name_kurz_de"], 
+        ["name_kurz_en"]
+    ]
+}

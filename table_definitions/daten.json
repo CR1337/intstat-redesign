@@ -1,0 +1,37 @@
+{
+    "table_name": "daten",
+    "description": "Speichert die eigentlichen Datenwerte, die mit Ländern und Indikatoren verknüpft sind.",
+    "columns": [
+        {
+            "name": "datum",
+            "type": "DATE",
+            "not_null": true,
+            "default": "'2000-01-01'"
+        },
+        {
+            "name": "wert",
+            "type": "DOUBLE",
+            "not_null": true,
+            "default": 0
+        }
+    ],
+    "foreign_keys": [
+        {
+            "name": "laender",
+            "references": "laender",
+            "min_1": false,
+            "description": "für Land",
+            "not_null": true
+        },
+        {
+            "name": "indikatoren",
+            "references": "indikatoren",
+            "min_1": false,
+            "description": "für Indikator",
+            "not_null": true
+        }
+    ],
+    "unique_sets": [
+        ["laender_id", "indikatoren_id"]
+    ]
+}

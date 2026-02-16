@@ -1,0 +1,25 @@
+{
+    "table_name": "kontinente",
+    "description": "Jeder Kontinent hat einen deutschen und einen englischen Namen.",
+    "columns": [
+        {
+            "name": "name_de",
+            "type": "VARCHAR(64)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "name_en",
+            "type": "VARCHAR(64)",
+            "not_null": true,
+            "default": "''"
+        }
+    ],
+    "foreign_keys": [
+    
+    ],
+    "unique_sets": [
+        ["name_de"], 
+        ["name_en"]
+    ]
+}

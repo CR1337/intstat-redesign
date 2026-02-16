@@ -1,0 +1,6 @@
+CREATE INDEX idx_{{ table_name }}_latest 
+    ON tab_{{ table_name }} (
+        {{ table_name }}_id, 
+        gueltig_seit DESC
+    );
+    

@@ -1,0 +1,32 @@
+---
+config:
+    layout: elk
+---
+erDiagram
+    {% for tab in tables %}
+
+        tab_{{ tab.table_name }} {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            {% if user_tracking %}
+                INTEGER ersteller_nutzer_id FK 
+            {% endif %}
+            INTEGER {{ tab.table_name }}_id PK
+
+            {% for fk in tab.foreign_keys %}
+                INTEGER {{ fk.name }}_id FK
+            {% endfor %}
+
+            {% for col in tab.columns %}
+                {{ col.type }} {{ col.name }}
+            {% endfor %}
+        }
+
+        {% for fk in tab.foreign_keys %}
+            tab_{{ fk.references }} ||--{% if fk.min_1 %}|{% else %}o{% endif %}{ tab_{{ tab.table_name }} : "{{ fk.description }}"
+        {% endfor %}
+        {% if user_tracking %}
+            tab_nutzer ||--o{ tab_{{ tab.table_name }} : "erstellt von"
+        {% endif %}
+
+    {% endfor %}

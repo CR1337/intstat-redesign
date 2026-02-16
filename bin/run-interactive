@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker run --name mysql-test-container-interactive -p 3306:3306 -it mysql-test-image /bin/bash

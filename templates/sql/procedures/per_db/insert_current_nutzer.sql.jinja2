@@ -1,0 +1,46 @@
+{% if user_tracking %}
+CREATE PROCEDURE insert_current_nutzer()
+BEGIN
+    DECLARE v_current_username VARCHAR(256);
+    DECLARE v_current_user_exists BOOL;
+    DECLARE v_new_nutzer_id INTEGER;
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_current_user_exists = EXISTS (
+        SELECT 1
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+    
+    IF NOT v_current_user_exists THEN
+        SET v_new_nutzer_id = (
+            SELECT neue_nutzer_id
+            FROM view_nutzer_neue_id
+        );
+
+        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+        TRUNCATE TABLE __insert_allowed__;
+        INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+        INSERT INTO tab_nutzer(
+            gueltig_seit,
+            ist_aktiv,
+            ersteller_nutzer_id,
+            nutzer_id,
+            name
+        ) VALUES (
+            CURRENT_TIMESTAMP(6),
+            TRUE,
+            v_new_nutzer_id,
+            v_new_nutzer_id,
+            v_current_username
+        );
+
+        TRUNCATE TABLE __insert_allowed__;
+
+    END IF;
+END;
+{% else %}
+DO 1;
+{% endif %}

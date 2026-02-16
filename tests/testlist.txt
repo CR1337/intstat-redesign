@@ -1,0 +1,9 @@
+fail_insert
+procedure_insert
+user_tracking
+fail_update
+fail_delete
+procedure_update
+procedure_delete
+
+restrict_duplicates

@@ -1,0 +1,27 @@
+CREATE TABLE IF NOT EXISTS tab_{{ table_name }} (
+    -- {{ description }}
+    gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ist_aktiv BOOL NOT NULL,
+    {% if user_tracking %}
+    ersteller_nutzer_id INTEGER NOT NULL,
+    {% endif %}
+        
+    {{ table_name }}_id INTEGER NOT NULL,
+
+    {% for fk in foreign_keys %}
+    {{ fk.name }}_id INTEGER {% if fk.not_null %}NOT NULL{% endif %},
+    {% endfor %}
+
+    {% for col in columns %}
+    {{ col.name }} {{ col.type }} {% if col.not_null %}NOT NULL{% endif %} DEFAULT {{ col.default }},
+    {% endfor %}
+
+    {% if user_tracking %}
+    FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
+        REFERENCES tab_nutzer(nutzer_id)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    {% endif %}
+
+    PRIMARY KEY ({{ table_name }}_id, gueltig_seit)
+);

@@ -1,0 +1,25 @@
+CREATE TRIGGER trg_{{ table_name }}_insert
+BEFORE INSERT ON tab_{{ table_name }}
+FOR EACH ROW
+BEGIN
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfügen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+    END IF;
+
+    {% for set in unique_sets %}
+    IF EXISTS (
+        SELECT 1
+        FROM tab_{{ table_name }}
+        WHERE
+            {% for column in set %}
+            {{ "AND" if not loop.first }} {{ column }} = NEW.{{ column }}
+            {% endfor %}
+            AND {{ table_name }}_id <> NEW.{{ table_name }}_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ({% for column in set %} {{ column }} {% endfor %}) in {{ table_name }} ist nicht erlaubt!';
+    END IF;
+    {% endfor %}
+END;

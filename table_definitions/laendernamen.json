@@ -1,0 +1,24 @@
+{
+    "table_name": "laendernamen",
+    "description": "Hier sind alle Ländernamen abgelegt. Ein Ländername ist einem Land zugeordnet.",
+    "columns": [
+        {
+            "name": "name",
+            "type": "VARCHAR(256)",
+            "not_null": true,
+            "default": "''"
+        }
+    ],
+    "foreign_keys": [
+        {
+            "name": "laender",
+            "references": "laender",
+            "min_1": false,
+            "description": "gehört zu Land",
+            "not_null": false
+        }
+    ],
+    "unique_sets": [
+        ["name"]
+    ]
+}

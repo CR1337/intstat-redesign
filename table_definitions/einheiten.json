@@ -1,0 +1,37 @@
+{
+    "table_name": "einheiten",
+    "description": "Enthält die Einheiten. eine Einheit hat ein Symbol und einen Beasiseinheit, in welche sie sich mittels ein es Faktors umrechnen lässt.",
+    "columns": [
+        {
+            "name": "faktor",
+            "type": "DOUBLE",
+            "not_null": true,
+            "default": 0
+        },
+        {
+            "name": "symbol_de",
+            "type": "VARCHAR(64)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "symbol_en",
+            "type": "VARCHAR(64)",
+            "not_null": true,
+            "default": "''"
+        }
+    ],
+    "foreign_keys": [
+        {
+            "name": "basis_einheiten",
+            "references": "einheiten",
+            "min_1": false,
+            "description": "hat Basiseinheit",
+            "not_null": false
+        }
+    ],
+    "unique_sets": [
+        ["symbol_de"], 
+        ["symbol_en"]
+    ]
+}

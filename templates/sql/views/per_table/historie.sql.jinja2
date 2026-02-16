@@ -1,0 +1,4 @@
+CREATE OR REPLACE VIEW view_{{ table_name }}_historie AS
+SELECT *
+FROM tab_{{ table_name }}
+ORDER BY {{ table_name }}_id, gueltig_seit DESC;

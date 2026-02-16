@@ -1,0 +1,78 @@
+CREATE PROCEDURE delete_from_{{ table_name }}(
+    IN {{ table_name }}_id_to_delete INTEGER
+)
+BEGIN
+    {% for col in columns %}
+    DECLARE v_{{ col.name }} {{ col.type }};
+    {% endfor %}
+    {% for fk in foreign_keys %}
+    DECLARE v_{{ fk.name }} INTEGER;
+    {% endfor %}
+
+    {% if user_tracking %}
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+    
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+    {% endif %}
+
+    SELECT 
+        {% for col in columns %}
+        {{ col.name }}{{ "," if not loop.last or foreign_keys }}
+        {% endfor %}
+        {% for fk in foreign_keys %}
+        {{ fk.name }}_id{{ "," if not loop.last }}
+        {% endfor %}
+    INTO
+        {% for col in columns %}
+        v_{{ col.name }}{{ "," if not loop.last or foreign_keys }}
+        {% endfor %}
+        {% for fk in foreign_keys %}
+        v_{{ fk.name }}{{ "," if not loop.last }}
+        {% endfor %}
+    FROM view_{{ table_name }}_aktuell
+    WHERE {{ table_name }}_id = {{ table_name }}_id_to_delete;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_{{ table_name }}(
+        gueltig_seit,
+        ist_aktiv,
+        {% if user_tracking %}
+        ersteller_nutzer_id,
+        {% endif %}
+        {% for col in columns %}
+        {{ col.name }},
+        {% endfor %}
+        {% for fk in foreign_keys %}
+        {{ fk.name }}_id,
+        {% endfor %}
+        {{ table_name }}_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        FALSE,
+        {% if user_tracking %}
+        v_nutzer_id,
+        {% endif %}
+        {% for col in columns %}
+        v_{{ col.name }},
+        {% endfor %}
+        {% for fk in foreign_keys %}
+        v_{{ fk.name }},
+        {% endfor %}
+        {{ table_name }}_id_to_delete
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+   
+END;    
