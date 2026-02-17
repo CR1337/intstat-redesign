@@ -9,5 +9,8 @@ CREATE USER IF NOT EXISTS 'user'@'%' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON intstat2_wt.* TO 'user'@'%';
 GRANT ALL PRIVILEGES ON intstat2_wot.* TO 'user'@'%';
 
+-- Gewähre SUPER Privileg für Funktionserstellung mit Binary Logging
+GRANT SUPER ON *.* TO 'user'@'%';
+
 -- Aktualisiere die Berechtigungen
 FLUSH PRIVILEGES;

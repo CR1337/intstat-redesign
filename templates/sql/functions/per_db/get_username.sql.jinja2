@@ -1,6 +1,7 @@
 {% if user_tracking %}
 CREATE FUNCTION get_aktuellen_nutzer_namen()
 RETURNS VARCHAR(256)
+NO SQL
 BEGIN
     RETURN SUBSTRING_INDEX(CURRENT_USER(), '@', 1);
 END;
