@@ -1,4 +1,4 @@
-# Dokumantation für das INTSTAT Redesign
+# Dokumentation für das INTSTAT Redesign
 
 ## Nutzertracking
 
