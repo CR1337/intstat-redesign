@@ -8,4 +8,10 @@ bin/build
 python3 make.py
 bin/run
 python3 build_db.py
-bin/test
+
+for arg in "$@"; do
+  if [ "$arg" = "-t" ]; then
+    bin/test
+    break
+  fi
+done
