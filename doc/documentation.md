@@ -1,180 +1,466 @@
 # Dokumantation für das INTSTAT Redesign
 
-## Varianten
+## Nutzertracking
 
-Die neue Datenbank soll eine Versionshistorie beinhalten. Das bedeutet, dass Daten nur hinzugefügt, jedoch nie gelöscht werden können. Wir eine Zeile verändert, so wird der alte Stand in der Historie gespeichert und eine neue Zeile mit dem neuen Stand hinzugefügt. Ältere Stände lassen sich jederzeit abrufen.
+Bisher haben wir uns alle mit dem selben Benutzernamen mit der Intstat verbunden. Dies können wir so beibehalten. Es gibt jedoch auch die Möglichkeit, aus Gründen der Nachvollziehbarkeit, zu tracken, welcher Benutzer welche Änderungen vorgenommen hat. Dazu wären folgende Schritte notwendig:
 
-Der Zugriff auf die alte Datenbank erfolgte für jeden mit dem selben Benutzer-Account. Aus Gründen der Nachvollziehbarkeit, können wir darüber nachdenken, dass jeder seinen eigenen Account erhält und getrackt wird, welcher Nutzer welche Veränderungen vorgenommen hat.
+1. Erstellen eines Accounts für **jeden** Nutzer der Intstat.
+2. Erstellen einer Tabelle `nutzer`.
+3. Verweis auf die Tabelle `nutzer` in **jeder** Zeile **jeder** Tabelle mittels `ersteller_nutzer_id`.
 
-### Nutzer Tracking
+## Versionierung
 
-Beim Nutzer Tracking gäbe es eine weitere Tabelle `tab_nutzer`, in welcher alle Nutzer abgelegt sind. Weiterhin enthält jede Tabelle ine weitere Spalte `nutzer_id`. Diese Spalte enthält die ID des Nutzers, welcher diese Spalte angelegt hat.
+MySQL unterstützt keine automatische Versionierung, wie es z.B. MariaDB mit `WITH SYSTEM VERSIONING` tut. Mithilfe von zusätzlichen Spalten, _Views_, _SQL-Triggers_ und _Stored Procedures_ kann eine solche Versionierung jedoch manuell implementiert werden.
 
-### Manuelle vs. automatische Versionierung
+Jede Tabelle enthält dazu zwei weitere Spalten:
 
-Für die manuelle Versionierung erhält jede Tabelle zwei weitere Spalten: `gueltig_seit` und `ist_aktiv`. Wird eine neue Zeile hinzugefügt (durch INSERT oder UPDATE), wird `gueltig seit` automatisch auf den aktuellen Timestamp gesetzt. Soll die Zeile durch ein DELETE gelöscht werden, so wird tatsächlich eine neue Zeile mit `ist_aktiv = FALSE` eingefügt. Das ist ein _"Grabstein"_ und markiert, dass es keinen aktuellen Stand für diese Zeile gibt.
+1. `gueltig_seit`: Speichert das Datum, an welchem die Zeile hinzugefügt wurde. Existiert keine weitere Zeile mit der gleichen `id` und einem späteren Datum in `gueltig_seit`, so ist die Zeile die aktuell gültige Zeile.
 
-Das beschriebene Verhalten wird durch SQL-`TRIGGER` implementiert, welche `INSERT`-, `UPDATE`- und `DELETE`-Befehle abfangen und durch das gewünschte Verhalten ersetzen. Somit kann von außen mit der Datenbank interagiert werden, als existiere die Historie nicht.
+2. `ist_aktiv`: Enthält diese Spalte den Wert `FALSE` oder `0`, so zeigt das einen Löschvorgang an. Ist eine Zeile mit `ist_aktiv = FALSE` die aktuelle Zeile, so bedeutet das, das es keine aktuell gültige Version dieser Zeile gibt. Eine solche Zeile wird als _Tombstone_ oder _Grabstein_ bezeichnet.
 
-Ab MySQL Version 8 existiert eine automatische Versionierung. Diese bietet grundsätzlich dieselben Features, wie die manuelle Versionierung. Sie ist deutlich einfacher in der Anwendung, erlaubt jedoch nicht soviel Kontrolle, wie die manuelle Versionierung (z.B. spezielles `TRIGGER`-Verhalten). Auch machen wir uns dann abhängig von MySQL Version >=8. Die automatische Versionierung erlaubt das Löschen der Historie über einen speziellen Befehl.
+SQL-Befehle wie `UPDATE` oder `DELETE` sind nicht erlaubt. Nur `INSERT` kann ausgeführt werden. Das wird über entsprechende _Trigger_ sichergestellt. 
+
+Zur Vereinfachung erfolgt die schreibende Interaktion mit der Datenbank ausschließlich über _Stored Procedures_. Die Lesende Interaktion kann über die Tabelle direkt erfolgen, ist jedoch einfacher über _Views_. So gibt es bspw. eine View, welche nur die aktuell gültigen zeilen anzeigt.
 
 ## Entity Relationship Diagramme
 
 ### Ohne Nutzer Tracking
 
 ```mermaid
+---
+config:
+    layout: elk
+---
+erDiagram
+
+        tab_daten {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER daten_id PK
+
+                INTEGER laender_id FK
+                INTEGER indikatoren_id FK
+
+                DATE datum
+                DOUBLE wert
+        }
+
+            tab_laender ||--o{ tab_daten : "für Land"
+            tab_indikatoren ||--o{ tab_daten : "für Indikator"
+
+
+        tab_laendergruppen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER laendergruppen_id PK
+
+
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
+        }
+
+
+
+        tab_laendergruppenzuordnungen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER laendergruppenzuordnungen_id PK
+
+                INTEGER laender_id FK
+                INTEGER laendergruppen_id FK
+
+        }
+
+            tab_laender ||--o{ tab_laendergruppenzuordnungen : "ordnet Land zu"
+            tab_laendergruppen ||--o{ tab_laendergruppenzuordnungen : "ordnet Länderguppe zu"
+
+
+        tab_nutzer {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER nutzer_id PK
+
+
+                VARCHAR(256) name
+        }
+
+
+
+        tab_quellen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER quellen_id PK
+
+
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
+                VARCHAR(16) name_kurz_de
+                VARCHAR(16) name_kurz_en
+        }
+
+
+
+        tab_indikatoren {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER indikatoren_id PK
+
+                INTEGER themen_id FK
+                INTEGER quellen_id FK
+                INTEGER einheiten_id FK
+
+                DOUBLE faktor
+                TINYINT_UNSIGNED dezimalstellen
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
+                VARCHAR(4096) beschreibung_de
+                VARCHAR(4096) beschreibung_en
+        }
+
+            tab_themen ||--o{ tab_indikatoren : "gehört zu Thema"
+            tab_quellen ||--o{ tab_indikatoren : "von Quelle"
+            tab_einheiten ||--o{ tab_indikatoren : "hat Einheit"
+
+
+        tab_themen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER themen_id PK
+
+
+                VARCHAR(64) name_de
+                VARCHAR(64) name_en
+                TINYINT_UNSIGNED farbe_r
+                TINYINT_UNSIGNED farbe_g
+                TINYINT_UNSIGNED farbe_b
+        }
+
+
+
+        tab_laender {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER laender_id PK
+
+                INTEGER kontinente_id FK
+                INTEGER laendernamen_de_id FK
+                INTEGER laendernamen_en_id FK
+
+                VARCHAR(2) iso2
+                VARCHAR(3) iso3
+        }
+
+            tab_kontinente ||--o{ tab_laender : "gehört zu Kontinent"
+            tab_laendernamen ||--o{ tab_laender : "hat dt. Namen"
+            tab_laendernamen ||--o{ tab_laender : "hat en. Namen"
+
+
+        tab_einheiten {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER einheiten_id PK
+
+                INTEGER basis_einheiten_id FK
+
+                DOUBLE faktor
+                VARCHAR(64) symbol_de
+                VARCHAR(64) symbol_en
+        }
+
+            tab_einheiten ||--o{ tab_einheiten : "hat Basiseinheit"
+
+
+        tab_laendernamen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER laendernamen_id PK
+
+                INTEGER laender_id FK
+
+                VARCHAR(256) name
+        }
+
+            tab_laender ||--o{ tab_laendernamen : "gehört zu Land"
+
+
+        tab_kontinente {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER kontinente_id PK
+
+
+                VARCHAR(64) name_de
+                VARCHAR(64) name_en
+        }
+
+
 
 ```
 
 ### Mit Nutzer Tracking
 
 ```mermaid
+---
+config:
+    layout: elk
+---
+erDiagram
+
+        tab_daten {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+                INTEGER ersteller_nutzer_id FK 
+            INTEGER daten_id PK
+
+                INTEGER laender_id FK
+                INTEGER indikatoren_id FK
+
+                DATE datum
+                DOUBLE wert
+        }
+
+            tab_laender ||--o{ tab_daten : "für Land"
+            tab_indikatoren ||--o{ tab_daten : "für Indikator"
+            tab_nutzer ||--o{ tab_daten : "erstellt von"
+
+
+        tab_laendergruppen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+                INTEGER ersteller_nutzer_id FK 
+            INTEGER laendergruppen_id PK
+
+
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
+        }
+
+            tab_nutzer ||--o{ tab_laendergruppen : "erstellt von"
+
+
+        tab_laendergruppenzuordnungen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+                INTEGER ersteller_nutzer_id FK 
+            INTEGER laendergruppenzuordnungen_id PK
+
+                INTEGER laender_id FK
+                INTEGER laendergruppen_id FK
+
+        }
+
+            tab_laender ||--o{ tab_laendergruppenzuordnungen : "ordnet Land zu"
+            tab_laendergruppen ||--o{ tab_laendergruppenzuordnungen : "ordnet Länderguppe zu"
+            tab_nutzer ||--o{ tab_laendergruppenzuordnungen : "erstellt von"
+
+
+        tab_nutzer {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+                INTEGER ersteller_nutzer_id FK 
+            INTEGER nutzer_id PK
+
+
+                VARCHAR(256) name
+        }
+
+            tab_nutzer ||--o{ tab_nutzer : "erstellt von"
+
+
+        tab_quellen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+                INTEGER ersteller_nutzer_id FK 
+            INTEGER quellen_id PK
+
+
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
+                VARCHAR(16) name_kurz_de
+                VARCHAR(16) name_kurz_en
+        }
+
+            tab_nutzer ||--o{ tab_quellen : "erstellt von"
+
+
+        tab_indikatoren {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+                INTEGER ersteller_nutzer_id FK 
+            INTEGER indikatoren_id PK
+
+                INTEGER themen_id FK
+                INTEGER quellen_id FK
+                INTEGER einheiten_id FK
+
+                DOUBLE faktor
+                TINYINT_UNSIGNED dezimalstellen
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
+                VARCHAR(4096) beschreibung_de
+                VARCHAR(4096) beschreibung_en
+        }
+
+            tab_themen ||--o{ tab_indikatoren : "gehört zu Thema"
+            tab_quellen ||--o{ tab_indikatoren : "von Quelle"
+            tab_einheiten ||--o{ tab_indikatoren : "hat Einheit"
+            tab_nutzer ||--o{ tab_indikatoren : "erstellt von"
+
+
+        tab_themen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+                INTEGER ersteller_nutzer_id FK 
+            INTEGER themen_id PK
+
+
+                VARCHAR(64) name_de
+                VARCHAR(64) name_en
+                TINYINT_UNSIGNED farbe_r
+                TINYINT_UNSIGNED farbe_g
+                TINYINT_UNSIGNED farbe_b
+        }
+
+            tab_nutzer ||--o{ tab_themen : "erstellt von"
+
+
+        tab_laender {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+                INTEGER ersteller_nutzer_id FK 
+            INTEGER laender_id PK
+
+                INTEGER kontinente_id FK
+                INTEGER laendernamen_de_id FK
+                INTEGER laendernamen_en_id FK
+
+                VARCHAR(2) iso2
+                VARCHAR(3) iso3
+        }
+
+            tab_kontinente ||--o{ tab_laender : "gehört zu Kontinent"
+            tab_laendernamen ||--o{ tab_laender : "hat dt. Namen"
+            tab_laendernamen ||--o{ tab_laender : "hat en. Namen"
+            tab_nutzer ||--o{ tab_laender : "erstellt von"
+
+
+        tab_einheiten {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+                INTEGER ersteller_nutzer_id FK 
+            INTEGER einheiten_id PK
+
+                INTEGER basis_einheiten_id FK
+
+                DOUBLE faktor
+                VARCHAR(64) symbol_de
+                VARCHAR(64) symbol_en
+        }
+
+            tab_einheiten ||--o{ tab_einheiten : "hat Basiseinheit"
+            tab_nutzer ||--o{ tab_einheiten : "erstellt von"
+
+
+        tab_laendernamen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+                INTEGER ersteller_nutzer_id FK 
+            INTEGER laendernamen_id PK
+
+                INTEGER laender_id FK
+
+                VARCHAR(256) name
+        }
+
+            tab_laender ||--o{ tab_laendernamen : "gehört zu Land"
+            tab_nutzer ||--o{ tab_laendernamen : "erstellt von"
+
+
+        tab_kontinente {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+                INTEGER ersteller_nutzer_id FK 
+            INTEGER kontinente_id PK
+
+
+                VARCHAR(64) name_de
+                VARCHAR(64) name_en
+        }
+
+            tab_nutzer ||--o{ tab_kontinente : "erstellt von"
+
 
 ```
 
-## Tabellen
+## Interaktion mit der Datenbank
 
-### `daten`
+### Einfügen einer Zeile (`INSERT`)
 
-Speichert die eigentlichen Datenwerte, die mit Ländern und Indikatoren verknüpft sind.
-### `laendergruppen`
+```SQL
+SET @neue_id = 0;
 
-Enthält Gruppen, zu welchen Länder gehören können, z.B. EU oder G7.
-### `laendergruppenzuordnungen`
+CALL insert_into_kontinente(
+    "atlantis",
+    "Atlantis",
+    @neue_id
+);
 
-Diese Tabelle ordnet Ländergruppen ihre Länder zu.
-### `nutzer`
+SELECT @neue_id;
+```
 
-Diese Tabelle speichert alle Nutzer. Sie ist nur notwendig, wenn Nutzer Tracking angewandt wird.
-### `quellen`
+### Auslesen einer aktuell gültigen Zeile (`SELECT`)
 
-Hier werden die Quellen gespeichert, aus denen die Werte für die Indikatoren stammen.
-### `indikatoren`
+#### Aus der Tabelle
 
-Enthält alle Indikatoren. Jeder Indikator besizt ein Thema, eine Quelle und eine Einheit. Außerdem enthält er einen Faktor, welcher mit zugehörigen Werten multipliziert werden muss und eine Dezimalstellengenauigkeit. 
-### `themen`
+```SQL
+SELECT t.*
+from tab_kontinente t
+INNER JOIN (
+    SELECT kontinente_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_kontinente
+    GROUP BY kontinente_id
+) latest
+ON t.kontinente_id = latest.kontinente_id 
+AND t.gueltig_seit = latest.max_gueltig_seit
+WHERE t.ist_aktiv;
+```
 
-Jedes Thema hat einen deutschen und einen englischen namen und eine Farbe.
-### `laender`
+#### Aus der View
 
-Hier sind die Länder gespeichert. Ein Land hat ISO2- und ISO3-Kennungen. Ein Land kann mehrere Namen haben. Auf die Anzeigenamen verweisen die Fremndschlüssel eines Landes.
-### `einheiten`
+```SQL
+SELECT * from view_kontinente_aktuell;
+```
 
-Enthält die Einheiten. eine Einheit hat ein Symbol und einen Beasiseinheit, in welche sie sich mittels ein es Faktors umrechnen lässt.
-### `laendernamen`
 
-Hier sind alle Ländernamen abgelegt. Ein Ländername ist einem Land zugeordnet.
-### `kontinente`
+### Aktualisieren einer Zeile (`UPDATE`)
 
-Jeder Kontinent hat einen deutschen und einen englischen Namen.
-
-## Schnittstelle zur Datenbank
-
-In diesem Abschnitt wird exemplarisch an der Tabelle `daten` die Interaktion mit der Datenbank demonstriert.
-
-### Einfügen eines **neuen** Datensatzes
-
-```sql
-INSERT INTO tab_daten(
-    daten_id,
-
-    laender_id,
-    indikatoren_id,
-
-    datum,
-    wert
-) VALUES (
-    SELECT neue_daten_id FROM view_daten_neue_id,
-
-    123,
-    42,
-
-    '2026-01-01',
-    3.141
+```SQL
+CALL update_value_kontinente_name_de(
+    atlantis_id,
+    'Atlantis'
 );
 ```
 
-Zu beachten ist hierbei:
+### Löschen einer Zeile (`DELETE`)
 
-1. Die Felder `gueltig_seit`, `ist_aktiv` und `nutzer_id` werden nicht vom benutzer gesetzt, sondern vom System verwaltet.
-2. `SELECT neue_daten_id FROM view_daten_neue_id` liefert die nächste freie ID. Wir können nicht `AUTO_INCREMENT` verwenden, weil es auch für das Aktualisieren von Zeilen neue IDs erzeugen würde.
-
-### Aktualisieren eines **bestehenden** Datensatzes
-
-```sql
-UPDATE tab_daten
-SET wert = 3.0
-WHERE daten_id = 11;
+```SQL
+CALL delete_from_kontinente(
+    atlantis_id
+);
 ```
 
-Das System wird die Zeile nicht überschreiben, sondern eine neue Zeile anlegen.
+### Auslesen einer älteren Version einer Zeile (`SELECT`)
 
-### Löschen eines bestehenden Datensatzes
-
-```sql
-DELETE FROM tab_daten
-WHERE daten_id = 11;
-```
-
-Das System wird die Zeile nicht löschen, sondern eine _"Grabstein"_-Zeile einfügen.
-
-### Auslesen eines aktuellen Datensatzes
-
-```sql
-SELECT *
-FROM view_daten_aktuell
-WHERE daten_id = 11;
-```
-
-Es kann zwar direkt aus `tab_daten` gelesen werden, jedoch muss dann die aktuelle Version noch manuell herausgefiltert werden. `view_daten_aktuell` führt diese Filterung bereits durch.
-
-### Auslesen der Historie eines Datensatzes
-
-```sql
-SELECT *
-from view_daten_historie
-WHERE daten_id = 11;
-```
-
-Das liefert dasselbe Ergebnis, wie die direkte Abfrage auf `tab_daten` jedoch ist das Ergbnis bereits nach `gueltig_seit` sortiert.
-
-### Auslesen des Standes eines bestimmten Datensatzes zu einer bestimmten Zeit
-
-```sql
-SELECT *
-FROM view_daten_historie
-WHERE daten_id = 11
-    AND gueltig_seit <= '2025-12-31 12:00:00'
-ORDER BY gueltig_seit DESC
-LIMIT 1;
-```
-
-Diese Abfrage gibt die Zeile mit `daten_id` 11 zum Stand vom 31.12.2025 um 12 Uhr zurück.
-
-### Auslesen des Standes einer ganzen Tabelle zu einer bestimmten Zeit
-
-#### Manuelle Versionierung
-
-```sql
+```SQL
 SELECT t.*
-FROM tab_daten t
-JOIN (
-    SELECT
-        daten_id,
-        MAX(gueltig_seit) AS max_gueltig_seit
-    FROM tab_daten
+from tab_kontinente t
+INNER JOIN (
+    SELECT kontinente_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_kontinente
     WHERE gueltig_seit <= '2025-12-31 12:00:00'
-    GROUP BY daten_id
+    GROUP BY kontinente_id
 ) latest
-  ON t.daten_id = latest.daten_id
- AND t.gueltig_seit = latest.max_gueltig_seit
+ON t.kontinente_id = latest.kontinente_id 
+AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
-``` 
-
-#### Automatische Versionierung
-
-```sql
-SELECT *
-FROM tab_daten
-FOR SYSTEM_TIME AS OF '2025-12-31 12:00:00'
 ```

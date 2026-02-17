@@ -18,7 +18,7 @@ erDiagram
             {% endfor %}
 
             {% for col in tab.columns %}
-                {{ col.type }} {{ col.name }}
+                {{ col.type | replace(' ', '_') }} {{ col.name }}
             {% endfor %}
         }
 

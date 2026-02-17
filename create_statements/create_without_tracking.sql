@@ -204,7 +204,7 @@ CREATE TABLE IF NOT EXISTS tab_laendergruppenzuordnungen (
 -- $$
 
 ALTER TABLE tab_einheiten
-ADD CONSTRAINT fk_einheiten_einheiten_b9dae86555e94258a9dd  --  hat Basiseinheit
+ADD CONSTRAINT fk_einheiten_einheiten_b961efb5a4844fdb999b  --  hat Basiseinheit
 FOREIGN KEY (basis_einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -212,7 +212,7 @@ FOREIGN KEY (basis_einheiten_id) REFERENCES tab_einheiten(einheiten_id)
 -- $$
 
 ALTER TABLE tab_laendernamen
-ADD CONSTRAINT fk_laendernamen_laender_8bd6e10aadbf4e5f9c09  --  gehört zu Land
+ADD CONSTRAINT fk_laendernamen_laender_1e017acc8f724bda900b  --  gehört zu Land
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -220,7 +220,7 @@ FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
 -- $$
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_themen_60b027d432c64ef48083  --  gehört zu Thema
+ADD CONSTRAINT fk_indikatoren_themen_c011c13f41ed44efad03  --  gehört zu Thema
 FOREIGN KEY (themen_id) REFERENCES tab_themen(themen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -228,7 +228,7 @@ FOREIGN KEY (themen_id) REFERENCES tab_themen(themen_id)
 -- $$
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_quellen_05c0331ea311466984a1  --  von Quelle
+ADD CONSTRAINT fk_indikatoren_quellen_fb027f5db7a64ffbaefc  --  von Quelle
 FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -236,7 +236,7 @@ FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
 -- $$
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_einheiten_5971028f16e24cdfb143  --  hat Einheit
+ADD CONSTRAINT fk_indikatoren_einheiten_9093dfb11f534906a398  --  hat Einheit
 FOREIGN KEY (einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -244,7 +244,7 @@ FOREIGN KEY (einheiten_id) REFERENCES tab_einheiten(einheiten_id)
 -- $$
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_kontinente_76d1a8db16444b4cb9e2  --  gehört zu Kontinent
+ADD CONSTRAINT fk_laender_kontinente_64e3d4f400414f0b8912  --  gehört zu Kontinent
 FOREIGN KEY (kontinente_id) REFERENCES tab_kontinente(kontinente_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -252,7 +252,7 @@ FOREIGN KEY (kontinente_id) REFERENCES tab_kontinente(kontinente_id)
 -- $$
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_a402ecde61fd4473b990  --  hat dt. Namen
+ADD CONSTRAINT fk_laender_laendernamen_a6dedd7dc30b4ccea100  --  hat dt. Namen
 FOREIGN KEY (laendernamen_de_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -260,7 +260,7 @@ FOREIGN KEY (laendernamen_de_id) REFERENCES tab_laendernamen(laendernamen_id)
 -- $$
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_e6bff267b2b74d5caa59  --  hat en. Namen
+ADD CONSTRAINT fk_laender_laendernamen_8c6e109693b54e85a7a6  --  hat en. Namen
 FOREIGN KEY (laendernamen_en_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -268,7 +268,7 @@ FOREIGN KEY (laendernamen_en_id) REFERENCES tab_laendernamen(laendernamen_id)
 -- $$
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_laender_a09268efc97440c18d11  --  für Land
+ADD CONSTRAINT fk_daten_laender_1d5ce5abffa444a0aef4  --  für Land
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -276,7 +276,7 @@ FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
 -- $$
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_indikatoren_7cce05f7f53240c185b3  --  für Indikator
+ADD CONSTRAINT fk_daten_indikatoren_6a2601d04c8b4d9980a9  --  für Indikator
 FOREIGN KEY (indikatoren_id) REFERENCES tab_indikatoren(indikatoren_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -284,7 +284,7 @@ FOREIGN KEY (indikatoren_id) REFERENCES tab_indikatoren(indikatoren_id)
 -- $$
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_80e225d2933d463faba0  --  ordnet Land zu
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_b4db19f543554c28b220  --  ordnet Land zu
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -292,7 +292,7 @@ FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
 -- $$
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_153c31ea9f18477081f8  --  ordnet Länderguppe zu
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_840a90a8abb94557bd38  --  ordnet Länderguppe zu
 FOREIGN KEY (laendergruppen_id) REFERENCES tab_laendergruppen(laendergruppen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
