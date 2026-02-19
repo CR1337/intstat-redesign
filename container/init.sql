@@ -271,73 +271,73 @@ CREATE TABLE IF NOT EXISTS tab_laendergruppenzuordnungen (
 );
 
 ALTER TABLE tab_einheiten
-ADD CONSTRAINT fk_einheiten_einheiten_52e129cbdf7b4025a57e  --  hat Basiseinheit
+ADD CONSTRAINT fk_einheiten_einheiten_77e85ac1a2574e6cbd3a  --  hat Basiseinheit
 FOREIGN KEY (basis_einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendernamen
-ADD CONSTRAINT fk_laendernamen_laender_72f1b7bb9a81432087f3  --  gehört zu Land
+ADD CONSTRAINT fk_laendernamen_laender_aed4f5d0f6a842498c53  --  gehört zu Land
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_themen_3872d8ce605248498eb6  --  gehört zu Thema
+ADD CONSTRAINT fk_indikatoren_themen_6168d6923fe846f5ada7  --  gehört zu Thema
 FOREIGN KEY (themen_id) REFERENCES tab_themen(themen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_quellen_cf3895f5923d4e98ae03  --  von Quelle
+ADD CONSTRAINT fk_indikatoren_quellen_07da993be5534b8381fe  --  von Quelle
 FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_einheiten_2e18f642ff2a4917a115  --  hat Einheit
+ADD CONSTRAINT fk_indikatoren_einheiten_a1dcf1a1a2544feea79d  --  hat Einheit
 FOREIGN KEY (einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_kontinente_614addab148e4fb495d9  --  gehört zu Kontinent
+ADD CONSTRAINT fk_laender_kontinente_3612229071c14ca0a26c  --  gehört zu Kontinent
 FOREIGN KEY (kontinente_id) REFERENCES tab_kontinente(kontinente_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_06ab6afdd987428a9af9  --  hat dt. Namen
+ADD CONSTRAINT fk_laender_laendernamen_b6b256d17a29453abf06  --  hat dt. Namen
 FOREIGN KEY (laendernamen_de_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_af00a3ada2a547e78889  --  hat en. Namen
+ADD CONSTRAINT fk_laender_laendernamen_e9e0e07783f341b2b2ae  --  hat en. Namen
 FOREIGN KEY (laendernamen_en_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_laender_3e7695849c8d4c0bbde9  --  für Land
+ADD CONSTRAINT fk_daten_laender_201e2c8a8692440fa9b6  --  für Land
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_indikatoren_51773d2af471482ca266  --  für Indikator
+ADD CONSTRAINT fk_daten_indikatoren_963db5b3a19b482b8773  --  für Indikator
 FOREIGN KEY (indikatoren_id) REFERENCES tab_indikatoren(indikatoren_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_52f5b46f76f24754bc33  --  ordnet Land zu
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_4d305e17931841998392  --  ordnet Land zu
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_447ac8b6899e41fd9721  --  ordnet Länderguppe zu
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_0d7ab51150ad4666b308  --  ordnet Länderguppe zu
 FOREIGN KEY (laendergruppen_id) REFERENCES tab_laendergruppen(laendergruppen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -679,7 +679,7 @@ BEFORE DELETE ON tab_nutzer
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Löschen (DELETE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -691,7 +691,7 @@ BEFORE DELETE ON tab_quellen
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Löschen (DELETE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -703,7 +703,7 @@ BEFORE DELETE ON tab_themen
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Löschen (DELETE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -715,7 +715,7 @@ BEFORE DELETE ON tab_einheiten
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Löschen (DELETE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -727,7 +727,7 @@ BEFORE DELETE ON tab_laendernamen
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Löschen (DELETE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -739,7 +739,7 @@ BEFORE DELETE ON tab_kontinente
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Löschen (DELETE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -751,7 +751,7 @@ BEFORE DELETE ON tab_laendergruppen
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Löschen (DELETE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -763,7 +763,7 @@ BEFORE DELETE ON tab_indikatoren
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Löschen (DELETE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -775,7 +775,7 @@ BEFORE DELETE ON tab_laender
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Löschen (DELETE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -787,7 +787,7 @@ BEFORE DELETE ON tab_daten
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Löschen (DELETE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -799,7 +799,7 @@ BEFORE DELETE ON tab_laendergruppenzuordnungen
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Löschen (DELETE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -811,7 +811,7 @@ BEFORE UPDATE ON tab_nutzer
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -823,7 +823,7 @@ BEFORE UPDATE ON tab_quellen
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -835,7 +835,7 @@ BEFORE UPDATE ON tab_themen
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -847,7 +847,7 @@ BEFORE UPDATE ON tab_einheiten
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -859,7 +859,7 @@ BEFORE UPDATE ON tab_laendernamen
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -871,7 +871,7 @@ BEFORE UPDATE ON tab_kontinente
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -883,7 +883,7 @@ BEFORE UPDATE ON tab_laendergruppen
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -895,7 +895,7 @@ BEFORE UPDATE ON tab_indikatoren
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -907,7 +907,7 @@ BEFORE UPDATE ON tab_laender
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -919,7 +919,7 @@ BEFORE UPDATE ON tab_daten
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -931,7 +931,7 @@ BEFORE UPDATE ON tab_laendergruppenzuordnungen
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;
@@ -945,7 +945,7 @@ BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
     END IF;
 
     IF EXISTS (
@@ -956,7 +956,7 @@ BEGIN
             AND nutzer_id <> NEW.nutzer_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name ) in nutzer ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name ) in nutzer ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -971,7 +971,7 @@ BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
     END IF;
 
     IF EXISTS (
@@ -982,7 +982,7 @@ BEGIN
             AND quellen_id <> NEW.quellen_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name_de ) in quellen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_de ) in quellen ist nicht erlaubt!';
     END IF;
     IF EXISTS (
         SELECT 1
@@ -992,7 +992,7 @@ BEGIN
             AND quellen_id <> NEW.quellen_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name_en ) in quellen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_en ) in quellen ist nicht erlaubt!';
     END IF;
     IF EXISTS (
         SELECT 1
@@ -1002,7 +1002,7 @@ BEGIN
             AND quellen_id <> NEW.quellen_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name_kurz_de ) in quellen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_kurz_de ) in quellen ist nicht erlaubt!';
     END IF;
     IF EXISTS (
         SELECT 1
@@ -1012,7 +1012,7 @@ BEGIN
             AND quellen_id <> NEW.quellen_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name_kurz_en ) in quellen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_kurz_en ) in quellen ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1027,7 +1027,7 @@ BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
     END IF;
 
     IF EXISTS (
@@ -1038,7 +1038,7 @@ BEGIN
             AND themen_id <> NEW.themen_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name_de ) in themen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_de ) in themen ist nicht erlaubt!';
     END IF;
     IF EXISTS (
         SELECT 1
@@ -1048,7 +1048,7 @@ BEGIN
             AND themen_id <> NEW.themen_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name_en ) in themen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_en ) in themen ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1063,7 +1063,7 @@ BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
     END IF;
 
     IF EXISTS (
@@ -1074,7 +1074,7 @@ BEGIN
             AND einheiten_id <> NEW.einheiten_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( symbol_de ) in einheiten ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( symbol_de ) in einheiten ist nicht erlaubt!';
     END IF;
     IF EXISTS (
         SELECT 1
@@ -1084,7 +1084,7 @@ BEGIN
             AND einheiten_id <> NEW.einheiten_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( symbol_en ) in einheiten ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( symbol_en ) in einheiten ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1099,7 +1099,7 @@ BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
     END IF;
 
     IF EXISTS (
@@ -1110,7 +1110,7 @@ BEGIN
             AND laendernamen_id <> NEW.laendernamen_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name ) in laendernamen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name ) in laendernamen ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1125,7 +1125,7 @@ BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
     END IF;
 
     IF EXISTS (
@@ -1136,7 +1136,7 @@ BEGIN
             AND kontinente_id <> NEW.kontinente_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name_de ) in kontinente ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_de ) in kontinente ist nicht erlaubt!';
     END IF;
     IF EXISTS (
         SELECT 1
@@ -1146,7 +1146,7 @@ BEGIN
             AND kontinente_id <> NEW.kontinente_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name_en ) in kontinente ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_en ) in kontinente ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1161,7 +1161,7 @@ BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
     END IF;
 
     IF EXISTS (
@@ -1172,7 +1172,7 @@ BEGIN
             AND laendergruppen_id <> NEW.laendergruppen_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name_de ) in laendergruppen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_de ) in laendergruppen ist nicht erlaubt!';
     END IF;
     IF EXISTS (
         SELECT 1
@@ -1182,7 +1182,7 @@ BEGIN
             AND laendergruppen_id <> NEW.laendergruppen_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name_en ) in laendergruppen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_en ) in laendergruppen ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1197,7 +1197,7 @@ BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
     END IF;
 
     IF EXISTS (
@@ -1208,7 +1208,7 @@ BEGIN
             AND indikatoren_id <> NEW.indikatoren_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name_de ) in indikatoren ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_de ) in indikatoren ist nicht erlaubt!';
     END IF;
     IF EXISTS (
         SELECT 1
@@ -1218,7 +1218,7 @@ BEGIN
             AND indikatoren_id <> NEW.indikatoren_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( name_en ) in indikatoren ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_en ) in indikatoren ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1233,7 +1233,7 @@ BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
     END IF;
 
     IF EXISTS (
@@ -1244,7 +1244,7 @@ BEGIN
             AND laender_id <> NEW.laender_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( laendernamen_de_id ) in laender ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( laendernamen_de_id ) in laender ist nicht erlaubt!';
     END IF;
     IF EXISTS (
         SELECT 1
@@ -1254,7 +1254,7 @@ BEGIN
             AND laender_id <> NEW.laender_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( laendernamen_en_id ) in laender ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( laendernamen_en_id ) in laender ist nicht erlaubt!';
     END IF;
     IF EXISTS (
         SELECT 1
@@ -1264,7 +1264,7 @@ BEGIN
             AND laender_id <> NEW.laender_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( iso2 ) in laender ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( iso2 ) in laender ist nicht erlaubt!';
     END IF;
     IF EXISTS (
         SELECT 1
@@ -1274,7 +1274,7 @@ BEGIN
             AND laender_id <> NEW.laender_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( iso3 ) in laender ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( iso3 ) in laender ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1289,7 +1289,7 @@ BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
     END IF;
 
     IF EXISTS (
@@ -1301,7 +1301,7 @@ BEGIN
             AND daten_id <> NEW.daten_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( laender_id  indikatoren_id ) in daten ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( laender_id  indikatoren_id ) in daten ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1316,7 +1316,7 @@ BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
     END IF;
 
     IF EXISTS (
@@ -1328,7 +1328,7 @@ BEGIN
             AND laendergruppenzuordnungen_id <> NEW.laendergruppenzuordnungen_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ( laender_id  laendergruppen_id ) in laendergruppenzuordnungen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( laender_id  laendergruppen_id ) in laendergruppenzuordnungen ist nicht erlaubt!';
     END IF;
 END$$
 

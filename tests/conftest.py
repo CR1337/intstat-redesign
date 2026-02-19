@@ -7,7 +7,7 @@ import mysql.connector
 from mysql.connector import Error
 from typing import Any, Dict, List
 
-USERNAME: str = "write-1"
+USERNAME: str = "super"
 
 DATABASES: List[Dict[str, str | int]] = [
     {

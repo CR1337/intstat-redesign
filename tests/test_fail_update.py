@@ -20,5 +20,5 @@ def test_fail_update(database_connection, table_definition):
     with pytest.raises(DatabaseError) as exc_info:
         run(connection, f"UPDATE tab_{table_name} SET ist_aktiv = FALSE;")
 
-    assert "Aktualisieren (UPDATE) von Einträgen ist nicht erlaubt!" in str(exc_info.value)
+    assert "Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!" in str(exc_info.value)
     assert exc_info.value.sqlstate == '45000'

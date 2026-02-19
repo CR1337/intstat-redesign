@@ -5,7 +5,7 @@ BEFORE UPDATE ON tab_{{ table_name }}
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;

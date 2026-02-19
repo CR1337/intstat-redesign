@@ -20,5 +20,5 @@ def test_fail_delete(database_connection, table_definition):
     with pytest.raises(DatabaseError) as exc_info:
         run(connection, f"DELETE FROM tab_{table_name};")
 
-    assert "Löschen (DELETE) von Einträgen ist nicht erlaubt!" in str(exc_info.value)
+    assert "Loeschen (DELETE) von Eintraegen ist nicht erlaubt!" in str(exc_info.value)
     assert exc_info.value.sqlstate == '45000'

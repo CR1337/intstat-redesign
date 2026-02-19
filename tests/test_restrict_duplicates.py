@@ -20,6 +20,6 @@ def test_restrict_duplicates(database_connection, table_definition):
     with pytest.raises(DatabaseError) as exc_info:
         procedure_insert(connection, table_name, arguments=results)
 
-    assert "Einfügen (INSERT) von Duplikaten (" in str(exc_info.value)
+    assert "Einfuegen (INSERT) von Duplikaten (" in str(exc_info.value)
     assert exc_info.value.sqlstate == '45000'
     

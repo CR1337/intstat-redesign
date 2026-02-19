@@ -5,7 +5,7 @@ BEFORE DELETE ON tab_{{ table_name }}
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Löschen (DELETE) von Einträgen ist nicht erlaubt!';
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
 END$$
 
 DELIMITER ;

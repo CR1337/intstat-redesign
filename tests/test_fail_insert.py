@@ -40,5 +40,5 @@ def test_fail_insert(database_connection, table_definition):
             ");"
         ]))
 
-    assert "Einfügen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!" in str(exc_info.value)
+    assert "Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!" in str(exc_info.value)
     assert exc_info.value.sqlstate == '45000'
