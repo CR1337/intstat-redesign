@@ -1,0 +1,28 @@
+[
+    
+    {
+        "name": "write-1",
+        "password": "password",
+        "privilege_level": "write"
+    },
+    {
+        "name": "write-2",
+        "password": "password",
+        "privilege_level": "write"
+    },
+    {
+        "name": "read-1",
+        "password": "password",
+        "privilege_level": "read"
+    },
+    {
+        "name": "read-2",
+        "password": "password",
+        "privilege_level": "read"
+    },
+    {
+        "name": "super",
+        "password": "password",
+        "privilege_level": "super"
+    }
+]

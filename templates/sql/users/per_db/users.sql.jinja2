@@ -1,0 +1,32 @@
+{# {% for user in users %}
+CREATE USER IF NOT EXISTS '{{ user.name }}'@'%' IDENTIFIED BY '{{ user.password }}';
+{% for privilege in privilege_levels[user.privilege_level] %}
+GRANT {{ privilege }} ON intstat2.* TO '{{ user.name }}'@'%';
+{% endfor %}
+{% endfor %}
+
+{% for user in users %}
+{% if user.privilege_level == 'super'%}
+GRANT SUPER ON *.* TO '{{ user.name }}'@'%';
+{% endif %}
+{% endfor %} #}
+
+{% for user in users %}
+CREATE USER IF NOT EXISTS '{{ user.name }}'@'%' IDENTIFIED BY '{{ user.password }}';
+{% endfor %}
+
+{% for user in users %}
+{% if user.privilege_level == "read" %}
+GRANT SELECT, SHOW VIEW ON intstat2.* TO '{{ user.name }}'@'%';
+{% elif user.privilege_level == "write" %}
+GRANT SELECT, EXECUTE, LOCK TABLES, SHOW VIEW ON intstat2.* TO '{{ user.name }}'@'%';
+{% elif user.privilege_level == "super" %}
+GRANT ALL PRIVILEGES ON intstat2.* TO '{{ user.name }}'@'%';
+GRANT SUPER ON *.* TO '{{ user.name }}'@'%';
+{% endif %}
+{% endfor %}
+
+
+FLUSH PRIVILEGES;
+
+USE intstat2;

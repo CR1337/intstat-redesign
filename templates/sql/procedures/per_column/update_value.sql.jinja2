@@ -1,3 +1,5 @@
+DELIMITER $$
+
 CREATE PROCEDURE update_value_{{ table_name }}_{{ column.name }}(
     IN {{ table_name }}_id_in INTEGER,
     IN value_in {{ column.type }}
@@ -12,7 +14,6 @@ BEGIN
     {% endfor %}
     {% endif %}
 
-    {% if user_tracking %}
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
     
@@ -25,7 +26,6 @@ BEGIN
         WHERE name = v_current_username
         LIMIT 1
     );
-    {% endif %}
 
     {% if (columns|length + foreign_keys|length > 1) %}
     SELECT 
@@ -53,9 +53,7 @@ BEGIN
     INSERT INTO tab_{{ table_name }}(
         gueltig_seit,
         ist_aktiv,
-        {% if user_tracking %}
         ersteller_nutzer_id,
-        {% endif %}
         {% for col in columns %}
         {{ col.name }},
         {% endfor %}
@@ -66,9 +64,7 @@ BEGIN
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
-        {% if user_tracking %}
         v_nutzer_id,
-        {% endif %}
         {% for col in columns %}
         {% if column.name == col.name %}
         value_in,
@@ -87,4 +83,6 @@ BEGIN
     );
 
     TRUNCATE TABLE __insert_allowed__;
-END;
+END$$
+
+DELIMITER ;

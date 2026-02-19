@@ -1,3 +1,5 @@
+DELIMITER $$
+
 CREATE TRIGGER trg_{{ table_name }}_insert
 BEFORE INSERT ON tab_{{ table_name }}
 FOR EACH ROW
@@ -22,4 +24,6 @@ BEGIN
         SET MESSAGE_TEXT = 'Einfügen (INSERT) von Duplikaten ({% for column in set %} {{ column }} {% endfor %}) in {{ table_name }} ist nicht erlaubt!';
     END IF;
     {% endfor %}
-END;
+END$$
+
+DELIMITER ;

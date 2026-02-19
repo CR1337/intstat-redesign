@@ -6,6 +6,8 @@ CONTAINER_NAME="mysql-test-container"
 # Überprüfe, ob der Container läuft
 if [ "$(docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null)" = "true" ]; then
     echo "Der Container '$CONTAINER_NAME' läuft."
+    exit 0
 else
     echo "Der Container '$CONTAINER_NAME' läuft *nicht*."
+    exit 1
 fi

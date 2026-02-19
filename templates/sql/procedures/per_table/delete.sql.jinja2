@@ -1,3 +1,5 @@
+DELIMITER $$
+
 CREATE PROCEDURE delete_from_{{ table_name }}(
     IN {{ table_name }}_id_to_delete INTEGER
 )
@@ -9,7 +11,6 @@ BEGIN
     DECLARE v_{{ fk.name }} INTEGER;
     {% endfor %}
 
-    {% if user_tracking %}
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
     
@@ -22,7 +23,6 @@ BEGIN
         WHERE name = v_current_username
         LIMIT 1
     );
-    {% endif %}
 
     SELECT 
         {% for col in columns %}
@@ -48,9 +48,7 @@ BEGIN
     INSERT INTO tab_{{ table_name }}(
         gueltig_seit,
         ist_aktiv,
-        {% if user_tracking %}
         ersteller_nutzer_id,
-        {% endif %}
         {% for col in columns %}
         {{ col.name }},
         {% endfor %}
@@ -61,9 +59,7 @@ BEGIN
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         FALSE,
-        {% if user_tracking %}
         v_nutzer_id,
-        {% endif %}
         {% for col in columns %}
         v_{{ col.name }},
         {% endfor %}
@@ -75,4 +71,6 @@ BEGIN
 
     TRUNCATE TABLE __insert_allowed__;
    
-END;    
+END$$
+
+DELIMITER ;

@@ -2,15 +2,29 @@
 set -euo pipefail
 trap 'echo "Error on line $LINENO. Exit code: $?"; exit 1' ERR
 
-bin/stop
-bin/remove
+if bin/check-running; then
+    echo "Stoppe container..."
+    bin/stop
+fi
+
+if bin/check-exists; then
+    echo "Entferne image..."
+    bin/remove
+fi
+
+echo "Erstelle container..."
 bin/build
-python3 make.py
+
+echo "Erzeuge SQL..."
+bin/make
+
+echo "Starte container..."
 bin/run
-python3 build_db.py
+bin/wait-for-mysql
 
 for arg in "$@"; do
   if [ "$arg" = "-t" ]; then
+    echo "Starte tests..."
     bin/test
     break
   fi

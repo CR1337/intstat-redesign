@@ -1,10 +1,10 @@
-{% if user_tracking %}
+DELIMITER $$
+
 CREATE FUNCTION get_aktuellen_nutzer_namen()
 RETURNS VARCHAR(256)
 NO SQL
 BEGIN
     RETURN SUBSTRING_INDEX(CURRENT_USER(), '@', 1);
-END;
-{% else %}
-DO 1;
-{% endif %}
+END$$
+
+DELIMITER ;

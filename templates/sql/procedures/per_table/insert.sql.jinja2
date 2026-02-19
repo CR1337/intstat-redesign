@@ -1,3 +1,5 @@
+DELIMITER $$
+
 CREATE PROCEDURE insert_into_{{ table_name }}(
     {% for col in columns %}
     IN {{ col.name }}_in {{ col.type }},
@@ -9,12 +11,9 @@ CREATE PROCEDURE insert_into_{{ table_name }}(
 )
 BEGIN
     DECLARE v_new_id INTEGER;
-    {% if user_tracking %}
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
-    {% endif %}
 
-    {% if user_tracking %}
     CALL insert_current_nutzer();
 
     SET v_current_username = get_aktuellen_nutzer_namen();
@@ -24,7 +23,6 @@ BEGIN
         WHERE name = v_current_username
         LIMIT 1
     );
-    {% endif %}
 
     START TRANSACTION;
 
@@ -40,9 +38,7 @@ BEGIN
     INSERT INTO tab_{{ table_name }}(
         gueltig_seit,
         ist_aktiv,
-        {% if user_tracking %}
         ersteller_nutzer_id,
-        {% endif %}
         {% for col in columns %}
         {{ col.name }},
         {% endfor %}
@@ -53,9 +49,7 @@ BEGIN
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
-        {% if user_tracking %}
         v_nutzer_id,
-        {% endif %}
         {% for col in columns %}
         {{ col.name }}_in,
         {% endfor %}
@@ -70,4 +64,6 @@ BEGIN
     SET new_{{ table_name }}_id_out = v_new_id;
     
     COMMIT;
-END;
+END$$
+
+DELIMITER ;

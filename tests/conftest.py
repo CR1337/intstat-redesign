@@ -7,7 +7,7 @@ import mysql.connector
 from mysql.connector import Error
 from typing import Any, Dict, List
 
-USERNAME: str = "user"
+USERNAME: str = "write-1"
 
 DATABASES: List[Dict[str, str | int]] = [
     {
@@ -15,14 +15,13 @@ DATABASES: List[Dict[str, str | int]] = [
         "port": 3306,
         "user": USERNAME,
         "password": "password",
-        "database": f"intstat2_{name}"
+        "database": "intstat2"
     }
-    for name in ("wt", "wot")
 ]
 
 USER_TABLE_NAME: str = "nutzer"
 
-TABLE_DEFINITIONS_DIRECTORY: str = "table_definitions"
+TABLE_DEFINITIONS_DIRECTORY: str = os.path.join("database_definition", "tables")
 
 
 def fetch(connection, statement) -> Any:
@@ -82,7 +81,7 @@ def table_definition(request):
 def get_random_value(type_: str = "INTEGER", quote_text: bool = False) -> Any:
     match type_:
         case "INTEGER":
-            return randint(-(2 ** 31 - 1), -1)
+            return randint(-(2 ** 31), -1)
         
         case "DATE":
             year = randint(1970, 2000)

@@ -1,4 +1,5 @@
-{% if user_tracking %}
+DELIMITER $$
+
 CREATE PROCEDURE insert_current_nutzer()
 BEGIN
     DECLARE v_current_username VARCHAR(256);
@@ -40,7 +41,6 @@ BEGIN
         TRUNCATE TABLE __insert_allowed__;
 
     END IF;
-END;
-{% else %}
-DO 1;
-{% endif %}
+END$$
+
+DELIMITER ;

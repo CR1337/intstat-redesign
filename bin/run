@@ -1,3 +1,9 @@
 #!/bin/bash
 
-docker run --name mysql-test-container -p 3306:3306 -d mysql-test-image
+CONTAINER_NAME="mysql-test-container"
+TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")  # Format: YYYY-MM-DD_HH-MM-SS
+LOG_FILE="logs/mysql-container_${TIMESTAMP}.log"
+
+docker run --name "$CONTAINER_NAME" -p 3306:3306 -d mysql-test-image
+
+docker logs -f "$CONTAINER_NAME" >> "$LOG_FILE" 2>&1 &

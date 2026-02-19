@@ -1,0 +1,18 @@
+{
+    "read": [
+        "SELECT",
+        "SHOW VIEW"
+    ],
+    "write": [
+        "SELECT",
+        "SHOW VIEW",
+        "EXECUTE",
+        "LOCK TABLES"
+    ],
+    "admin": [
+        "ALL PRIVILEGES"
+    ],
+    "super": [
+        "ALL PRIVILEGES"
+    ]
+}
