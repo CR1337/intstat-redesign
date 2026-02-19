@@ -1,9 +1,6 @@
 # Verwende das offizielle MySQL 8.0.22 Image als Basis
 FROM mysql:8.0.22
 
-# Setze Umgebungsvariablen für MySQL
-ENV MYSQL_ROOT_PASSWORD=password
-
 # Kopiere die benutzerdefinierte MySQL-Konfiguration
 COPY container/my.cnf /etc/mysql/conf.d/
 

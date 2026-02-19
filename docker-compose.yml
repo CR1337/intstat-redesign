@@ -1,0 +1,17 @@
+services:
+  mysql:
+    image: mysql:8.0.22
+    container_name: mysql-test-container
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./container/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./container/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - intstat-network
+
+networks:
+  intstat-network:
+    driver: bridge

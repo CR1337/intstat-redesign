@@ -1,13 +1,10 @@
 #!/bin/bash
 
-# Name des Containers (ersetze dies mit deinem Containernamen, falls abweichend)
-CONTAINER_NAME="mysql-test-container"
-
-# Überprüfe, ob der Container läuft
-if [ "$(docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null)" = "true" ]; then
-    echo "Der Container '$CONTAINER_NAME' läuft."
+# Check if the container is running
+if docker compose ps 2>/dev/null | grep mysql-test-container | grep -q Up; then
+    echo "The container 'mysql-test-container' is running."
     exit 0
 else
-    echo "Der Container '$CONTAINER_NAME' läuft *nicht*."
+    echo "The container 'mysql-test-container' is *not* running."
     exit 1
 fi

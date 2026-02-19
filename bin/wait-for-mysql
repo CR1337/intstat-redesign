@@ -1,23 +1,16 @@
 #!/bin/bash
 
-CONTAINER_NAME="mysql-test-container"
-MYSQL_USER="super"
-MYSQL_PASSWORD="password"
-MYSQL_PORT=3306
-
-
-
-echo "Waiting for MySQL in container '$CONTAINER_NAME' to be ready..."
+echo "Waiting for MySQL to be ready..."
 sleep 7
 
 # Wait until "MySQL init process done. Ready for start up." appears in logs
-while ! docker logs "$CONTAINER_NAME" 2>&1 | grep -q "MySQL init process done. Ready for start up."; do
+while ! docker compose logs 2>&1 | grep -q "MySQL init process done. Ready for start up."; do
     sleep 2
 done
 
 # Now wait until MySQL responds (final server)
-while ! docker exec "$CONTAINER_NAME" mysqladmin ping -uroot --silent &> /dev/null; do
+while ! docker compose exec -T mysql mysqladmin ping -uroot --silent &> /dev/null; do
     sleep 2
 done
 
-echo "MySQL in container '$CONTAINER_NAME' is ready."
+echo "MySQL is ready."
