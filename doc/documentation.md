@@ -22,17 +22,198 @@ SQL-Befehle wie `UPDATE` oder `DELETE` sind nicht erlaubt. Nur `INSERT` kann aus
 
 Zur Vereinfachung erfolgt die schreibende Interaktion mit der Datenbank ausschließlich über _Stored Procedures_. Die Lesende Interaktion kann über die Tabelle direkt erfolgen, ist jedoch einfacher über _Views_. So gibt es bspw. eine View, welche nur die aktuell gültigen zeilen anzeigt.
 
-## Entity Relationship Diagramme
-
-### Ohne Nutzer Tracking
+## Entity Relationship Diagramm
 
 ```mermaid
+---
+config:
+    layout: elk
+---
+erDiagram
 
-```
+        tab_daten {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER daten_id PK
 
-### Mit Nutzer Tracking
+                INTEGER laender_id FK
+                INTEGER indikatoren_id FK
 
-```mermaid
+                DATE datum
+                DOUBLE wert
+        }
+
+            tab_laender ||--o{ tab_daten : "für Land"
+            tab_indikatoren ||--o{ tab_daten : "für Indikator"
+        tab_nutzer ||--o{ tab_daten : "erstellt von"
+
+
+        tab_laendergruppen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER laendergruppen_id PK
+
+
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
+        }
+
+        tab_nutzer ||--o{ tab_laendergruppen : "erstellt von"
+
+
+        tab_laendergruppenzuordnungen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER laendergruppenzuordnungen_id PK
+
+                INTEGER laender_id FK
+                INTEGER laendergruppen_id FK
+
+        }
+
+            tab_laender ||--o{ tab_laendergruppenzuordnungen : "ordnet Land zu"
+            tab_laendergruppen ||--o{ tab_laendergruppenzuordnungen : "ordnet Länderguppe zu"
+        tab_nutzer ||--o{ tab_laendergruppenzuordnungen : "erstellt von"
+
+
+        tab_nutzer {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER nutzer_id PK
+
+
+                VARCHAR(256) name
+        }
+
+        tab_nutzer ||--o{ tab_nutzer : "erstellt von"
+
+
+        tab_quellen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER quellen_id PK
+
+
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
+                VARCHAR(16) name_kurz_de
+                VARCHAR(16) name_kurz_en
+        }
+
+        tab_nutzer ||--o{ tab_quellen : "erstellt von"
+
+
+        tab_indikatoren {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER indikatoren_id PK
+
+                INTEGER themen_id FK
+                INTEGER quellen_id FK
+                INTEGER einheiten_id FK
+
+                DOUBLE faktor
+                TINYINT_UNSIGNED dezimalstellen
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
+                VARCHAR(4096) beschreibung_de
+                VARCHAR(4096) beschreibung_en
+        }
+
+            tab_themen ||--o{ tab_indikatoren : "gehört zu Thema"
+            tab_quellen ||--o{ tab_indikatoren : "von Quelle"
+            tab_einheiten ||--o{ tab_indikatoren : "hat Einheit"
+        tab_nutzer ||--o{ tab_indikatoren : "erstellt von"
+
+
+        tab_themen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER themen_id PK
+
+
+                VARCHAR(64) name_de
+                VARCHAR(64) name_en
+                TINYINT_UNSIGNED farbe_r
+                TINYINT_UNSIGNED farbe_g
+                TINYINT_UNSIGNED farbe_b
+        }
+
+        tab_nutzer ||--o{ tab_themen : "erstellt von"
+
+
+        tab_laender {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER laender_id PK
+
+                INTEGER kontinente_id FK
+                INTEGER laendernamen_de_id FK
+                INTEGER laendernamen_en_id FK
+
+                VARCHAR(2) iso2
+                VARCHAR(3) iso3
+        }
+
+            tab_kontinente ||--o{ tab_laender : "gehört zu Kontinent"
+            tab_laendernamen ||--o{ tab_laender : "hat dt. Namen"
+            tab_laendernamen ||--o{ tab_laender : "hat en. Namen"
+        tab_nutzer ||--o{ tab_laender : "erstellt von"
+
+
+        tab_einheiten {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER einheiten_id PK
+
+                INTEGER basis_einheiten_id FK
+
+                DOUBLE faktor
+                VARCHAR(64) symbol_de
+                VARCHAR(64) symbol_en
+        }
+
+            tab_einheiten ||--o{ tab_einheiten : "hat Basiseinheit"
+        tab_nutzer ||--o{ tab_einheiten : "erstellt von"
+
+
+        tab_laendernamen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER laendernamen_id PK
+
+                INTEGER laender_id FK
+
+                VARCHAR(256) name
+        }
+
+            tab_laender ||--o{ tab_laendernamen : "gehört zu Land"
+        tab_nutzer ||--o{ tab_laendernamen : "erstellt von"
+
+
+        tab_kontinente {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER kontinente_id PK
+
+
+                VARCHAR(64) name_de
+                VARCHAR(64) name_en
+        }
+
+        tab_nutzer ||--o{ tab_kontinente : "erstellt von"
+
 
 ```
 
