@@ -4,10 +4,10 @@ set -e
 ARCH=$(uname -m)
 
 if [[ "$ARCH" == "x86_64" ]]; then
-    cp Dockerfile.amd64 Dockerfile
+    cp docker-compose.yml.amd64 docker-compose.yml
     echo "Selected Dockerfile.amd64 for amd64 architecture."
 elif [[ "$ARCH" == "aarch64" ]]; then
-    cp Dockerfile.arm64 Dockerfile
+    cp docker-compose.yml.arm64 docker-compose.yml
     echo "Selected Dockerfile.arm64 for arm64 architecture."
 else
     echo "Unsupported architecture: $ARCH"
