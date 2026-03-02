@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+ARCH=$(uname -m)
+
+if [[ "$ARCH" == "x86_64" ]]; then
+    cp Dockerfile.amd64 Dockerfile
+    echo "Selected Dockerfile.amd64 for amd64 architecture."
+elif [[ "$ARCH" == "aarch64" ]]; then
+    cp Dockerfile.arm64 Dockerfile
+    echo "Selected Dockerfile.arm64 for arm64 architecture."
+else
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+fi

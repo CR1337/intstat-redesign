@@ -2,6 +2,9 @@
 set -euo pipefail
 trap 'echo "Error on line $LINENO. Exit code: $?"; exit 1' ERR
 
+echo "Wähle zur Architektur passendes Dockerfile aus..."
+bin/select-dockerfile
+
 if bin/check-running; then
     echo "Stoppe container..."
     bin/stop
