@@ -10,5 +10,8 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-apt update && sudo apt upgrade -y
-apt install -y r-base
+apt upgrade -y
+apt install -y unixodbc unixodbc-dev
+apt install -y odbc-mariadb
+cp ./odbc.ini /etc/odbc.ini
+cp ./odbcinst.ini /etc/odbcinst.ini

@@ -10,7 +10,7 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-apt install nginx
+apt install -y nginx
 cp ./nginx.conf /etc/nginx/sites-enabled/default
 
 # Path to the Nginx service file

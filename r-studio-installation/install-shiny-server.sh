@@ -10,5 +10,5 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-apt -y install cmake
+apt install -y cmake
 wget -O - https://raw.githubusercontent.com/pjaselin/ShinyServer_On_RaspberryPi/master/StableInstall_RPiShinyServer.sh | bash
