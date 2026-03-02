@@ -9,22 +9,4 @@ In diesem Ordner befinden sich drei Installationsskripte, die nacheinander ausge
 3. **install-rstudio-server.sh**
 	- Installiert den RStudio Server für browserbasiertes Arbeiten mit R.
 
-
-**Automatische Ausführung mit screen:**
-Sie können alle drei Installationsschritte automatisch und in der richtigen Reihenfolge in einer eigenen screen-Session ausführen. So läuft die Installation weiter, auch wenn die SSH-Verbindung getrennt wird.
-
-```bash
-bash pipeline.sh <session-name>
-```
-
-Ersetzen Sie `<session-name>` durch einen beliebigen Namen für die screen-Session (z.B. `rsetup`).
-
-Sie können den Fortschritt jederzeit mit folgendem Befehl beobachten:
-
-```bash
-screen -r <session-name>
-```
-
-Das Skript führt nacheinander `install-r.sh`, `install-shiny-server.sh` und `install-rstudio-server.sh` aus. Alle Skripte werden mit administrativen Rechten ausgeführt.
-
 _Quelle: [https://www.r-bloggers.com/2022/09/setting-up-your-own-shiny-and-rstudio-server-on-a-raspberry-pi/](https://www.r-bloggers.com/2022/09/setting-up-your-own-shiny-and-rstudio-server-on-a-raspberry-pi/)_
