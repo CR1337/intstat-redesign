@@ -27,7 +27,6 @@ apt install -y g++ gcc gfortran libreadline-dev libx11-dev libxt-dev \
 cd /usr/local/src
 echo -e "${GREEN}Lade R-Quellen herunter...${NC}"
 wget https://cran.rstudio.com/src/base/R-${R_VERSION:0:1}/R-$R_VERSION.tar.gz
-su
 echo -e "${GREEN}Entpacke R-Quellen...${NC}"
 tar zxvf R-$R_VERSION.tar.gz
 cd R-$R_VERSION
