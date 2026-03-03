@@ -288,3 +288,9 @@ ON t.kontinente_id = latest.kontinente_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 ```
+
+### Bulk insert_into_kontinente
+
+```SQL
+
+```

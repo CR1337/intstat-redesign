@@ -271,73 +271,73 @@ CREATE TABLE IF NOT EXISTS tab_laendergruppenzuordnungen (
 );
 
 ALTER TABLE tab_einheiten
-ADD CONSTRAINT fk_einheiten_einheiten_15ee72000093458088e0  --  hat Basiseinheit
+ADD CONSTRAINT fk_einheiten_einheiten_cb644aa774384d85b15f  --  hat Basiseinheit
 FOREIGN KEY (basis_einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendernamen
-ADD CONSTRAINT fk_laendernamen_laender_99382293707b48e99773  --  gehört zu Land
+ADD CONSTRAINT fk_laendernamen_laender_ce52c32c55934e35833b  --  gehört zu Land
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_themen_c184718edc8c4ba1ad7c  --  gehört zu Thema
+ADD CONSTRAINT fk_indikatoren_themen_376e88fc79d04e2dab13  --  gehört zu Thema
 FOREIGN KEY (themen_id) REFERENCES tab_themen(themen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_quellen_79026ec0387b4f82a027  --  von Quelle
+ADD CONSTRAINT fk_indikatoren_quellen_6124ce54d2f341768ecc  --  von Quelle
 FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_einheiten_3320659500944dcf981d  --  hat Einheit
+ADD CONSTRAINT fk_indikatoren_einheiten_b9b655f5cc3f44cba26d  --  hat Einheit
 FOREIGN KEY (einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_kontinente_df2ec54bda7f4c7ba670  --  gehört zu Kontinent
+ADD CONSTRAINT fk_laender_kontinente_5d891a313f604ab4b763  --  gehört zu Kontinent
 FOREIGN KEY (kontinente_id) REFERENCES tab_kontinente(kontinente_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_648abc1c5ac146eb8a86  --  hat dt. Namen
+ADD CONSTRAINT fk_laender_laendernamen_ac493815d2ab4afca13f  --  hat dt. Namen
 FOREIGN KEY (laendernamen_de_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_ba74bf7dc9d644fb853c  --  hat en. Namen
+ADD CONSTRAINT fk_laender_laendernamen_41d36b8f228744e7ac5a  --  hat en. Namen
 FOREIGN KEY (laendernamen_en_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_laender_a068ac2371444042aea8  --  für Land
+ADD CONSTRAINT fk_daten_laender_361423277a014826a6c8  --  für Land
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_indikatoren_d7a51098fd5747009eb8  --  für Indikator
+ADD CONSTRAINT fk_daten_indikatoren_a0853b0f00e4436fa5ad  --  für Indikator
 FOREIGN KEY (indikatoren_id) REFERENCES tab_indikatoren(indikatoren_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_67f9f442f3004f22b4ae  --  ordnet Land zu
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_97f1c4ce4ec24b15a358  --  ordnet Land zu
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_a759d4a3688641bd92f5  --  ordnet Länderguppe zu
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_02b5b3244f3740498536  --  ordnet Länderguppe zu
 FOREIGN KEY (laendergruppen_id) REFERENCES tab_laendergruppen(laendergruppen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -1377,6 +1377,1097 @@ BEGIN
         TRUNCATE TABLE __insert_allowed__;
 
     END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE bulk_insert_into_nutzer(
+    OUT rows_inserted_out INTEGER
+)
+BEGIN
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    DECLARE v_new_id INTEGER;
+    DECLARE v_count INTEGER DEFAULT 0;
+
+    -- Ensure the current user is set
+    CALL insert_current_nutzer();
+
+    -- Get the current user's ID
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    -- Cursor to loop through the temporary table
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE name_val VARCHAR(256);
+
+    -- Temporary table must be created and populated before calling this procedure
+    DECLARE cur CURSOR FOR
+        SELECT
+            name_in,
+        FROM temp_nutzer_bulk;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO
+            name_val
+;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Get a new ID for each row
+        SET v_new_id = (
+            SELECT neue_nutzer_id
+            FROM view_nutzer_neue_id
+        );
+
+        -- Check if insert is allowed
+        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+        TRUNCATE TABLE __insert_allowed__;
+        INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+        -- Insert the row
+        INSERT INTO tab_nutzer(
+            gueltig_seit,
+            ist_aktiv,
+            ersteller_nutzer_id,
+            name,
+            nutzer_id
+        ) VALUES (
+            CURRENT_TIMESTAMP(6),
+            TRUE,
+            v_nutzer_id,
+            name_val,
+            v_new_id
+        );
+
+        TRUNCATE TABLE __insert_allowed__;
+        SET v_count = v_count + 1;
+    END LOOP;
+
+    CLOSE cur;
+
+    SET rows_inserted_out = v_count;
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE bulk_insert_into_quellen(
+    OUT rows_inserted_out INTEGER
+)
+BEGIN
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    DECLARE v_new_id INTEGER;
+    DECLARE v_count INTEGER DEFAULT 0;
+
+    -- Ensure the current user is set
+    CALL insert_current_nutzer();
+
+    -- Get the current user's ID
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    -- Cursor to loop through the temporary table
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE name_de_val VARCHAR(256);
+    DECLARE name_en_val VARCHAR(256);
+    DECLARE name_kurz_de_val VARCHAR(16);
+    DECLARE name_kurz_en_val VARCHAR(16);
+
+    -- Temporary table must be created and populated before calling this procedure
+    DECLARE cur CURSOR FOR
+        SELECT
+            name_de_in,
+            name_en_in,
+            name_kurz_de_in,
+            name_kurz_en_in,
+        FROM temp_quellen_bulk;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO
+            name_de_val
+,            name_en_val
+,            name_kurz_de_val
+,            name_kurz_en_val
+;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Get a new ID for each row
+        SET v_new_id = (
+            SELECT neue_quellen_id
+            FROM view_quellen_neue_id
+        );
+
+        -- Check if insert is allowed
+        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+        TRUNCATE TABLE __insert_allowed__;
+        INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+        -- Insert the row
+        INSERT INTO tab_quellen(
+            gueltig_seit,
+            ist_aktiv,
+            ersteller_nutzer_id,
+            name_de,
+            name_en,
+            name_kurz_de,
+            name_kurz_en,
+            quellen_id
+        ) VALUES (
+            CURRENT_TIMESTAMP(6),
+            TRUE,
+            v_nutzer_id,
+            name_de_val,
+            name_en_val,
+            name_kurz_de_val,
+            name_kurz_en_val,
+            v_new_id
+        );
+
+        TRUNCATE TABLE __insert_allowed__;
+        SET v_count = v_count + 1;
+    END LOOP;
+
+    CLOSE cur;
+
+    SET rows_inserted_out = v_count;
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE bulk_insert_into_themen(
+    OUT rows_inserted_out INTEGER
+)
+BEGIN
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    DECLARE v_new_id INTEGER;
+    DECLARE v_count INTEGER DEFAULT 0;
+
+    -- Ensure the current user is set
+    CALL insert_current_nutzer();
+
+    -- Get the current user's ID
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    -- Cursor to loop through the temporary table
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE name_de_val VARCHAR(64);
+    DECLARE name_en_val VARCHAR(64);
+    DECLARE farbe_r_val TINYINT UNSIGNED;
+    DECLARE farbe_g_val TINYINT UNSIGNED;
+    DECLARE farbe_b_val TINYINT UNSIGNED;
+
+    -- Temporary table must be created and populated before calling this procedure
+    DECLARE cur CURSOR FOR
+        SELECT
+            name_de_in,
+            name_en_in,
+            farbe_r_in,
+            farbe_g_in,
+            farbe_b_in,
+        FROM temp_themen_bulk;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO
+            name_de_val
+,            name_en_val
+,            farbe_r_val
+,            farbe_g_val
+,            farbe_b_val
+;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Get a new ID for each row
+        SET v_new_id = (
+            SELECT neue_themen_id
+            FROM view_themen_neue_id
+        );
+
+        -- Check if insert is allowed
+        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+        TRUNCATE TABLE __insert_allowed__;
+        INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+        -- Insert the row
+        INSERT INTO tab_themen(
+            gueltig_seit,
+            ist_aktiv,
+            ersteller_nutzer_id,
+            name_de,
+            name_en,
+            farbe_r,
+            farbe_g,
+            farbe_b,
+            themen_id
+        ) VALUES (
+            CURRENT_TIMESTAMP(6),
+            TRUE,
+            v_nutzer_id,
+            name_de_val,
+            name_en_val,
+            farbe_r_val,
+            farbe_g_val,
+            farbe_b_val,
+            v_new_id
+        );
+
+        TRUNCATE TABLE __insert_allowed__;
+        SET v_count = v_count + 1;
+    END LOOP;
+
+    CLOSE cur;
+
+    SET rows_inserted_out = v_count;
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE bulk_insert_into_einheiten(
+    OUT rows_inserted_out INTEGER
+)
+BEGIN
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    DECLARE v_new_id INTEGER;
+    DECLARE v_count INTEGER DEFAULT 0;
+
+    -- Ensure the current user is set
+    CALL insert_current_nutzer();
+
+    -- Get the current user's ID
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    -- Cursor to loop through the temporary table
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE faktor_val DOUBLE;
+    DECLARE symbol_de_val VARCHAR(64);
+    DECLARE symbol_en_val VARCHAR(64);
+    DECLARE basis_einheiten_val INTEGER;
+
+    -- Temporary table must be created and populated before calling this procedure
+    DECLARE cur CURSOR FOR
+        SELECT
+            faktor_in,
+            symbol_de_in,
+            symbol_en_in,
+            basis_einheiten_in
+        FROM temp_einheiten_bulk;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO
+            faktor_val
+,            symbol_de_val
+,            symbol_en_val
+ basis_einheiten_val
+;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Get a new ID for each row
+        SET v_new_id = (
+            SELECT neue_einheiten_id
+            FROM view_einheiten_neue_id
+        );
+
+        -- Check if insert is allowed
+        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+        TRUNCATE TABLE __insert_allowed__;
+        INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+        -- Insert the row
+        INSERT INTO tab_einheiten(
+            gueltig_seit,
+            ist_aktiv,
+            ersteller_nutzer_id,
+            faktor,
+            symbol_de,
+            symbol_en,
+            basis_einheiten_id,
+            einheiten_id
+        ) VALUES (
+            CURRENT_TIMESTAMP(6),
+            TRUE,
+            v_nutzer_id,
+            faktor_val,
+            symbol_de_val,
+            symbol_en_val,
+            basis_einheiten_val,
+            v_new_id
+        );
+
+        TRUNCATE TABLE __insert_allowed__;
+        SET v_count = v_count + 1;
+    END LOOP;
+
+    CLOSE cur;
+
+    SET rows_inserted_out = v_count;
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE bulk_insert_into_laendernamen(
+    OUT rows_inserted_out INTEGER
+)
+BEGIN
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    DECLARE v_new_id INTEGER;
+    DECLARE v_count INTEGER DEFAULT 0;
+
+    -- Ensure the current user is set
+    CALL insert_current_nutzer();
+
+    -- Get the current user's ID
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    -- Cursor to loop through the temporary table
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE name_val VARCHAR(256);
+    DECLARE laender_val INTEGER;
+
+    -- Temporary table must be created and populated before calling this procedure
+    DECLARE cur CURSOR FOR
+        SELECT
+            name_in,
+            laender_in
+        FROM temp_laendernamen_bulk;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO
+            name_val
+ laender_val
+;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Get a new ID for each row
+        SET v_new_id = (
+            SELECT neue_laendernamen_id
+            FROM view_laendernamen_neue_id
+        );
+
+        -- Check if insert is allowed
+        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+        TRUNCATE TABLE __insert_allowed__;
+        INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+        -- Insert the row
+        INSERT INTO tab_laendernamen(
+            gueltig_seit,
+            ist_aktiv,
+            ersteller_nutzer_id,
+            name,
+            laender_id,
+            laendernamen_id
+        ) VALUES (
+            CURRENT_TIMESTAMP(6),
+            TRUE,
+            v_nutzer_id,
+            name_val,
+            laender_val,
+            v_new_id
+        );
+
+        TRUNCATE TABLE __insert_allowed__;
+        SET v_count = v_count + 1;
+    END LOOP;
+
+    CLOSE cur;
+
+    SET rows_inserted_out = v_count;
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE bulk_insert_into_kontinente(
+    OUT rows_inserted_out INTEGER
+)
+BEGIN
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    DECLARE v_new_id INTEGER;
+    DECLARE v_count INTEGER DEFAULT 0;
+
+    -- Ensure the current user is set
+    CALL insert_current_nutzer();
+
+    -- Get the current user's ID
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    -- Cursor to loop through the temporary table
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE name_de_val VARCHAR(64);
+    DECLARE name_en_val VARCHAR(64);
+
+    -- Temporary table must be created and populated before calling this procedure
+    DECLARE cur CURSOR FOR
+        SELECT
+            name_de_in,
+            name_en_in,
+        FROM temp_kontinente_bulk;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO
+            name_de_val
+,            name_en_val
+;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Get a new ID for each row
+        SET v_new_id = (
+            SELECT neue_kontinente_id
+            FROM view_kontinente_neue_id
+        );
+
+        -- Check if insert is allowed
+        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+        TRUNCATE TABLE __insert_allowed__;
+        INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+        -- Insert the row
+        INSERT INTO tab_kontinente(
+            gueltig_seit,
+            ist_aktiv,
+            ersteller_nutzer_id,
+            name_de,
+            name_en,
+            kontinente_id
+        ) VALUES (
+            CURRENT_TIMESTAMP(6),
+            TRUE,
+            v_nutzer_id,
+            name_de_val,
+            name_en_val,
+            v_new_id
+        );
+
+        TRUNCATE TABLE __insert_allowed__;
+        SET v_count = v_count + 1;
+    END LOOP;
+
+    CLOSE cur;
+
+    SET rows_inserted_out = v_count;
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE bulk_insert_into_laendergruppen(
+    OUT rows_inserted_out INTEGER
+)
+BEGIN
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    DECLARE v_new_id INTEGER;
+    DECLARE v_count INTEGER DEFAULT 0;
+
+    -- Ensure the current user is set
+    CALL insert_current_nutzer();
+
+    -- Get the current user's ID
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    -- Cursor to loop through the temporary table
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE name_de_val VARCHAR(256);
+    DECLARE name_en_val VARCHAR(256);
+
+    -- Temporary table must be created and populated before calling this procedure
+    DECLARE cur CURSOR FOR
+        SELECT
+            name_de_in,
+            name_en_in,
+        FROM temp_laendergruppen_bulk;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO
+            name_de_val
+,            name_en_val
+;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Get a new ID for each row
+        SET v_new_id = (
+            SELECT neue_laendergruppen_id
+            FROM view_laendergruppen_neue_id
+        );
+
+        -- Check if insert is allowed
+        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+        TRUNCATE TABLE __insert_allowed__;
+        INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+        -- Insert the row
+        INSERT INTO tab_laendergruppen(
+            gueltig_seit,
+            ist_aktiv,
+            ersteller_nutzer_id,
+            name_de,
+            name_en,
+            laendergruppen_id
+        ) VALUES (
+            CURRENT_TIMESTAMP(6),
+            TRUE,
+            v_nutzer_id,
+            name_de_val,
+            name_en_val,
+            v_new_id
+        );
+
+        TRUNCATE TABLE __insert_allowed__;
+        SET v_count = v_count + 1;
+    END LOOP;
+
+    CLOSE cur;
+
+    SET rows_inserted_out = v_count;
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE bulk_insert_into_indikatoren(
+    OUT rows_inserted_out INTEGER
+)
+BEGIN
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    DECLARE v_new_id INTEGER;
+    DECLARE v_count INTEGER DEFAULT 0;
+
+    -- Ensure the current user is set
+    CALL insert_current_nutzer();
+
+    -- Get the current user's ID
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    -- Cursor to loop through the temporary table
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE faktor_val DOUBLE;
+    DECLARE dezimalstellen_val TINYINT UNSIGNED;
+    DECLARE name_de_val VARCHAR(256);
+    DECLARE name_en_val VARCHAR(256);
+    DECLARE beschreibung_de_val VARCHAR(4096);
+    DECLARE beschreibung_en_val VARCHAR(4096);
+    DECLARE themen_val INTEGER;
+    DECLARE quellen_val INTEGER;
+    DECLARE einheiten_val INTEGER;
+
+    -- Temporary table must be created and populated before calling this procedure
+    DECLARE cur CURSOR FOR
+        SELECT
+            faktor_in,
+            dezimalstellen_in,
+            name_de_in,
+            name_en_in,
+            beschreibung_de_in,
+            beschreibung_en_in,
+            themen_in
+,            quellen_in
+,            einheiten_in
+        FROM temp_indikatoren_bulk;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO
+            faktor_val
+,            dezimalstellen_val
+,            name_de_val
+,            name_en_val
+,            beschreibung_de_val
+,            beschreibung_en_val
+ themen_val
+, quellen_val
+, einheiten_val
+;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Get a new ID for each row
+        SET v_new_id = (
+            SELECT neue_indikatoren_id
+            FROM view_indikatoren_neue_id
+        );
+
+        -- Check if insert is allowed
+        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+        TRUNCATE TABLE __insert_allowed__;
+        INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+        -- Insert the row
+        INSERT INTO tab_indikatoren(
+            gueltig_seit,
+            ist_aktiv,
+            ersteller_nutzer_id,
+            faktor,
+            dezimalstellen,
+            name_de,
+            name_en,
+            beschreibung_de,
+            beschreibung_en,
+            themen_id,
+            quellen_id,
+            einheiten_id,
+            indikatoren_id
+        ) VALUES (
+            CURRENT_TIMESTAMP(6),
+            TRUE,
+            v_nutzer_id,
+            faktor_val,
+            dezimalstellen_val,
+            name_de_val,
+            name_en_val,
+            beschreibung_de_val,
+            beschreibung_en_val,
+            themen_val,
+            quellen_val,
+            einheiten_val,
+            v_new_id
+        );
+
+        TRUNCATE TABLE __insert_allowed__;
+        SET v_count = v_count + 1;
+    END LOOP;
+
+    CLOSE cur;
+
+    SET rows_inserted_out = v_count;
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE bulk_insert_into_laender(
+    OUT rows_inserted_out INTEGER
+)
+BEGIN
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    DECLARE v_new_id INTEGER;
+    DECLARE v_count INTEGER DEFAULT 0;
+
+    -- Ensure the current user is set
+    CALL insert_current_nutzer();
+
+    -- Get the current user's ID
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    -- Cursor to loop through the temporary table
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE iso2_val VARCHAR(2);
+    DECLARE iso3_val VARCHAR(3);
+    DECLARE kontinente_val INTEGER;
+    DECLARE laendernamen_de_val INTEGER;
+    DECLARE laendernamen_en_val INTEGER;
+
+    -- Temporary table must be created and populated before calling this procedure
+    DECLARE cur CURSOR FOR
+        SELECT
+            iso2_in,
+            iso3_in,
+            kontinente_in
+,            laendernamen_de_in
+,            laendernamen_en_in
+        FROM temp_laender_bulk;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO
+            iso2_val
+,            iso3_val
+ kontinente_val
+, laendernamen_de_val
+, laendernamen_en_val
+;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Get a new ID for each row
+        SET v_new_id = (
+            SELECT neue_laender_id
+            FROM view_laender_neue_id
+        );
+
+        -- Check if insert is allowed
+        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+        TRUNCATE TABLE __insert_allowed__;
+        INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+        -- Insert the row
+        INSERT INTO tab_laender(
+            gueltig_seit,
+            ist_aktiv,
+            ersteller_nutzer_id,
+            iso2,
+            iso3,
+            kontinente_id,
+            laendernamen_de_id,
+            laendernamen_en_id,
+            laender_id
+        ) VALUES (
+            CURRENT_TIMESTAMP(6),
+            TRUE,
+            v_nutzer_id,
+            iso2_val,
+            iso3_val,
+            kontinente_val,
+            laendernamen_de_val,
+            laendernamen_en_val,
+            v_new_id
+        );
+
+        TRUNCATE TABLE __insert_allowed__;
+        SET v_count = v_count + 1;
+    END LOOP;
+
+    CLOSE cur;
+
+    SET rows_inserted_out = v_count;
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE bulk_insert_into_daten(
+    OUT rows_inserted_out INTEGER
+)
+BEGIN
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    DECLARE v_new_id INTEGER;
+    DECLARE v_count INTEGER DEFAULT 0;
+
+    -- Ensure the current user is set
+    CALL insert_current_nutzer();
+
+    -- Get the current user's ID
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    -- Cursor to loop through the temporary table
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE datum_val DATE;
+    DECLARE wert_val DOUBLE;
+    DECLARE laender_val INTEGER;
+    DECLARE indikatoren_val INTEGER;
+
+    -- Temporary table must be created and populated before calling this procedure
+    DECLARE cur CURSOR FOR
+        SELECT
+            datum_in,
+            wert_in,
+            laender_in
+,            indikatoren_in
+        FROM temp_daten_bulk;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO
+            datum_val
+,            wert_val
+ laender_val
+, indikatoren_val
+;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Get a new ID for each row
+        SET v_new_id = (
+            SELECT neue_daten_id
+            FROM view_daten_neue_id
+        );
+
+        -- Check if insert is allowed
+        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+        TRUNCATE TABLE __insert_allowed__;
+        INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+        -- Insert the row
+        INSERT INTO tab_daten(
+            gueltig_seit,
+            ist_aktiv,
+            ersteller_nutzer_id,
+            datum,
+            wert,
+            laender_id,
+            indikatoren_id,
+            daten_id
+        ) VALUES (
+            CURRENT_TIMESTAMP(6),
+            TRUE,
+            v_nutzer_id,
+            datum_val,
+            wert_val,
+            laender_val,
+            indikatoren_val,
+            v_new_id
+        );
+
+        TRUNCATE TABLE __insert_allowed__;
+        SET v_count = v_count + 1;
+    END LOOP;
+
+    CLOSE cur;
+
+    SET rows_inserted_out = v_count;
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE bulk_insert_into_laendergruppenzuordnungen(
+    OUT rows_inserted_out INTEGER
+)
+BEGIN
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    DECLARE v_new_id INTEGER;
+    DECLARE v_count INTEGER DEFAULT 0;
+
+    -- Ensure the current user is set
+    CALL insert_current_nutzer();
+
+    -- Get the current user's ID
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    -- Cursor to loop through the temporary table
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE laender_val INTEGER;
+    DECLARE laendergruppen_val INTEGER;
+
+    -- Temporary table must be created and populated before calling this procedure
+    DECLARE cur CURSOR FOR
+        SELECT
+            laender_in
+,            laendergruppen_in
+        FROM temp_laendergruppenzuordnungen_bulk;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO
+ laender_val
+, laendergruppen_val
+;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Get a new ID for each row
+        SET v_new_id = (
+            SELECT neue_laendergruppenzuordnungen_id
+            FROM view_laendergruppenzuordnungen_neue_id
+        );
+
+        -- Check if insert is allowed
+        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+        TRUNCATE TABLE __insert_allowed__;
+        INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+        -- Insert the row
+        INSERT INTO tab_laendergruppenzuordnungen(
+            gueltig_seit,
+            ist_aktiv,
+            ersteller_nutzer_id,
+            laender_id,
+            laendergruppen_id,
+            laendergruppenzuordnungen_id
+        ) VALUES (
+            CURRENT_TIMESTAMP(6),
+            TRUE,
+            v_nutzer_id,
+            laender_val,
+            laendergruppen_val,
+            v_new_id
+        );
+
+        TRUNCATE TABLE __insert_allowed__;
+        SET v_count = v_count + 1;
+    END LOOP;
+
+    CLOSE cur;
+
+    SET rows_inserted_out = v_count;
+    COMMIT;
 END$$
 
 DELIMITER ;

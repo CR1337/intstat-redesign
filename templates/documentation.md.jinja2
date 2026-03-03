@@ -99,3 +99,41 @@ ON t.kontinente_id = latest.kontinente_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 ```
+
+### Bulk insert_into_kontinente
+
+#### Erstellen einer temporären Tabelle
+
+```SQL
+CREATE TEMPORARY TABLE IF NOT EXISTS temp_kontinente_bulk (
+    name_de_in VARCHAR(64),
+    name_en_in VARCHAR(64)
+);
+```
+
+#### Füllen der temporären Tabelle
+
+```SQL
+INSERT INTO temp_kontinente_bulk (name_de_in, name_en_in)
+VALUES
+    ('Europa', 'Europe'),
+    ('Nordamerika', 'North America'),
+    ('Südamerika', 'South America'),
+    ('Asien', 'Asia'),
+    ('Afrika', 'Africa'),
+    ('Ozeanien', 'Oceania'),
+    ('Antarktika', 'Antarctica');
+```
+
+#### Übertragen der Daten in die eigentliche Tabelle
+
+```SQL
+CALL bulk_insert_into_kontinente(@rows_inserted);
+SELECT @rows_inserted AS rows_inserted;
+```
+
+#### Löschen der temporären Tabelle
+
+```SQL
+DROP TEMPORARY TABLE IF EXISTS temp_kontinente_bulk;
+```

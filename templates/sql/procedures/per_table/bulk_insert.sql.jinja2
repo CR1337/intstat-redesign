@@ -1,0 +1,111 @@
+DELIMITER $$
+
+CREATE PROCEDURE bulk_insert_into_{{ table_name }}(
+    OUT rows_inserted_out INTEGER
+)
+BEGIN
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    DECLARE v_new_id INTEGER;
+    DECLARE v_count INTEGER DEFAULT 0;
+
+    -- Ensure the current user is set
+    CALL insert_current_nutzer();
+
+    -- Get the current user's ID
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    -- Cursor to loop through the temporary table
+    DECLARE done INT DEFAULT FALSE;
+    {% for col in columns %}
+    DECLARE {{ col.name }}_val {{ col.type }};
+    {% endfor %}
+    {% for fk in foreign_keys %}
+    DECLARE {{ fk.name }}_val INTEGER;
+    {% endfor %}
+
+    -- Temporary table must be created and populated before calling this procedure
+    DECLARE cur CURSOR FOR
+        SELECT
+            {% for col in columns %}
+            {{ col.name }}_in,
+            {% endfor %}
+            {% for fk in foreign_keys %}
+            {{ fk.name }}_in
+            {% if not loop.last %},{% endif %}
+            {% endfor %}
+        FROM temp_{{ table_name }}_bulk;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO
+            {% for col in columns %}
+            {{ col.name }}_val
+            {% if not loop.last %},{% endif %}
+            {% endfor %}
+            {% for fk in foreign_keys %}
+            {% if not loop.first %},{% endif %} {{ fk.name }}_val
+            {% endfor %};
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Get a new ID for each row
+        SET v_new_id = (
+            SELECT neue_{{ table_name }}_id
+            FROM view_{{ table_name }}_neue_id
+        );
+
+        -- Check if insert is allowed
+        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+        TRUNCATE TABLE __insert_allowed__;
+        INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+        -- Insert the row
+        INSERT INTO tab_{{ table_name }}(
+            gueltig_seit,
+            ist_aktiv,
+            ersteller_nutzer_id,
+            {% for col in columns %}
+            {{ col.name }},
+            {% endfor %}
+            {% for fk in foreign_keys %}
+            {{ fk.name }}_id,
+            {% endfor %}
+            {{ table_name }}_id
+        ) VALUES (
+            CURRENT_TIMESTAMP(6),
+            TRUE,
+            v_nutzer_id,
+            {% for col in columns %}
+            {{ col.name }}_val,
+            {% endfor %}
+            {% for fk in foreign_keys %}
+            {{ fk.name }}_val,
+            {% endfor %}
+            v_new_id
+        );
+
+        TRUNCATE TABLE __insert_allowed__;
+        SET v_count = v_count + 1;
+    END LOOP;
+
+    CLOSE cur;
+
+    SET rows_inserted_out = v_count;
+    COMMIT;
+END$$
+
+DELIMITER ;
