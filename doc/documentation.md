@@ -38,8 +38,8 @@ erDiagram
             INTEGER lizenzen_id PK
 
 
-                INTEGER name
-                INTEGER url
+                VARCHAR(64) name
+                VARCHAR(512) url
                 BOOLEAN extra_bedingungen
         }
 
@@ -54,8 +54,6 @@ erDiagram
 
                 INTEGER laender_id FK
                 INTEGER indikatoren_id FK
-                INTEGER quellen_id FK
-                INTEGER lizenzen_id FK
 
                 DATE datum
                 DOUBLE wert
@@ -63,8 +61,6 @@ erDiagram
 
             tab_laender ||--o{ tab_daten : "für Land"
             tab_indikatoren ||--o{ tab_daten : "für Indikator"
-            tab_quellen ||--o{ tab_daten : "von Quelle"
-            tab_lizenzen ||--o{ tab_daten : "hat Lizenz"
         tab_nutzer ||--o{ tab_daten : "erstellt von"
 
 
@@ -75,8 +71,8 @@ erDiagram
             INTEGER laendergruppen_id PK
 
 
-                INTEGER name_de
-                INTEGER name_en
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
         }
 
         tab_nutzer ||--o{ tab_laendergruppen : "erstellt von"
@@ -105,8 +101,8 @@ erDiagram
             INTEGER metadaten_id PK
 
 
-                INTEGER kuerzel
-                INTEGER bezeichnung
+                VARCHAR(8) kuerzel
+                VARCHAR(256) bezeichnung
         }
 
         tab_nutzer ||--o{ tab_metadaten : "erstellt von"
@@ -119,7 +115,7 @@ erDiagram
             INTEGER nutzer_id PK
 
 
-                VARCHAR(32) name
+                VARCHAR(256) name
         }
 
         tab_nutzer ||--o{ tab_nutzer : "erstellt von"
@@ -132,10 +128,10 @@ erDiagram
             INTEGER quellen_id PK
 
 
-                INTEGER name_de
-                INTEGER name_en
-                INTEGER name_kurz_de
-                INTEGER name_kurz_en
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
+                VARCHAR(16) name_kurz_de
+                VARCHAR(16) name_kurz_en
         }
 
         tab_nutzer ||--o{ tab_quellen : "erstellt von"
@@ -153,10 +149,10 @@ erDiagram
 
                 DOUBLE faktor
                 TINYINT_UNSIGNED dezimalstellen
-                INTEGER name_de
-                INTEGER name_en
-                INTEGER beschreibung_de
-                INTEGER beschreibung_en
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
+                VARCHAR(4096) beschreibung_de
+                VARCHAR(4096) beschreibung_en
         }
 
             tab_themen ||--o{ tab_indikatoren : "gehört zu Thema"
@@ -172,8 +168,8 @@ erDiagram
             INTEGER themen_id PK
 
 
-                INTEGER name_de
-                INTEGER name_en
+                VARCHAR(64) name_de
+                VARCHAR(64) name_en
                 TINYINT_UNSIGNED farbe_r
                 TINYINT_UNSIGNED farbe_g
                 TINYINT_UNSIGNED farbe_b
@@ -192,8 +188,8 @@ erDiagram
                 INTEGER laendernamen_de_id FK
                 INTEGER laendernamen_en_id FK
 
-                INTEGER iso2
-                INTEGER iso3
+                VARCHAR(2) iso2
+                VARCHAR(3) iso3
         }
 
             tab_kontinente ||--o{ tab_laender : "gehört zu Kontinent"
@@ -211,8 +207,8 @@ erDiagram
                 INTEGER basis_einheiten_id FK
 
                 DOUBLE faktor
-                INTEGER symbol_de
-                INTEGER symbol_en
+                VARCHAR(64) symbol_de
+                VARCHAR(64) symbol_en
         }
 
             tab_einheiten ||--o{ tab_einheiten : "hat Basiseinheit"
@@ -227,7 +223,7 @@ erDiagram
 
                 INTEGER laender_id FK
 
-                INTEGER name
+                VARCHAR(256) name
         }
 
             tab_laender ||--o{ tab_laendernamen : "gehört zu Land"
@@ -257,8 +253,8 @@ erDiagram
             INTEGER kontinente_id PK
 
 
-                INTEGER name_de
-                INTEGER name_en
+                VARCHAR(64) name_de
+                VARCHAR(64) name_en
         }
 
         tab_nutzer ||--o{ tab_kontinente : "erstellt von"
