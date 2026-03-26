@@ -7,14 +7,10 @@ pytestmark = pytest.mark.order(8)
 
 def test_restrict_duplicates(database_connection, table_definition):
     connection, db_name = database_connection
-    table_name = table_definition['table_name']
+    table_name = table_definition["table_name"]
 
-    if (
-        table_name == USER_TABLE_NAME
-    ):
-        pytest.skip(
-            f"No INSERT procedure for {table_name}."
-        )
+    if table_name == USER_TABLE_NAME:
+        pytest.skip(f"No INSERT procedure for {table_name}.")
 
     if not table_definition["unique_sets"]:
         return
@@ -24,5 +20,4 @@ def test_restrict_duplicates(database_connection, table_definition):
         procedure_insert(connection, table_name, arguments=results)
 
     assert "Einfuegen (INSERT) von Duplikaten (" in str(exc_info.value)
-    assert exc_info.value.sqlstate == '45000'
-    
+    assert exc_info.value.sqlstate == "45000"

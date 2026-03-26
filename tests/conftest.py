@@ -15,7 +15,7 @@ DATABASES: List[Dict[str, str | int]] = [
         "port": 3306,
         "user": USERNAME,
         "password": "password",
-        "database": "intstat2"
+        "database": "intstat2",
     }
 ]
 
@@ -50,7 +50,7 @@ def database_connection(request):
         print(f"The error {e} occurred for {database_config['database']}.")
         pytest.fail(f"Failed to connect to {database_config['database']}.")
 
-    yield connection, database_config['database']
+    yield connection, database_config["database"]
 
     if connection and connection.is_connected():
         connection.close()
@@ -59,20 +59,21 @@ def database_connection(request):
 
 def get_table_definitions():
     filenames = [
-        fn 
-        for fn in os.listdir(TABLE_DEFINITIONS_DIRECTORY) 
-        if fn.endswith(".json")
+        fn for fn in os.listdir(TABLE_DEFINITIONS_DIRECTORY) if fn.endswith(".json")
     ]
 
     table_definitions = []
     for fn in filenames:
-        with open(os.path.join(TABLE_DEFINITIONS_DIRECTORY, fn), 'r') as file:
+        with open(os.path.join(TABLE_DEFINITIONS_DIRECTORY, fn), "r") as file:
             table_definitions.append(json.load(file))
 
     return table_definitions
 
 
-@pytest.fixture(params=get_table_definitions(), ids=[d['table_name'] for d in get_table_definitions()])
+@pytest.fixture(
+    params=get_table_definitions(),
+    ids=[d["table_name"] for d in get_table_definitions()],
+)
 def table_definition(request):
     definition = request.param
     yield definition
@@ -81,8 +82,8 @@ def table_definition(request):
 def get_random_value(type_: str = "INTEGER", quote_text: bool = False) -> Any:
     match type_:
         case "INTEGER":
-            return randint(-(2 ** 31), -1)
-        
+            return randint(-(2**31), -1)
+
         case "DATE":
             year = randint(1970, 2000)
             month = randint(1, 12)
@@ -91,10 +92,10 @@ def get_random_value(type_: str = "INTEGER", quote_text: bool = False) -> Any:
             if quote_text:
                 result = f"'{result}'"
             return result
-        
+
         case "DOUBLE":
             return random()
-        
+
         case _ if type_.startswith("VARCHAR(") and type_.endswith(")"):
             length = int(type_[8:-1])
             result = "".join(choice(ascii_letters) for _ in range(length))
@@ -107,33 +108,29 @@ def get_random_value(type_: str = "INTEGER", quote_text: bool = False) -> Any:
 
         case "BOOL" | "BOOLEAN":
             return randint(0, 1)
-        
+
         case _:
             raise ValueError(f"Unknown type: {type_}")
-        
 
-def procedure_insert(connection, table_name, arguments = None) -> List[Any]:
-    table_definition = list(filter(
-        lambda d: d['table_name'] == table_name, 
-        get_table_definitions()
-    ))[0]
+
+def procedure_insert(connection, table_name, arguments=None) -> List[Any]:
+    table_definition = list(
+        filter(lambda d: d["table_name"] == table_name, get_table_definitions())
+    )[0]
 
     if arguments is None:
         fk_values = []
-        for fk in table_definition['foreign_keys']:
-            if not fk['not_null']:
+        for fk in table_definition["foreign_keys"]:
+            if not fk["not_null"]:
                 fk_values.append(None)
                 continue
-            fk_values.append(procedure_insert(
-                connection, 
-                fk['references']
-            )[-1])
+            fk_values.append(procedure_insert(connection, fk["references"])[-1])
 
-        table_name = table_definition['table_name']
+        table_name = table_definition["table_name"]
 
         column_values = [
-            str(get_random_value(c['type'], quote_text=False))
-            for c in table_definition['columns']
+            str(get_random_value(c["type"], quote_text=False))
+            for c in table_definition["columns"]
         ]
 
         arguments = column_values + fk_values + [0]
