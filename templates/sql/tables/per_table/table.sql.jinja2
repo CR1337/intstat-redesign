@@ -2,8 +2,9 @@ CREATE TABLE IF NOT EXISTS tab_{{ table_name }} (
     -- {{ description }}
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
+
     ersteller_nutzer_id INTEGER NOT NULL,
-        
+
     {{ table_name }}_id INTEGER NOT NULL,
 
     {% for fk in foreign_keys %}

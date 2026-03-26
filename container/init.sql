@@ -36,12 +36,13 @@ CREATE TABLE IF NOT EXISTS tab_nutzer (
     -- Diese Tabelle speichert alle Nutzer. Sie ist nur notwendig, wenn Nutzer Tracking angewandt wird.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
+
     ersteller_nutzer_id INTEGER NOT NULL,
         
     nutzer_id INTEGER NOT NULL,
 
 
-    name VARCHAR(256) NOT NULL DEFAULT '',
+    name VARCHAR(32) NOT NULL DEFAULT '',
 
     FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
         REFERENCES tab_nutzer(nutzer_id)
@@ -55,15 +56,16 @@ CREATE TABLE IF NOT EXISTS tab_quellen (
     -- Hier werden die Quellen gespeichert, aus denen die Werte für die Indikatoren stammen.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
+
     ersteller_nutzer_id INTEGER NOT NULL,
         
     quellen_id INTEGER NOT NULL,
 
 
-    name_de VARCHAR(256) NOT NULL DEFAULT '',
-    name_en VARCHAR(256) NOT NULL DEFAULT '',
-    name_kurz_de VARCHAR(16) NOT NULL DEFAULT '',
-    name_kurz_en VARCHAR(16) NOT NULL DEFAULT '',
+    name_de INTEGER NOT NULL DEFAULT -1,
+    name_en INTEGER NOT NULL DEFAULT -1,
+    name_kurz_de INTEGER NOT NULL DEFAULT -1,
+    name_kurz_en INTEGER NOT NULL DEFAULT -1,
 
     FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
         REFERENCES tab_nutzer(nutzer_id)
@@ -77,13 +79,14 @@ CREATE TABLE IF NOT EXISTS tab_themen (
     -- Jedes Thema hat einen deutschen und einen englischen namen und eine Farbe.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
+
     ersteller_nutzer_id INTEGER NOT NULL,
         
     themen_id INTEGER NOT NULL,
 
 
-    name_de VARCHAR(64) NOT NULL DEFAULT '',
-    name_en VARCHAR(64) NOT NULL DEFAULT '',
+    name_de INTEGER NOT NULL DEFAULT -1,
+    name_en INTEGER NOT NULL DEFAULT -1,
     farbe_r TINYINT UNSIGNED NOT NULL DEFAULT 0,
     farbe_g TINYINT UNSIGNED NOT NULL DEFAULT 0,
     farbe_b TINYINT UNSIGNED NOT NULL DEFAULT 0,
@@ -100,6 +103,7 @@ CREATE TABLE IF NOT EXISTS tab_einheiten (
     -- Enthält die Einheiten. eine Einheit hat ein Symbol und einen Beasiseinheit, in welche sie sich mittels ein es Faktors umrechnen lässt.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
+
     ersteller_nutzer_id INTEGER NOT NULL,
         
     einheiten_id INTEGER NOT NULL,
@@ -107,8 +111,8 @@ CREATE TABLE IF NOT EXISTS tab_einheiten (
     basis_einheiten_id INTEGER ,
 
     faktor DOUBLE NOT NULL DEFAULT 0,
-    symbol_de VARCHAR(64) NOT NULL DEFAULT '',
-    symbol_en VARCHAR(64) NOT NULL DEFAULT '',
+    symbol_de INTEGER NOT NULL DEFAULT -1,
+    symbol_en INTEGER NOT NULL DEFAULT -1,
 
     FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
         REFERENCES tab_nutzer(nutzer_id)
@@ -122,13 +126,14 @@ CREATE TABLE IF NOT EXISTS tab_laendernamen (
     -- Hier sind alle Ländernamen abgelegt. Ein Ländername ist einem Land zugeordnet.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
+
     ersteller_nutzer_id INTEGER NOT NULL,
         
     laendernamen_id INTEGER NOT NULL,
 
     laender_id INTEGER ,
 
-    name VARCHAR(256) NOT NULL DEFAULT '',
+    name INTEGER NOT NULL DEFAULT -1,
 
     FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
         REFERENCES tab_nutzer(nutzer_id)
@@ -142,13 +147,14 @@ CREATE TABLE IF NOT EXISTS tab_kontinente (
     -- Jeder Kontinent hat einen deutschen und einen englischen Namen.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
+
     ersteller_nutzer_id INTEGER NOT NULL,
         
     kontinente_id INTEGER NOT NULL,
 
 
-    name_de VARCHAR(64) NOT NULL DEFAULT '',
-    name_en VARCHAR(64) NOT NULL DEFAULT '',
+    name_de INTEGER NOT NULL DEFAULT -1,
+    name_en INTEGER NOT NULL DEFAULT -1,
 
     FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
         REFERENCES tab_nutzer(nutzer_id)
@@ -162,13 +168,14 @@ CREATE TABLE IF NOT EXISTS tab_laendergruppen (
     -- Enthält Gruppen, zu welchen Länder gehören können, z.B. EU oder G7.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
+
     ersteller_nutzer_id INTEGER NOT NULL,
         
     laendergruppen_id INTEGER NOT NULL,
 
 
-    name_de VARCHAR(256) NOT NULL DEFAULT '',
-    name_en VARCHAR(256) NOT NULL DEFAULT '',
+    name_de INTEGER NOT NULL DEFAULT -1,
+    name_en INTEGER NOT NULL DEFAULT -1,
 
     FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
         REFERENCES tab_nutzer(nutzer_id)
@@ -178,10 +185,54 @@ CREATE TABLE IF NOT EXISTS tab_laendergruppen (
     PRIMARY KEY (laendergruppen_id, gueltig_seit)
 );
 
+CREATE TABLE IF NOT EXISTS tab_lizenzen (
+    -- TODO
+    gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ist_aktiv BOOL NOT NULL,
+
+    ersteller_nutzer_id INTEGER NOT NULL,
+        
+    lizenzen_id INTEGER NOT NULL,
+
+
+    name INTEGER NOT NULL DEFAULT -1,
+    url INTEGER NOT NULL DEFAULT -1,
+    extra_bedingungen BOOLEAN NOT NULL DEFAULT 0,
+
+    FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
+        REFERENCES tab_nutzer(nutzer_id)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+
+    PRIMARY KEY (lizenzen_id, gueltig_seit)
+);
+
+CREATE TABLE IF NOT EXISTS tab_metadaten (
+    -- TODO
+    gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ist_aktiv BOOL NOT NULL,
+
+    ersteller_nutzer_id INTEGER NOT NULL,
+        
+    metadaten_id INTEGER NOT NULL,
+
+
+    kuerzel INTEGER NOT NULL DEFAULT -1,
+    bezeichnung INTEGER NOT NULL DEFAULT -1,
+
+    FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
+        REFERENCES tab_nutzer(nutzer_id)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+
+    PRIMARY KEY (metadaten_id, gueltig_seit)
+);
+
 CREATE TABLE IF NOT EXISTS tab_indikatoren (
     -- Enthält alle Indikatoren. Jeder Indikator besizt ein Thema, eine Quelle und eine Einheit. Außerdem enthält er einen Faktor, welcher mit zugehörigen Werten multipliziert werden muss und eine Dezimalstellengenauigkeit. 
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
+
     ersteller_nutzer_id INTEGER NOT NULL,
         
     indikatoren_id INTEGER NOT NULL,
@@ -192,10 +243,10 @@ CREATE TABLE IF NOT EXISTS tab_indikatoren (
 
     faktor DOUBLE NOT NULL DEFAULT 0,
     dezimalstellen TINYINT UNSIGNED NOT NULL DEFAULT 0,
-    name_de VARCHAR(256) NOT NULL DEFAULT '',
-    name_en VARCHAR(256) NOT NULL DEFAULT '',
-    beschreibung_de VARCHAR(4096) NOT NULL DEFAULT '',
-    beschreibung_en VARCHAR(4096) NOT NULL DEFAULT '',
+    name_de INTEGER NOT NULL DEFAULT -1,
+    name_en INTEGER NOT NULL DEFAULT -1,
+    beschreibung_de INTEGER NOT NULL DEFAULT -1,
+    beschreibung_en INTEGER NOT NULL DEFAULT -1,
 
     FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
         REFERENCES tab_nutzer(nutzer_id)
@@ -209,6 +260,7 @@ CREATE TABLE IF NOT EXISTS tab_laender (
     -- Hier sind die Länder gespeichert. Ein Land hat ISO2- und ISO3-Kennungen. Ein Land kann mehrere Namen haben. Auf die Anzeigenamen verweisen die Fremndschlüssel eines Landes.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
+
     ersteller_nutzer_id INTEGER NOT NULL,
         
     laender_id INTEGER NOT NULL,
@@ -217,8 +269,8 @@ CREATE TABLE IF NOT EXISTS tab_laender (
     laendernamen_de_id INTEGER NOT NULL,
     laendernamen_en_id INTEGER NOT NULL,
 
-    iso2 VARCHAR(2) NOT NULL DEFAULT '',
-    iso3 VARCHAR(3) NOT NULL DEFAULT '',
+    iso2 INTEGER NOT NULL DEFAULT -1,
+    iso3 INTEGER NOT NULL DEFAULT -1,
 
     FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
         REFERENCES tab_nutzer(nutzer_id)
@@ -232,12 +284,15 @@ CREATE TABLE IF NOT EXISTS tab_daten (
     -- Speichert die eigentlichen Datenwerte, die mit Ländern und Indikatoren verknüpft sind.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
+
     ersteller_nutzer_id INTEGER NOT NULL,
         
     daten_id INTEGER NOT NULL,
 
     laender_id INTEGER NOT NULL,
     indikatoren_id INTEGER NOT NULL,
+    quellen_id INTEGER NOT NULL,
+    lizenzen_id INTEGER ,
 
     datum DATE NOT NULL DEFAULT '2000-01-01',
     wert DOUBLE NOT NULL DEFAULT 0,
@@ -254,6 +309,7 @@ CREATE TABLE IF NOT EXISTS tab_laendergruppenzuordnungen (
     -- Diese Tabelle ordnet Ländergruppen ihre Länder zu.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
+
     ersteller_nutzer_id INTEGER NOT NULL,
         
     laendergruppenzuordnungen_id INTEGER NOT NULL,
@@ -270,75 +326,120 @@ CREATE TABLE IF NOT EXISTS tab_laendergruppenzuordnungen (
     PRIMARY KEY (laendergruppenzuordnungen_id, gueltig_seit)
 );
 
+CREATE TABLE IF NOT EXISTS tab_metadatenzuordnungen (
+    -- Diese Tabelle ordnet Datenpunkten ihre Metadaten zu.
+    gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ist_aktiv BOOL NOT NULL,
+
+    ersteller_nutzer_id INTEGER NOT NULL,
+        
+    metadatenzuordnungen_id INTEGER NOT NULL,
+
+    daten_id INTEGER NOT NULL,
+    metadaten_id INTEGER NOT NULL,
+
+
+    FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
+        REFERENCES tab_nutzer(nutzer_id)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+
+    PRIMARY KEY (metadatenzuordnungen_id, gueltig_seit)
+);
+
 ALTER TABLE tab_einheiten
-ADD CONSTRAINT fk_einheiten_einheiten_cb644aa774384d85b15f  --  hat Basiseinheit
+ADD CONSTRAINT fk_einheiten_einheiten_62a080fcc5424ae7ab0c  --  hat Basiseinheit
 FOREIGN KEY (basis_einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendernamen
-ADD CONSTRAINT fk_laendernamen_laender_ce52c32c55934e35833b  --  gehört zu Land
+ADD CONSTRAINT fk_laendernamen_laender_48dba5ead32f4061ba49  --  gehört zu Land
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_themen_376e88fc79d04e2dab13  --  gehört zu Thema
+ADD CONSTRAINT fk_indikatoren_themen_9347393b2003417ca6d5  --  gehört zu Thema
 FOREIGN KEY (themen_id) REFERENCES tab_themen(themen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_quellen_6124ce54d2f341768ecc  --  von Quelle
+ADD CONSTRAINT fk_indikatoren_quellen_581fc67ec6364b2bb492  --  von Quelle
 FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_einheiten_b9b655f5cc3f44cba26d  --  hat Einheit
+ADD CONSTRAINT fk_indikatoren_einheiten_1e3f6cc7daed47dc95e6  --  hat Einheit
 FOREIGN KEY (einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_kontinente_5d891a313f604ab4b763  --  gehört zu Kontinent
+ADD CONSTRAINT fk_laender_kontinente_104d343ef56e4411bb22  --  gehört zu Kontinent
 FOREIGN KEY (kontinente_id) REFERENCES tab_kontinente(kontinente_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_ac493815d2ab4afca13f  --  hat dt. Namen
+ADD CONSTRAINT fk_laender_laendernamen_c3ffce9b766544e9bc39  --  hat dt. Namen
 FOREIGN KEY (laendernamen_de_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_41d36b8f228744e7ac5a  --  hat en. Namen
+ADD CONSTRAINT fk_laender_laendernamen_3d95d0d037704732ac2d  --  hat en. Namen
 FOREIGN KEY (laendernamen_en_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_laender_361423277a014826a6c8  --  für Land
+ADD CONSTRAINT fk_daten_laender_95a3a2ada6ef40d0985b  --  für Land
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_indikatoren_a0853b0f00e4436fa5ad  --  für Indikator
+ADD CONSTRAINT fk_daten_indikatoren_bcf1ccf6eb3640f0a1ff  --  für Indikator
 FOREIGN KEY (indikatoren_id) REFERENCES tab_indikatoren(indikatoren_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
+ALTER TABLE tab_daten
+ADD CONSTRAINT fk_daten_quellen_4e947447462744cf8732  --  von Quelle
+FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE tab_daten
+ADD CONSTRAINT fk_daten_lizenzen_e891d053250a4db39369  --  hat Lizenz
+FOREIGN KEY (lizenzen_id) REFERENCES tab_lizenzen(lizenzen_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_97f1c4ce4ec24b15a358  --  ordnet Land zu
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_426b68db7fa141efb73d  --  ordnet Land zu
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_02b5b3244f3740498536  --  ordnet Länderguppe zu
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_c7e4394cb6914f338e60  --  ordnet Länderguppe zu
 FOREIGN KEY (laendergruppen_id) REFERENCES tab_laendergruppen(laendergruppen_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE tab_metadatenzuordnungen
+ADD CONSTRAINT fk_metadatenzuordnungen_daten_ae14dea7772445c3a956  --  ordnet Datenpunkt zu
+FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE tab_metadatenzuordnungen
+ADD CONSTRAINT fk_metadatenzuordnungen_metadaten_905f20027b1b4e67b762  --  ordnet Metadatum zu
+FOREIGN KEY (metadaten_id) REFERENCES tab_metadaten(metadaten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
@@ -391,6 +492,20 @@ CREATE INDEX idx_laendergruppen_latest
     );
     
 
+CREATE INDEX idx_lizenzen_latest 
+    ON tab_lizenzen (
+        lizenzen_id, 
+        gueltig_seit DESC
+    );
+    
+
+CREATE INDEX idx_metadaten_latest 
+    ON tab_metadaten (
+        metadaten_id, 
+        gueltig_seit DESC
+    );
+    
+
 CREATE INDEX idx_indikatoren_latest 
     ON tab_indikatoren (
         indikatoren_id, 
@@ -415,6 +530,13 @@ CREATE INDEX idx_daten_latest
 CREATE INDEX idx_laendergruppenzuordnungen_latest 
     ON tab_laendergruppenzuordnungen (
         laendergruppenzuordnungen_id, 
+        gueltig_seit DESC
+    );
+    
+
+CREATE INDEX idx_metadatenzuordnungen_latest 
+    ON tab_metadatenzuordnungen (
+        metadatenzuordnungen_id, 
         gueltig_seit DESC
     );
     
@@ -454,6 +576,16 @@ SELECT *
 FROM tab_laendergruppen
 ORDER BY laendergruppen_id, gueltig_seit DESC;
 
+CREATE OR REPLACE VIEW view_lizenzen_historie AS
+SELECT *
+FROM tab_lizenzen
+ORDER BY lizenzen_id, gueltig_seit DESC;
+
+CREATE OR REPLACE VIEW view_metadaten_historie AS
+SELECT *
+FROM tab_metadaten
+ORDER BY metadaten_id, gueltig_seit DESC;
+
 CREATE OR REPLACE VIEW view_indikatoren_historie AS
 SELECT *
 FROM tab_indikatoren
@@ -473,6 +605,11 @@ CREATE OR REPLACE VIEW view_laendergruppenzuordnungen_historie AS
 SELECT *
 FROM tab_laendergruppenzuordnungen
 ORDER BY laendergruppenzuordnungen_id, gueltig_seit DESC;
+
+CREATE OR REPLACE VIEW view_metadatenzuordnungen_historie AS
+SELECT *
+FROM tab_metadatenzuordnungen
+ORDER BY metadatenzuordnungen_id, gueltig_seit DESC;
 
 CREATE OR REPLACE VIEW view_nutzer_aktuell AS
 SELECT t.*
@@ -558,6 +695,30 @@ ON t.laendergruppen_id = latest.laendergruppen_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 
+CREATE OR REPLACE VIEW view_lizenzen_aktuell AS
+SELECT t.*
+from tab_lizenzen t
+INNER JOIN (
+    SELECT lizenzen_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_lizenzen
+    GROUP BY lizenzen_id
+) latest
+ON t.lizenzen_id = latest.lizenzen_id 
+AND t.gueltig_seit = latest.max_gueltig_seit
+WHERE t.ist_aktiv;
+
+CREATE OR REPLACE VIEW view_metadaten_aktuell AS
+SELECT t.*
+from tab_metadaten t
+INNER JOIN (
+    SELECT metadaten_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_metadaten
+    GROUP BY metadaten_id
+) latest
+ON t.metadaten_id = latest.metadaten_id 
+AND t.gueltig_seit = latest.max_gueltig_seit
+WHERE t.ist_aktiv;
+
 CREATE OR REPLACE VIEW view_indikatoren_aktuell AS
 SELECT t.*
 from tab_indikatoren t
@@ -606,6 +767,18 @@ ON t.laendergruppenzuordnungen_id = latest.laendergruppenzuordnungen_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 
+CREATE OR REPLACE VIEW view_metadatenzuordnungen_aktuell AS
+SELECT t.*
+from tab_metadatenzuordnungen t
+INNER JOIN (
+    SELECT metadatenzuordnungen_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_metadatenzuordnungen
+    GROUP BY metadatenzuordnungen_id
+) latest
+ON t.metadatenzuordnungen_id = latest.metadatenzuordnungen_id 
+AND t.gueltig_seit = latest.max_gueltig_seit
+WHERE t.ist_aktiv;
+
 CREATE OR REPLACE VIEW view_nutzer_neue_id AS
 SELECT
     COALESCE(MAX(nutzer_id), 0) + 1 AS neue_nutzer_id
@@ -648,6 +821,18 @@ SELECT
 FROM tab_laendergruppen
 LIMIT 1;
 
+CREATE OR REPLACE VIEW view_lizenzen_neue_id AS
+SELECT
+    COALESCE(MAX(lizenzen_id), 0) + 1 AS neue_lizenzen_id
+FROM tab_lizenzen
+LIMIT 1;
+
+CREATE OR REPLACE VIEW view_metadaten_neue_id AS
+SELECT
+    COALESCE(MAX(metadaten_id), 0) + 1 AS neue_metadaten_id
+FROM tab_metadaten
+LIMIT 1;
+
 CREATE OR REPLACE VIEW view_indikatoren_neue_id AS
 SELECT
     COALESCE(MAX(indikatoren_id), 0) + 1 AS neue_indikatoren_id
@@ -670,6 +855,12 @@ CREATE OR REPLACE VIEW view_laendergruppenzuordnungen_neue_id AS
 SELECT
     COALESCE(MAX(laendergruppenzuordnungen_id), 0) + 1 AS neue_laendergruppenzuordnungen_id
 FROM tab_laendergruppenzuordnungen
+LIMIT 1;
+
+CREATE OR REPLACE VIEW view_metadatenzuordnungen_neue_id AS
+SELECT
+    COALESCE(MAX(metadatenzuordnungen_id), 0) + 1 AS neue_metadatenzuordnungen_id
+FROM tab_metadatenzuordnungen
 LIMIT 1;
 
 DELIMITER $$
@@ -758,6 +949,30 @@ DELIMITER ;
 
 DELIMITER $$
 
+CREATE TRIGGER trg_lizenzen_delete
+BEFORE DELETE ON tab_lizenzen
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_metadaten_delete
+BEFORE DELETE ON tab_metadaten
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
 CREATE TRIGGER trg_indikatoren_delete
 BEFORE DELETE ON tab_indikatoren
 FOR EACH ROW
@@ -796,6 +1011,18 @@ DELIMITER $$
 
 CREATE TRIGGER trg_laendergruppenzuordnungen_delete
 BEFORE DELETE ON tab_laendergruppenzuordnungen
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_metadatenzuordnungen_delete
+BEFORE DELETE ON tab_metadatenzuordnungen
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
@@ -890,6 +1117,30 @@ DELIMITER ;
 
 DELIMITER $$
 
+CREATE TRIGGER trg_lizenzen_update
+BEFORE UPDATE ON tab_lizenzen
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_metadaten_update
+BEFORE UPDATE ON tab_metadaten
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
 CREATE TRIGGER trg_indikatoren_update
 BEFORE UPDATE ON tab_indikatoren
 FOR EACH ROW
@@ -928,6 +1179,18 @@ DELIMITER $$
 
 CREATE TRIGGER trg_laendergruppenzuordnungen_update
 BEFORE UPDATE ON tab_laendergruppenzuordnungen
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_metadatenzuordnungen_update
+BEFORE UPDATE ON tab_metadatenzuordnungen
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
@@ -1190,8 +1453,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER trg_indikatoren_insert
-BEFORE INSERT ON tab_indikatoren
+CREATE TRIGGER trg_lizenzen_insert
+BEFORE INSERT ON tab_lizenzen
 FOR EACH ROW
 BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
@@ -1202,24 +1465,56 @@ BEGIN
 
     IF EXISTS (
         SELECT 1
-        FROM tab_indikatoren
+        FROM tab_lizenzen
         WHERE
-             name_de = NEW.name_de
-            AND indikatoren_id <> NEW.indikatoren_id
+             name = NEW.name
+            AND lizenzen_id <> NEW.lizenzen_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_de ) in indikatoren ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name ) in lizenzen ist nicht erlaubt!';
     END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_metadaten_insert
+BEFORE INSERT ON tab_metadaten
+FOR EACH ROW
+BEGIN
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+    END IF;
+
     IF EXISTS (
         SELECT 1
-        FROM tab_indikatoren
+        FROM tab_metadaten
         WHERE
-             name_en = NEW.name_en
-            AND indikatoren_id <> NEW.indikatoren_id
+             kuerzel = NEW.kuerzel
+            AND metadaten_id <> NEW.metadaten_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name_en ) in indikatoren ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( kuerzel ) in metadaten ist nicht erlaubt!';
     END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_indikatoren_insert
+BEFORE INSERT ON tab_indikatoren
+FOR EACH ROW
+BEGIN
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+    END IF;
+
 END$$
 
 DELIMITER ;
@@ -1298,10 +1593,11 @@ BEGIN
         WHERE
              laender_id = NEW.laender_id
             AND indikatoren_id = NEW.indikatoren_id
+            AND datum = NEW.datum
             AND daten_id <> NEW.daten_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( laender_id  indikatoren_id ) in daten ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( laender_id  indikatoren_id  datum ) in daten ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1329,6 +1625,33 @@ BEGIN
     ) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( laender_id  laendergruppen_id ) in laendergruppenzuordnungen ist nicht erlaubt!';
+    END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_metadatenzuordnungen_insert
+BEFORE INSERT ON tab_metadatenzuordnungen
+FOR EACH ROW
+BEGIN
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+    END IF;
+
+    IF EXISTS (
+        SELECT 1
+        FROM tab_metadatenzuordnungen
+        WHERE
+             daten_id = NEW.daten_id
+            AND metadaten_id = NEW.metadaten_id
+            AND metadatenzuordnungen_id <> NEW.metadatenzuordnungen_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( daten_id  metadaten_id ) in metadatenzuordnungen ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1381,1101 +1704,38 @@ END$$
 
 DELIMITER ;
 
-DELIMITER $$
 
-CREATE PROCEDURE bulk_insert_into_nutzer(
-    OUT rows_inserted_out INTEGER
-)
-BEGIN
-    DECLARE v_nutzer_id INTEGER;
-    DECLARE v_current_username VARCHAR(256);
-    DECLARE v_new_id INTEGER;
-    DECLARE v_count INTEGER DEFAULT 0;
 
-    -- Ensure the current user is set
-    CALL insert_current_nutzer();
 
-    -- Get the current user's ID
-    SET v_current_username = get_aktuellen_nutzer_namen();
-    SET v_nutzer_id = (
-        SELECT nutzer_id
-        FROM view_nutzer_aktuell
-        WHERE name = v_current_username
-        LIMIT 1
-    );
 
-    START TRANSACTION;
 
-    -- Cursor to loop through the temporary table
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE name_val VARCHAR(256);
 
-    -- Temporary table must be created and populated before calling this procedure
-    DECLARE cur CURSOR FOR
-        SELECT
-            name_in,
-        FROM temp_nutzer_bulk;
 
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-    OPEN cur;
 
-    read_loop: LOOP
-        FETCH cur INTO
-            name_val
-;
 
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
 
-        -- Get a new ID for each row
-        SET v_new_id = (
-            SELECT neue_nutzer_id
-            FROM view_nutzer_neue_id
-        );
 
-        -- Check if insert is allowed
-        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
-        TRUNCATE TABLE __insert_allowed__;
-        INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-        -- Insert the row
-        INSERT INTO tab_nutzer(
-            gueltig_seit,
-            ist_aktiv,
-            ersteller_nutzer_id,
-            name,
-            nutzer_id
-        ) VALUES (
-            CURRENT_TIMESTAMP(6),
-            TRUE,
-            v_nutzer_id,
-            name_val,
-            v_new_id
-        );
 
-        TRUNCATE TABLE __insert_allowed__;
-        SET v_count = v_count + 1;
-    END LOOP;
 
-    CLOSE cur;
 
-    SET rows_inserted_out = v_count;
-    COMMIT;
-END$$
 
-DELIMITER ;
 
-DELIMITER $$
 
-CREATE PROCEDURE bulk_insert_into_quellen(
-    OUT rows_inserted_out INTEGER
-)
-BEGIN
-    DECLARE v_nutzer_id INTEGER;
-    DECLARE v_current_username VARCHAR(256);
-    DECLARE v_new_id INTEGER;
-    DECLARE v_count INTEGER DEFAULT 0;
 
-    -- Ensure the current user is set
-    CALL insert_current_nutzer();
 
-    -- Get the current user's ID
-    SET v_current_username = get_aktuellen_nutzer_namen();
-    SET v_nutzer_id = (
-        SELECT nutzer_id
-        FROM view_nutzer_aktuell
-        WHERE name = v_current_username
-        LIMIT 1
-    );
 
-    START TRANSACTION;
 
-    -- Cursor to loop through the temporary table
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE name_de_val VARCHAR(256);
-    DECLARE name_en_val VARCHAR(256);
-    DECLARE name_kurz_de_val VARCHAR(16);
-    DECLARE name_kurz_en_val VARCHAR(16);
 
-    -- Temporary table must be created and populated before calling this procedure
-    DECLARE cur CURSOR FOR
-        SELECT
-            name_de_in,
-            name_en_in,
-            name_kurz_de_in,
-            name_kurz_en_in,
-        FROM temp_quellen_bulk;
 
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-    OPEN cur;
 
-    read_loop: LOOP
-        FETCH cur INTO
-            name_de_val
-,            name_en_val
-,            name_kurz_de_val
-,            name_kurz_en_val
-;
-
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-
-        -- Get a new ID for each row
-        SET v_new_id = (
-            SELECT neue_quellen_id
-            FROM view_quellen_neue_id
-        );
-
-        -- Check if insert is allowed
-        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
-        TRUNCATE TABLE __insert_allowed__;
-        INSERT INTO __insert_allowed__ VALUES(TRUE);
-
-        -- Insert the row
-        INSERT INTO tab_quellen(
-            gueltig_seit,
-            ist_aktiv,
-            ersteller_nutzer_id,
-            name_de,
-            name_en,
-            name_kurz_de,
-            name_kurz_en,
-            quellen_id
-        ) VALUES (
-            CURRENT_TIMESTAMP(6),
-            TRUE,
-            v_nutzer_id,
-            name_de_val,
-            name_en_val,
-            name_kurz_de_val,
-            name_kurz_en_val,
-            v_new_id
-        );
-
-        TRUNCATE TABLE __insert_allowed__;
-        SET v_count = v_count + 1;
-    END LOOP;
-
-    CLOSE cur;
-
-    SET rows_inserted_out = v_count;
-    COMMIT;
-END$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE PROCEDURE bulk_insert_into_themen(
-    OUT rows_inserted_out INTEGER
-)
-BEGIN
-    DECLARE v_nutzer_id INTEGER;
-    DECLARE v_current_username VARCHAR(256);
-    DECLARE v_new_id INTEGER;
-    DECLARE v_count INTEGER DEFAULT 0;
-
-    -- Ensure the current user is set
-    CALL insert_current_nutzer();
-
-    -- Get the current user's ID
-    SET v_current_username = get_aktuellen_nutzer_namen();
-    SET v_nutzer_id = (
-        SELECT nutzer_id
-        FROM view_nutzer_aktuell
-        WHERE name = v_current_username
-        LIMIT 1
-    );
-
-    START TRANSACTION;
-
-    -- Cursor to loop through the temporary table
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE name_de_val VARCHAR(64);
-    DECLARE name_en_val VARCHAR(64);
-    DECLARE farbe_r_val TINYINT UNSIGNED;
-    DECLARE farbe_g_val TINYINT UNSIGNED;
-    DECLARE farbe_b_val TINYINT UNSIGNED;
-
-    -- Temporary table must be created and populated before calling this procedure
-    DECLARE cur CURSOR FOR
-        SELECT
-            name_de_in,
-            name_en_in,
-            farbe_r_in,
-            farbe_g_in,
-            farbe_b_in,
-        FROM temp_themen_bulk;
-
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    OPEN cur;
-
-    read_loop: LOOP
-        FETCH cur INTO
-            name_de_val
-,            name_en_val
-,            farbe_r_val
-,            farbe_g_val
-,            farbe_b_val
-;
-
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-
-        -- Get a new ID for each row
-        SET v_new_id = (
-            SELECT neue_themen_id
-            FROM view_themen_neue_id
-        );
-
-        -- Check if insert is allowed
-        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
-        TRUNCATE TABLE __insert_allowed__;
-        INSERT INTO __insert_allowed__ VALUES(TRUE);
-
-        -- Insert the row
-        INSERT INTO tab_themen(
-            gueltig_seit,
-            ist_aktiv,
-            ersteller_nutzer_id,
-            name_de,
-            name_en,
-            farbe_r,
-            farbe_g,
-            farbe_b,
-            themen_id
-        ) VALUES (
-            CURRENT_TIMESTAMP(6),
-            TRUE,
-            v_nutzer_id,
-            name_de_val,
-            name_en_val,
-            farbe_r_val,
-            farbe_g_val,
-            farbe_b_val,
-            v_new_id
-        );
-
-        TRUNCATE TABLE __insert_allowed__;
-        SET v_count = v_count + 1;
-    END LOOP;
-
-    CLOSE cur;
-
-    SET rows_inserted_out = v_count;
-    COMMIT;
-END$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE PROCEDURE bulk_insert_into_einheiten(
-    OUT rows_inserted_out INTEGER
-)
-BEGIN
-    DECLARE v_nutzer_id INTEGER;
-    DECLARE v_current_username VARCHAR(256);
-    DECLARE v_new_id INTEGER;
-    DECLARE v_count INTEGER DEFAULT 0;
-
-    -- Ensure the current user is set
-    CALL insert_current_nutzer();
-
-    -- Get the current user's ID
-    SET v_current_username = get_aktuellen_nutzer_namen();
-    SET v_nutzer_id = (
-        SELECT nutzer_id
-        FROM view_nutzer_aktuell
-        WHERE name = v_current_username
-        LIMIT 1
-    );
-
-    START TRANSACTION;
-
-    -- Cursor to loop through the temporary table
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE faktor_val DOUBLE;
-    DECLARE symbol_de_val VARCHAR(64);
-    DECLARE symbol_en_val VARCHAR(64);
-    DECLARE basis_einheiten_val INTEGER;
-
-    -- Temporary table must be created and populated before calling this procedure
-    DECLARE cur CURSOR FOR
-        SELECT
-            faktor_in,
-            symbol_de_in,
-            symbol_en_in,
-            basis_einheiten_in
-        FROM temp_einheiten_bulk;
-
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    OPEN cur;
-
-    read_loop: LOOP
-        FETCH cur INTO
-            faktor_val
-,            symbol_de_val
-,            symbol_en_val
- basis_einheiten_val
-;
-
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-
-        -- Get a new ID for each row
-        SET v_new_id = (
-            SELECT neue_einheiten_id
-            FROM view_einheiten_neue_id
-        );
-
-        -- Check if insert is allowed
-        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
-        TRUNCATE TABLE __insert_allowed__;
-        INSERT INTO __insert_allowed__ VALUES(TRUE);
-
-        -- Insert the row
-        INSERT INTO tab_einheiten(
-            gueltig_seit,
-            ist_aktiv,
-            ersteller_nutzer_id,
-            faktor,
-            symbol_de,
-            symbol_en,
-            basis_einheiten_id,
-            einheiten_id
-        ) VALUES (
-            CURRENT_TIMESTAMP(6),
-            TRUE,
-            v_nutzer_id,
-            faktor_val,
-            symbol_de_val,
-            symbol_en_val,
-            basis_einheiten_val,
-            v_new_id
-        );
-
-        TRUNCATE TABLE __insert_allowed__;
-        SET v_count = v_count + 1;
-    END LOOP;
-
-    CLOSE cur;
-
-    SET rows_inserted_out = v_count;
-    COMMIT;
-END$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE PROCEDURE bulk_insert_into_laendernamen(
-    OUT rows_inserted_out INTEGER
-)
-BEGIN
-    DECLARE v_nutzer_id INTEGER;
-    DECLARE v_current_username VARCHAR(256);
-    DECLARE v_new_id INTEGER;
-    DECLARE v_count INTEGER DEFAULT 0;
-
-    -- Ensure the current user is set
-    CALL insert_current_nutzer();
-
-    -- Get the current user's ID
-    SET v_current_username = get_aktuellen_nutzer_namen();
-    SET v_nutzer_id = (
-        SELECT nutzer_id
-        FROM view_nutzer_aktuell
-        WHERE name = v_current_username
-        LIMIT 1
-    );
-
-    START TRANSACTION;
-
-    -- Cursor to loop through the temporary table
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE name_val VARCHAR(256);
-    DECLARE laender_val INTEGER;
-
-    -- Temporary table must be created and populated before calling this procedure
-    DECLARE cur CURSOR FOR
-        SELECT
-            name_in,
-            laender_in
-        FROM temp_laendernamen_bulk;
-
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    OPEN cur;
-
-    read_loop: LOOP
-        FETCH cur INTO
-            name_val
- laender_val
-;
-
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-
-        -- Get a new ID for each row
-        SET v_new_id = (
-            SELECT neue_laendernamen_id
-            FROM view_laendernamen_neue_id
-        );
-
-        -- Check if insert is allowed
-        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
-        TRUNCATE TABLE __insert_allowed__;
-        INSERT INTO __insert_allowed__ VALUES(TRUE);
-
-        -- Insert the row
-        INSERT INTO tab_laendernamen(
-            gueltig_seit,
-            ist_aktiv,
-            ersteller_nutzer_id,
-            name,
-            laender_id,
-            laendernamen_id
-        ) VALUES (
-            CURRENT_TIMESTAMP(6),
-            TRUE,
-            v_nutzer_id,
-            name_val,
-            laender_val,
-            v_new_id
-        );
-
-        TRUNCATE TABLE __insert_allowed__;
-        SET v_count = v_count + 1;
-    END LOOP;
-
-    CLOSE cur;
-
-    SET rows_inserted_out = v_count;
-    COMMIT;
-END$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE PROCEDURE bulk_insert_into_kontinente(
-    OUT rows_inserted_out INTEGER
-)
-BEGIN
-    DECLARE v_nutzer_id INTEGER;
-    DECLARE v_current_username VARCHAR(256);
-    DECLARE v_new_id INTEGER;
-    DECLARE v_count INTEGER DEFAULT 0;
-
-    -- Ensure the current user is set
-    CALL insert_current_nutzer();
-
-    -- Get the current user's ID
-    SET v_current_username = get_aktuellen_nutzer_namen();
-    SET v_nutzer_id = (
-        SELECT nutzer_id
-        FROM view_nutzer_aktuell
-        WHERE name = v_current_username
-        LIMIT 1
-    );
-
-    START TRANSACTION;
-
-    -- Cursor to loop through the temporary table
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE name_de_val VARCHAR(64);
-    DECLARE name_en_val VARCHAR(64);
-
-    -- Temporary table must be created and populated before calling this procedure
-    DECLARE cur CURSOR FOR
-        SELECT
-            name_de_in,
-            name_en_in,
-        FROM temp_kontinente_bulk;
-
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    OPEN cur;
-
-    read_loop: LOOP
-        FETCH cur INTO
-            name_de_val
-,            name_en_val
-;
-
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-
-        -- Get a new ID for each row
-        SET v_new_id = (
-            SELECT neue_kontinente_id
-            FROM view_kontinente_neue_id
-        );
-
-        -- Check if insert is allowed
-        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
-        TRUNCATE TABLE __insert_allowed__;
-        INSERT INTO __insert_allowed__ VALUES(TRUE);
-
-        -- Insert the row
-        INSERT INTO tab_kontinente(
-            gueltig_seit,
-            ist_aktiv,
-            ersteller_nutzer_id,
-            name_de,
-            name_en,
-            kontinente_id
-        ) VALUES (
-            CURRENT_TIMESTAMP(6),
-            TRUE,
-            v_nutzer_id,
-            name_de_val,
-            name_en_val,
-            v_new_id
-        );
-
-        TRUNCATE TABLE __insert_allowed__;
-        SET v_count = v_count + 1;
-    END LOOP;
-
-    CLOSE cur;
-
-    SET rows_inserted_out = v_count;
-    COMMIT;
-END$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE PROCEDURE bulk_insert_into_laendergruppen(
-    OUT rows_inserted_out INTEGER
-)
-BEGIN
-    DECLARE v_nutzer_id INTEGER;
-    DECLARE v_current_username VARCHAR(256);
-    DECLARE v_new_id INTEGER;
-    DECLARE v_count INTEGER DEFAULT 0;
-
-    -- Ensure the current user is set
-    CALL insert_current_nutzer();
-
-    -- Get the current user's ID
-    SET v_current_username = get_aktuellen_nutzer_namen();
-    SET v_nutzer_id = (
-        SELECT nutzer_id
-        FROM view_nutzer_aktuell
-        WHERE name = v_current_username
-        LIMIT 1
-    );
-
-    START TRANSACTION;
-
-    -- Cursor to loop through the temporary table
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE name_de_val VARCHAR(256);
-    DECLARE name_en_val VARCHAR(256);
-
-    -- Temporary table must be created and populated before calling this procedure
-    DECLARE cur CURSOR FOR
-        SELECT
-            name_de_in,
-            name_en_in,
-        FROM temp_laendergruppen_bulk;
-
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    OPEN cur;
-
-    read_loop: LOOP
-        FETCH cur INTO
-            name_de_val
-,            name_en_val
-;
-
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-
-        -- Get a new ID for each row
-        SET v_new_id = (
-            SELECT neue_laendergruppen_id
-            FROM view_laendergruppen_neue_id
-        );
-
-        -- Check if insert is allowed
-        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
-        TRUNCATE TABLE __insert_allowed__;
-        INSERT INTO __insert_allowed__ VALUES(TRUE);
-
-        -- Insert the row
-        INSERT INTO tab_laendergruppen(
-            gueltig_seit,
-            ist_aktiv,
-            ersteller_nutzer_id,
-            name_de,
-            name_en,
-            laendergruppen_id
-        ) VALUES (
-            CURRENT_TIMESTAMP(6),
-            TRUE,
-            v_nutzer_id,
-            name_de_val,
-            name_en_val,
-            v_new_id
-        );
-
-        TRUNCATE TABLE __insert_allowed__;
-        SET v_count = v_count + 1;
-    END LOOP;
-
-    CLOSE cur;
-
-    SET rows_inserted_out = v_count;
-    COMMIT;
-END$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE PROCEDURE bulk_insert_into_indikatoren(
-    OUT rows_inserted_out INTEGER
-)
-BEGIN
-    DECLARE v_nutzer_id INTEGER;
-    DECLARE v_current_username VARCHAR(256);
-    DECLARE v_new_id INTEGER;
-    DECLARE v_count INTEGER DEFAULT 0;
-
-    -- Ensure the current user is set
-    CALL insert_current_nutzer();
-
-    -- Get the current user's ID
-    SET v_current_username = get_aktuellen_nutzer_namen();
-    SET v_nutzer_id = (
-        SELECT nutzer_id
-        FROM view_nutzer_aktuell
-        WHERE name = v_current_username
-        LIMIT 1
-    );
-
-    START TRANSACTION;
-
-    -- Cursor to loop through the temporary table
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE faktor_val DOUBLE;
-    DECLARE dezimalstellen_val TINYINT UNSIGNED;
-    DECLARE name_de_val VARCHAR(256);
-    DECLARE name_en_val VARCHAR(256);
-    DECLARE beschreibung_de_val VARCHAR(4096);
-    DECLARE beschreibung_en_val VARCHAR(4096);
-    DECLARE themen_val INTEGER;
-    DECLARE quellen_val INTEGER;
-    DECLARE einheiten_val INTEGER;
-
-    -- Temporary table must be created and populated before calling this procedure
-    DECLARE cur CURSOR FOR
-        SELECT
-            faktor_in,
-            dezimalstellen_in,
-            name_de_in,
-            name_en_in,
-            beschreibung_de_in,
-            beschreibung_en_in,
-            themen_in
-,            quellen_in
-,            einheiten_in
-        FROM temp_indikatoren_bulk;
-
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    OPEN cur;
-
-    read_loop: LOOP
-        FETCH cur INTO
-            faktor_val
-,            dezimalstellen_val
-,            name_de_val
-,            name_en_val
-,            beschreibung_de_val
-,            beschreibung_en_val
- themen_val
-, quellen_val
-, einheiten_val
-;
-
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-
-        -- Get a new ID for each row
-        SET v_new_id = (
-            SELECT neue_indikatoren_id
-            FROM view_indikatoren_neue_id
-        );
-
-        -- Check if insert is allowed
-        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
-        TRUNCATE TABLE __insert_allowed__;
-        INSERT INTO __insert_allowed__ VALUES(TRUE);
-
-        -- Insert the row
-        INSERT INTO tab_indikatoren(
-            gueltig_seit,
-            ist_aktiv,
-            ersteller_nutzer_id,
-            faktor,
-            dezimalstellen,
-            name_de,
-            name_en,
-            beschreibung_de,
-            beschreibung_en,
-            themen_id,
-            quellen_id,
-            einheiten_id,
-            indikatoren_id
-        ) VALUES (
-            CURRENT_TIMESTAMP(6),
-            TRUE,
-            v_nutzer_id,
-            faktor_val,
-            dezimalstellen_val,
-            name_de_val,
-            name_en_val,
-            beschreibung_de_val,
-            beschreibung_en_val,
-            themen_val,
-            quellen_val,
-            einheiten_val,
-            v_new_id
-        );
-
-        TRUNCATE TABLE __insert_allowed__;
-        SET v_count = v_count + 1;
-    END LOOP;
-
-    CLOSE cur;
-
-    SET rows_inserted_out = v_count;
-    COMMIT;
-END$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE PROCEDURE bulk_insert_into_laender(
-    OUT rows_inserted_out INTEGER
-)
-BEGIN
-    DECLARE v_nutzer_id INTEGER;
-    DECLARE v_current_username VARCHAR(256);
-    DECLARE v_new_id INTEGER;
-    DECLARE v_count INTEGER DEFAULT 0;
-
-    -- Ensure the current user is set
-    CALL insert_current_nutzer();
-
-    -- Get the current user's ID
-    SET v_current_username = get_aktuellen_nutzer_namen();
-    SET v_nutzer_id = (
-        SELECT nutzer_id
-        FROM view_nutzer_aktuell
-        WHERE name = v_current_username
-        LIMIT 1
-    );
-
-    START TRANSACTION;
-
-    -- Cursor to loop through the temporary table
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE iso2_val VARCHAR(2);
-    DECLARE iso3_val VARCHAR(3);
-    DECLARE kontinente_val INTEGER;
-    DECLARE laendernamen_de_val INTEGER;
-    DECLARE laendernamen_en_val INTEGER;
-
-    -- Temporary table must be created and populated before calling this procedure
-    DECLARE cur CURSOR FOR
-        SELECT
-            iso2_in,
-            iso3_in,
-            kontinente_in
-,            laendernamen_de_in
-,            laendernamen_en_in
-        FROM temp_laender_bulk;
-
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    OPEN cur;
-
-    read_loop: LOOP
-        FETCH cur INTO
-            iso2_val
-,            iso3_val
- kontinente_val
-, laendernamen_de_val
-, laendernamen_en_val
-;
-
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-
-        -- Get a new ID for each row
-        SET v_new_id = (
-            SELECT neue_laender_id
-            FROM view_laender_neue_id
-        );
-
-        -- Check if insert is allowed
-        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
-        TRUNCATE TABLE __insert_allowed__;
-        INSERT INTO __insert_allowed__ VALUES(TRUE);
-
-        -- Insert the row
-        INSERT INTO tab_laender(
-            gueltig_seit,
-            ist_aktiv,
-            ersteller_nutzer_id,
-            iso2,
-            iso3,
-            kontinente_id,
-            laendernamen_de_id,
-            laendernamen_en_id,
-            laender_id
-        ) VALUES (
-            CURRENT_TIMESTAMP(6),
-            TRUE,
-            v_nutzer_id,
-            iso2_val,
-            iso3_val,
-            kontinente_val,
-            laendernamen_de_val,
-            laendernamen_en_val,
-            v_new_id
-        );
-
-        TRUNCATE TABLE __insert_allowed__;
-        SET v_count = v_count + 1;
-    END LOOP;
-
-    CLOSE cur;
-
-    SET rows_inserted_out = v_count;
-    COMMIT;
-END$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE PROCEDURE bulk_insert_into_daten(
-    OUT rows_inserted_out INTEGER
-)
-BEGIN
-    DECLARE v_nutzer_id INTEGER;
-    DECLARE v_current_username VARCHAR(256);
-    DECLARE v_new_id INTEGER;
-    DECLARE v_count INTEGER DEFAULT 0;
-
-    -- Ensure the current user is set
-    CALL insert_current_nutzer();
-
-    -- Get the current user's ID
-    SET v_current_username = get_aktuellen_nutzer_namen();
-    SET v_nutzer_id = (
-        SELECT nutzer_id
-        FROM view_nutzer_aktuell
-        WHERE name = v_current_username
-        LIMIT 1
-    );
-
-    START TRANSACTION;
-
-    -- Cursor to loop through the temporary table
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE datum_val DATE;
-    DECLARE wert_val DOUBLE;
-    DECLARE laender_val INTEGER;
-    DECLARE indikatoren_val INTEGER;
-
-    -- Temporary table must be created and populated before calling this procedure
-    DECLARE cur CURSOR FOR
-        SELECT
-            datum_in,
-            wert_in,
-            laender_in
-,            indikatoren_in
-        FROM temp_daten_bulk;
-
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    OPEN cur;
-
-    read_loop: LOOP
-        FETCH cur INTO
-            datum_val
-,            wert_val
- laender_val
-, indikatoren_val
-;
-
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-
-        -- Get a new ID for each row
-        SET v_new_id = (
-            SELECT neue_daten_id
-            FROM view_daten_neue_id
-        );
-
-        -- Check if insert is allowed
-        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
-        TRUNCATE TABLE __insert_allowed__;
-        INSERT INTO __insert_allowed__ VALUES(TRUE);
-
-        -- Insert the row
-        INSERT INTO tab_daten(
-            gueltig_seit,
-            ist_aktiv,
-            ersteller_nutzer_id,
-            datum,
-            wert,
-            laender_id,
-            indikatoren_id,
-            daten_id
-        ) VALUES (
-            CURRENT_TIMESTAMP(6),
-            TRUE,
-            v_nutzer_id,
-            datum_val,
-            wert_val,
-            laender_val,
-            indikatoren_val,
-            v_new_id
-        );
-
-        TRUNCATE TABLE __insert_allowed__;
-        SET v_count = v_count + 1;
-    END LOOP;
-
-    CLOSE cur;
-
-    SET rows_inserted_out = v_count;
-    COMMIT;
-END$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE PROCEDURE bulk_insert_into_laendergruppenzuordnungen(
-    OUT rows_inserted_out INTEGER
-)
-BEGIN
-    DECLARE v_nutzer_id INTEGER;
-    DECLARE v_current_username VARCHAR(256);
-    DECLARE v_new_id INTEGER;
-    DECLARE v_count INTEGER DEFAULT 0;
-
-    -- Ensure the current user is set
-    CALL insert_current_nutzer();
-
-    -- Get the current user's ID
-    SET v_current_username = get_aktuellen_nutzer_namen();
-    SET v_nutzer_id = (
-        SELECT nutzer_id
-        FROM view_nutzer_aktuell
-        WHERE name = v_current_username
-        LIMIT 1
-    );
-
-    START TRANSACTION;
-
-    -- Cursor to loop through the temporary table
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE laender_val INTEGER;
-    DECLARE laendergruppen_val INTEGER;
-
-    -- Temporary table must be created and populated before calling this procedure
-    DECLARE cur CURSOR FOR
-        SELECT
-            laender_in
-,            laendergruppen_in
-        FROM temp_laendergruppenzuordnungen_bulk;
-
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    OPEN cur;
-
-    read_loop: LOOP
-        FETCH cur INTO
- laender_val
-, laendergruppen_val
-;
-
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-
-        -- Get a new ID for each row
-        SET v_new_id = (
-            SELECT neue_laendergruppenzuordnungen_id
-            FROM view_laendergruppenzuordnungen_neue_id
-        );
-
-        -- Check if insert is allowed
-        CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
-        TRUNCATE TABLE __insert_allowed__;
-        INSERT INTO __insert_allowed__ VALUES(TRUE);
-
-        -- Insert the row
-        INSERT INTO tab_laendergruppenzuordnungen(
-            gueltig_seit,
-            ist_aktiv,
-            ersteller_nutzer_id,
-            laender_id,
-            laendergruppen_id,
-            laendergruppenzuordnungen_id
-        ) VALUES (
-            CURRENT_TIMESTAMP(6),
-            TRUE,
-            v_nutzer_id,
-            laender_val,
-            laendergruppen_val,
-            v_new_id
-        );
-
-        TRUNCATE TABLE __insert_allowed__;
-        SET v_count = v_count + 1;
-    END LOOP;
-
-    CLOSE cur;
-
-    SET rows_inserted_out = v_count;
-    COMMIT;
-END$$
-
-DELIMITER ;
 
 DELIMITER $$
 
 CREATE PROCEDURE insert_into_nutzer(
-    IN name_in VARCHAR(256),
+    IN name_in VARCHAR(32),
     OUT new_nutzer_id_out INTEGER
 )
 BEGIN
@@ -2530,10 +1790,10 @@ DELIMITER ;
 DELIMITER $$
 
 CREATE PROCEDURE insert_into_quellen(
-    IN name_de_in VARCHAR(256),
-    IN name_en_in VARCHAR(256),
-    IN name_kurz_de_in VARCHAR(16),
-    IN name_kurz_en_in VARCHAR(16),
+    IN name_de_in INTEGER,
+    IN name_en_in INTEGER,
+    IN name_kurz_de_in INTEGER,
+    IN name_kurz_en_in INTEGER,
     OUT new_quellen_id_out INTEGER
 )
 BEGIN
@@ -2594,8 +1854,8 @@ DELIMITER ;
 DELIMITER $$
 
 CREATE PROCEDURE insert_into_themen(
-    IN name_de_in VARCHAR(64),
-    IN name_en_in VARCHAR(64),
+    IN name_de_in INTEGER,
+    IN name_en_in INTEGER,
     IN farbe_r_in TINYINT UNSIGNED,
     IN farbe_g_in TINYINT UNSIGNED,
     IN farbe_b_in TINYINT UNSIGNED,
@@ -2662,8 +1922,8 @@ DELIMITER $$
 
 CREATE PROCEDURE insert_into_einheiten(
     IN faktor_in DOUBLE,
-    IN symbol_de_in VARCHAR(64),
-    IN symbol_en_in VARCHAR(64),
+    IN symbol_de_in INTEGER,
+    IN symbol_en_in INTEGER,
     IN basis_einheiten_in INTEGER,
     OUT new_einheiten_id_out INTEGER
 )
@@ -2725,7 +1985,7 @@ DELIMITER ;
 DELIMITER $$
 
 CREATE PROCEDURE insert_into_laendernamen(
-    IN name_in VARCHAR(256),
+    IN name_in INTEGER,
     IN laender_in INTEGER,
     OUT new_laendernamen_id_out INTEGER
 )
@@ -2783,8 +2043,8 @@ DELIMITER ;
 DELIMITER $$
 
 CREATE PROCEDURE insert_into_kontinente(
-    IN name_de_in VARCHAR(64),
-    IN name_en_in VARCHAR(64),
+    IN name_de_in INTEGER,
+    IN name_en_in INTEGER,
     OUT new_kontinente_id_out INTEGER
 )
 BEGIN
@@ -2841,8 +2101,8 @@ DELIMITER ;
 DELIMITER $$
 
 CREATE PROCEDURE insert_into_laendergruppen(
-    IN name_de_in VARCHAR(256),
-    IN name_en_in VARCHAR(256),
+    IN name_de_in INTEGER,
+    IN name_en_in INTEGER,
     OUT new_laendergruppen_id_out INTEGER
 )
 BEGIN
@@ -2898,13 +2158,132 @@ DELIMITER ;
 
 DELIMITER $$
 
+CREATE PROCEDURE insert_into_lizenzen(
+    IN name_in INTEGER,
+    IN url_in INTEGER,
+    IN extra_bedingungen_in BOOLEAN,
+    OUT new_lizenzen_id_out INTEGER
+)
+BEGIN
+    DECLARE v_new_id INTEGER;
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    SET v_new_id = (
+        SELECT neue_lizenzen_id
+        FROM view_lizenzen_neue_id
+    );
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_lizenzen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name,
+        url,
+        extra_bedingungen,
+        lizenzen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        name_in,
+        url_in,
+        extra_bedingungen_in,
+        v_new_id
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+
+    SET new_lizenzen_id_out = v_new_id;
+    
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE insert_into_metadaten(
+    IN kuerzel_in INTEGER,
+    IN bezeichnung_in INTEGER,
+    OUT new_metadaten_id_out INTEGER
+)
+BEGIN
+    DECLARE v_new_id INTEGER;
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    SET v_new_id = (
+        SELECT neue_metadaten_id
+        FROM view_metadaten_neue_id
+    );
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_metadaten(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        kuerzel,
+        bezeichnung,
+        metadaten_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        kuerzel_in,
+        bezeichnung_in,
+        v_new_id
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+
+    SET new_metadaten_id_out = v_new_id;
+    
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
 CREATE PROCEDURE insert_into_indikatoren(
     IN faktor_in DOUBLE,
     IN dezimalstellen_in TINYINT UNSIGNED,
-    IN name_de_in VARCHAR(256),
-    IN name_en_in VARCHAR(256),
-    IN beschreibung_de_in VARCHAR(4096),
-    IN beschreibung_en_in VARCHAR(4096),
+    IN name_de_in INTEGER,
+    IN name_en_in INTEGER,
+    IN beschreibung_de_in INTEGER,
+    IN beschreibung_en_in INTEGER,
     IN themen_in INTEGER,
     IN quellen_in INTEGER,
     IN einheiten_in INTEGER,
@@ -2978,8 +2357,8 @@ DELIMITER ;
 DELIMITER $$
 
 CREATE PROCEDURE insert_into_laender(
-    IN iso2_in VARCHAR(2),
-    IN iso3_in VARCHAR(3),
+    IN iso2_in INTEGER,
+    IN iso3_in INTEGER,
     IN kontinente_in INTEGER,
     IN laendernamen_de_in INTEGER,
     IN laendernamen_en_in INTEGER,
@@ -3049,6 +2428,8 @@ CREATE PROCEDURE insert_into_daten(
     IN wert_in DOUBLE,
     IN laender_in INTEGER,
     IN indikatoren_in INTEGER,
+    IN quellen_in INTEGER,
+    IN lizenzen_in INTEGER,
     OUT new_daten_id_out INTEGER
 )
 BEGIN
@@ -3085,6 +2466,8 @@ BEGIN
         wert,
         laender_id,
         indikatoren_id,
+        quellen_id,
+        lizenzen_id,
         daten_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -3094,6 +2477,8 @@ BEGIN
         wert_in,
         laender_in,
         indikatoren_in,
+        quellen_in,
+        lizenzen_in,
         v_new_id
     );
 
@@ -3166,11 +2551,69 @@ DELIMITER ;
 
 DELIMITER $$
 
+CREATE PROCEDURE insert_into_metadatenzuordnungen(
+    IN daten_in INTEGER,
+    IN metadaten_in INTEGER,
+    OUT new_metadatenzuordnungen_id_out INTEGER
+)
+BEGIN
+    DECLARE v_new_id INTEGER;
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    SET v_new_id = (
+        SELECT neue_metadatenzuordnungen_id
+        FROM view_metadatenzuordnungen_neue_id
+    );
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_metadatenzuordnungen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        daten_id,
+        metadaten_id,
+        metadatenzuordnungen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        daten_in,
+        metadaten_in,
+        v_new_id
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+
+    SET new_metadatenzuordnungen_id_out = v_new_id;
+    
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
 CREATE PROCEDURE delete_from_nutzer(
     IN nutzer_id_to_delete INTEGER
 )
 BEGIN
-    DECLARE v_name VARCHAR(256);
+    DECLARE v_name VARCHAR(32);
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -3222,10 +2665,10 @@ CREATE PROCEDURE delete_from_quellen(
     IN quellen_id_to_delete INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_name_kurz_de VARCHAR(16);
-    DECLARE v_name_kurz_en VARCHAR(16);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_name_kurz_de INTEGER;
+    DECLARE v_name_kurz_en INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -3289,8 +2732,8 @@ CREATE PROCEDURE delete_from_themen(
     IN themen_id_to_delete INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(64);
-    DECLARE v_name_en VARCHAR(64);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
     DECLARE v_farbe_r TINYINT UNSIGNED;
     DECLARE v_farbe_g TINYINT UNSIGNED;
     DECLARE v_farbe_b TINYINT UNSIGNED;
@@ -3362,8 +2805,8 @@ CREATE PROCEDURE delete_from_einheiten(
 )
 BEGIN
     DECLARE v_faktor DOUBLE;
-    DECLARE v_symbol_de VARCHAR(64);
-    DECLARE v_symbol_en VARCHAR(64);
+    DECLARE v_symbol_de INTEGER;
+    DECLARE v_symbol_en INTEGER;
     DECLARE v_basis_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -3428,7 +2871,7 @@ CREATE PROCEDURE delete_from_laendernamen(
     IN laendernamen_id_to_delete INTEGER
 )
 BEGIN
-    DECLARE v_name VARCHAR(256);
+    DECLARE v_name INTEGER;
     DECLARE v_laender INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -3485,8 +2928,8 @@ CREATE PROCEDURE delete_from_kontinente(
     IN kontinente_id_to_delete INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(64);
-    DECLARE v_name_en VARCHAR(64);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -3542,8 +2985,8 @@ CREATE PROCEDURE delete_from_laendergruppen(
     IN laendergruppen_id_to_delete INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -3595,16 +3038,135 @@ DELIMITER ;
 
 DELIMITER $$
 
+CREATE PROCEDURE delete_from_lizenzen(
+    IN lizenzen_id_to_delete INTEGER
+)
+BEGIN
+    DECLARE v_name INTEGER;
+    DECLARE v_url INTEGER;
+    DECLARE v_extra_bedingungen BOOLEAN;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+    
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        name,
+        url,
+        extra_bedingungen
+    INTO
+        v_name,
+        v_url,
+        v_extra_bedingungen
+    FROM view_lizenzen_aktuell
+    WHERE lizenzen_id = lizenzen_id_to_delete;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_lizenzen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name,
+        url,
+        extra_bedingungen,
+        lizenzen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        FALSE,
+        v_nutzer_id,
+        v_name,
+        v_url,
+        v_extra_bedingungen,
+        lizenzen_id_to_delete
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+   
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE delete_from_metadaten(
+    IN metadaten_id_to_delete INTEGER
+)
+BEGIN
+    DECLARE v_kuerzel INTEGER;
+    DECLARE v_bezeichnung INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+    
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        kuerzel,
+        bezeichnung
+    INTO
+        v_kuerzel,
+        v_bezeichnung
+    FROM view_metadaten_aktuell
+    WHERE metadaten_id = metadaten_id_to_delete;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_metadaten(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        kuerzel,
+        bezeichnung,
+        metadaten_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        FALSE,
+        v_nutzer_id,
+        v_kuerzel,
+        v_bezeichnung,
+        metadaten_id_to_delete
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+   
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
 CREATE PROCEDURE delete_from_indikatoren(
     IN indikatoren_id_to_delete INTEGER
 )
 BEGIN
     DECLARE v_faktor DOUBLE;
     DECLARE v_dezimalstellen TINYINT UNSIGNED;
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_beschreibung_de VARCHAR(4096);
-    DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_beschreibung_de INTEGER;
+    DECLARE v_beschreibung_en INTEGER;
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -3691,8 +3253,8 @@ CREATE PROCEDURE delete_from_laender(
     IN laender_id_to_delete INTEGER
 )
 BEGIN
-    DECLARE v_iso2 VARCHAR(2);
-    DECLARE v_iso3 VARCHAR(3);
+    DECLARE v_iso2 INTEGER;
+    DECLARE v_iso3 INTEGER;
     DECLARE v_kontinente INTEGER;
     DECLARE v_laendernamen_de INTEGER;
     DECLARE v_laendernamen_en INTEGER;
@@ -3767,6 +3329,8 @@ BEGIN
     DECLARE v_wert DOUBLE;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
+    DECLARE v_quellen INTEGER;
+    DECLARE v_lizenzen INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -3785,12 +3349,16 @@ BEGIN
         datum,
         wert,
         laender_id,
-        indikatoren_id
+        indikatoren_id,
+        quellen_id,
+        lizenzen_id
     INTO
         v_datum,
         v_wert,
         v_laender,
-        v_indikatoren
+        v_indikatoren,
+        v_quellen,
+        v_lizenzen
     FROM view_daten_aktuell
     WHERE daten_id = daten_id_to_delete;
 
@@ -3806,6 +3374,8 @@ BEGIN
         wert,
         laender_id,
         indikatoren_id,
+        quellen_id,
+        lizenzen_id,
         daten_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -3815,6 +3385,8 @@ BEGIN
         v_wert,
         v_laender,
         v_indikatoren,
+        v_quellen,
+        v_lizenzen,
         daten_id_to_delete
     );
 
@@ -3883,9 +3455,66 @@ DELIMITER ;
 
 DELIMITER $$
 
+CREATE PROCEDURE delete_from_metadatenzuordnungen(
+    IN metadatenzuordnungen_id_to_delete INTEGER
+)
+BEGIN
+    DECLARE v_daten INTEGER;
+    DECLARE v_metadaten INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+    
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        daten_id,
+        metadaten_id
+    INTO
+        v_daten,
+        v_metadaten
+    FROM view_metadatenzuordnungen_aktuell
+    WHERE metadatenzuordnungen_id = metadatenzuordnungen_id_to_delete;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_metadatenzuordnungen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        daten_id,
+        metadaten_id,
+        metadatenzuordnungen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        FALSE,
+        v_nutzer_id,
+        v_daten,
+        v_metadaten,
+        metadatenzuordnungen_id_to_delete
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+   
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
 CREATE PROCEDURE update_value_nutzer_name(
     IN nutzer_id_in INTEGER,
-    IN value_in VARCHAR(256)
+    IN value_in VARCHAR(32)
 )
 BEGIN
 
@@ -3930,13 +3559,13 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_quellen_name_de(
     IN quellen_id_in INTEGER,
-    IN value_in VARCHAR(256)
+    IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_name_kurz_de VARCHAR(16);
-    DECLARE v_name_kurz_en VARCHAR(16);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_name_kurz_de INTEGER;
+    DECLARE v_name_kurz_en INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -3997,13 +3626,13 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_quellen_name_en(
     IN quellen_id_in INTEGER,
-    IN value_in VARCHAR(256)
+    IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_name_kurz_de VARCHAR(16);
-    DECLARE v_name_kurz_en VARCHAR(16);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_name_kurz_de INTEGER;
+    DECLARE v_name_kurz_en INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -4064,13 +3693,13 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_quellen_name_kurz_de(
     IN quellen_id_in INTEGER,
-    IN value_in VARCHAR(16)
+    IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_name_kurz_de VARCHAR(16);
-    DECLARE v_name_kurz_en VARCHAR(16);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_name_kurz_de INTEGER;
+    DECLARE v_name_kurz_en INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -4131,13 +3760,13 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_quellen_name_kurz_en(
     IN quellen_id_in INTEGER,
-    IN value_in VARCHAR(16)
+    IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_name_kurz_de VARCHAR(16);
-    DECLARE v_name_kurz_en VARCHAR(16);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_name_kurz_de INTEGER;
+    DECLARE v_name_kurz_en INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -4198,11 +3827,11 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_themen_name_de(
     IN themen_id_in INTEGER,
-    IN value_in VARCHAR(64)
+    IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(64);
-    DECLARE v_name_en VARCHAR(64);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
     DECLARE v_farbe_r TINYINT UNSIGNED;
     DECLARE v_farbe_g TINYINT UNSIGNED;
     DECLARE v_farbe_b TINYINT UNSIGNED;
@@ -4270,11 +3899,11 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_themen_name_en(
     IN themen_id_in INTEGER,
-    IN value_in VARCHAR(64)
+    IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(64);
-    DECLARE v_name_en VARCHAR(64);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
     DECLARE v_farbe_r TINYINT UNSIGNED;
     DECLARE v_farbe_g TINYINT UNSIGNED;
     DECLARE v_farbe_b TINYINT UNSIGNED;
@@ -4345,8 +3974,8 @@ CREATE PROCEDURE update_value_themen_farbe_r(
     IN value_in TINYINT UNSIGNED
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(64);
-    DECLARE v_name_en VARCHAR(64);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
     DECLARE v_farbe_r TINYINT UNSIGNED;
     DECLARE v_farbe_g TINYINT UNSIGNED;
     DECLARE v_farbe_b TINYINT UNSIGNED;
@@ -4417,8 +4046,8 @@ CREATE PROCEDURE update_value_themen_farbe_g(
     IN value_in TINYINT UNSIGNED
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(64);
-    DECLARE v_name_en VARCHAR(64);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
     DECLARE v_farbe_r TINYINT UNSIGNED;
     DECLARE v_farbe_g TINYINT UNSIGNED;
     DECLARE v_farbe_b TINYINT UNSIGNED;
@@ -4489,8 +4118,8 @@ CREATE PROCEDURE update_value_themen_farbe_b(
     IN value_in TINYINT UNSIGNED
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(64);
-    DECLARE v_name_en VARCHAR(64);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
     DECLARE v_farbe_r TINYINT UNSIGNED;
     DECLARE v_farbe_g TINYINT UNSIGNED;
     DECLARE v_farbe_b TINYINT UNSIGNED;
@@ -4562,8 +4191,8 @@ CREATE PROCEDURE update_value_einheiten_faktor(
 )
 BEGIN
     DECLARE v_faktor DOUBLE;
-    DECLARE v_symbol_de VARCHAR(64);
-    DECLARE v_symbol_en VARCHAR(64);
+    DECLARE v_symbol_de INTEGER;
+    DECLARE v_symbol_en INTEGER;
     DECLARE v_basis_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -4625,12 +4254,12 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_einheiten_symbol_de(
     IN einheiten_id_in INTEGER,
-    IN value_in VARCHAR(64)
+    IN value_in INTEGER
 )
 BEGIN
     DECLARE v_faktor DOUBLE;
-    DECLARE v_symbol_de VARCHAR(64);
-    DECLARE v_symbol_en VARCHAR(64);
+    DECLARE v_symbol_de INTEGER;
+    DECLARE v_symbol_en INTEGER;
     DECLARE v_basis_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -4692,12 +4321,12 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_einheiten_symbol_en(
     IN einheiten_id_in INTEGER,
-    IN value_in VARCHAR(64)
+    IN value_in INTEGER
 )
 BEGIN
     DECLARE v_faktor DOUBLE;
-    DECLARE v_symbol_de VARCHAR(64);
-    DECLARE v_symbol_en VARCHAR(64);
+    DECLARE v_symbol_de INTEGER;
+    DECLARE v_symbol_en INTEGER;
     DECLARE v_basis_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -4763,8 +4392,8 @@ CREATE PROCEDURE update_value_einheiten_basis_einheiten(
 )
 BEGIN
     DECLARE v_faktor DOUBLE;
-    DECLARE v_symbol_de VARCHAR(64);
-    DECLARE v_symbol_en VARCHAR(64);
+    DECLARE v_symbol_de INTEGER;
+    DECLARE v_symbol_en INTEGER;
     DECLARE v_basis_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -4826,10 +4455,10 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_laendernamen_name(
     IN laendernamen_id_in INTEGER,
-    IN value_in VARCHAR(256)
+    IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_name VARCHAR(256);
+    DECLARE v_name INTEGER;
     DECLARE v_laender INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -4886,7 +4515,7 @@ CREATE PROCEDURE update_value_laendernamen_laender(
     IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_name VARCHAR(256);
+    DECLARE v_name INTEGER;
     DECLARE v_laender INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -4940,11 +4569,11 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_kontinente_name_de(
     IN kontinente_id_in INTEGER,
-    IN value_in VARCHAR(64)
+    IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(64);
-    DECLARE v_name_en VARCHAR(64);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -4997,11 +4626,11 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_kontinente_name_en(
     IN kontinente_id_in INTEGER,
-    IN value_in VARCHAR(64)
+    IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(64);
-    DECLARE v_name_en VARCHAR(64);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -5054,11 +4683,11 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_laendergruppen_name_de(
     IN laendergruppen_id_in INTEGER,
-    IN value_in VARCHAR(256)
+    IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -5111,11 +4740,11 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_laendergruppen_name_en(
     IN laendergruppen_id_in INTEGER,
-    IN value_in VARCHAR(256)
+    IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -5166,6 +4795,306 @@ DELIMITER ;
 
 DELIMITER $$
 
+CREATE PROCEDURE update_value_lizenzen_name(
+    IN lizenzen_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_name INTEGER;
+    DECLARE v_url INTEGER;
+    DECLARE v_extra_bedingungen BOOLEAN;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        name,
+        url,
+        extra_bedingungen
+    INTO
+        v_name,
+        v_url,
+        v_extra_bedingungen
+    FROM view_lizenzen_aktuell
+    WHERE lizenzen_id = lizenzen_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_lizenzen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name,
+        url,
+        extra_bedingungen,
+        lizenzen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        value_in,
+        v_url,
+        v_extra_bedingungen,
+        lizenzen_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_lizenzen_url(
+    IN lizenzen_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_name INTEGER;
+    DECLARE v_url INTEGER;
+    DECLARE v_extra_bedingungen BOOLEAN;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        name,
+        url,
+        extra_bedingungen
+    INTO
+        v_name,
+        v_url,
+        v_extra_bedingungen
+    FROM view_lizenzen_aktuell
+    WHERE lizenzen_id = lizenzen_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_lizenzen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name,
+        url,
+        extra_bedingungen,
+        lizenzen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_name,
+        value_in,
+        v_extra_bedingungen,
+        lizenzen_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_lizenzen_extra_bedingungen(
+    IN lizenzen_id_in INTEGER,
+    IN value_in BOOLEAN
+)
+BEGIN
+    DECLARE v_name INTEGER;
+    DECLARE v_url INTEGER;
+    DECLARE v_extra_bedingungen BOOLEAN;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        name,
+        url,
+        extra_bedingungen
+    INTO
+        v_name,
+        v_url,
+        v_extra_bedingungen
+    FROM view_lizenzen_aktuell
+    WHERE lizenzen_id = lizenzen_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_lizenzen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name,
+        url,
+        extra_bedingungen,
+        lizenzen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_name,
+        v_url,
+        value_in,
+        lizenzen_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_metadaten_kuerzel(
+    IN metadaten_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_kuerzel INTEGER;
+    DECLARE v_bezeichnung INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        kuerzel,
+        bezeichnung
+    INTO
+        v_kuerzel,
+        v_bezeichnung
+    FROM view_metadaten_aktuell
+    WHERE metadaten_id = metadaten_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_metadaten(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        kuerzel,
+        bezeichnung,
+        metadaten_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        value_in,
+        v_bezeichnung,
+        metadaten_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_metadaten_bezeichnung(
+    IN metadaten_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_kuerzel INTEGER;
+    DECLARE v_bezeichnung INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        kuerzel,
+        bezeichnung
+    INTO
+        v_kuerzel,
+        v_bezeichnung
+    FROM view_metadaten_aktuell
+    WHERE metadaten_id = metadaten_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_metadaten(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        kuerzel,
+        bezeichnung,
+        metadaten_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_kuerzel,
+        value_in,
+        metadaten_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
 CREATE PROCEDURE update_value_indikatoren_faktor(
     IN indikatoren_id_in INTEGER,
     IN value_in DOUBLE
@@ -5173,10 +5102,10 @@ CREATE PROCEDURE update_value_indikatoren_faktor(
 BEGIN
     DECLARE v_faktor DOUBLE;
     DECLARE v_dezimalstellen TINYINT UNSIGNED;
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_beschreibung_de VARCHAR(4096);
-    DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_beschreibung_de INTEGER;
+    DECLARE v_beschreibung_en INTEGER;
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5265,10 +5194,10 @@ CREATE PROCEDURE update_value_indikatoren_dezimalstellen(
 BEGIN
     DECLARE v_faktor DOUBLE;
     DECLARE v_dezimalstellen TINYINT UNSIGNED;
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_beschreibung_de VARCHAR(4096);
-    DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_beschreibung_de INTEGER;
+    DECLARE v_beschreibung_en INTEGER;
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5352,15 +5281,15 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_indikatoren_name_de(
     IN indikatoren_id_in INTEGER,
-    IN value_in VARCHAR(256)
+    IN value_in INTEGER
 )
 BEGIN
     DECLARE v_faktor DOUBLE;
     DECLARE v_dezimalstellen TINYINT UNSIGNED;
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_beschreibung_de VARCHAR(4096);
-    DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_beschreibung_de INTEGER;
+    DECLARE v_beschreibung_en INTEGER;
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5444,15 +5373,15 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_indikatoren_name_en(
     IN indikatoren_id_in INTEGER,
-    IN value_in VARCHAR(256)
+    IN value_in INTEGER
 )
 BEGIN
     DECLARE v_faktor DOUBLE;
     DECLARE v_dezimalstellen TINYINT UNSIGNED;
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_beschreibung_de VARCHAR(4096);
-    DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_beschreibung_de INTEGER;
+    DECLARE v_beschreibung_en INTEGER;
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5536,15 +5465,15 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_indikatoren_beschreibung_de(
     IN indikatoren_id_in INTEGER,
-    IN value_in VARCHAR(4096)
+    IN value_in INTEGER
 )
 BEGIN
     DECLARE v_faktor DOUBLE;
     DECLARE v_dezimalstellen TINYINT UNSIGNED;
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_beschreibung_de VARCHAR(4096);
-    DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_beschreibung_de INTEGER;
+    DECLARE v_beschreibung_en INTEGER;
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5628,15 +5557,15 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_indikatoren_beschreibung_en(
     IN indikatoren_id_in INTEGER,
-    IN value_in VARCHAR(4096)
+    IN value_in INTEGER
 )
 BEGIN
     DECLARE v_faktor DOUBLE;
     DECLARE v_dezimalstellen TINYINT UNSIGNED;
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_beschreibung_de VARCHAR(4096);
-    DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_beschreibung_de INTEGER;
+    DECLARE v_beschreibung_en INTEGER;
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5725,10 +5654,10 @@ CREATE PROCEDURE update_value_indikatoren_themen(
 BEGIN
     DECLARE v_faktor DOUBLE;
     DECLARE v_dezimalstellen TINYINT UNSIGNED;
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_beschreibung_de VARCHAR(4096);
-    DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_beschreibung_de INTEGER;
+    DECLARE v_beschreibung_en INTEGER;
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5817,10 +5746,10 @@ CREATE PROCEDURE update_value_indikatoren_quellen(
 BEGIN
     DECLARE v_faktor DOUBLE;
     DECLARE v_dezimalstellen TINYINT UNSIGNED;
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_beschreibung_de VARCHAR(4096);
-    DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_beschreibung_de INTEGER;
+    DECLARE v_beschreibung_en INTEGER;
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5909,10 +5838,10 @@ CREATE PROCEDURE update_value_indikatoren_einheiten(
 BEGIN
     DECLARE v_faktor DOUBLE;
     DECLARE v_dezimalstellen TINYINT UNSIGNED;
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_beschreibung_de VARCHAR(4096);
-    DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_name_de INTEGER;
+    DECLARE v_name_en INTEGER;
+    DECLARE v_beschreibung_de INTEGER;
+    DECLARE v_beschreibung_en INTEGER;
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5996,11 +5925,11 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_laender_iso2(
     IN laender_id_in INTEGER,
-    IN value_in VARCHAR(2)
+    IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_iso2 VARCHAR(2);
-    DECLARE v_iso3 VARCHAR(3);
+    DECLARE v_iso2 INTEGER;
+    DECLARE v_iso3 INTEGER;
     DECLARE v_kontinente INTEGER;
     DECLARE v_laendernamen_de INTEGER;
     DECLARE v_laendernamen_en INTEGER;
@@ -6068,11 +5997,11 @@ DELIMITER $$
 
 CREATE PROCEDURE update_value_laender_iso3(
     IN laender_id_in INTEGER,
-    IN value_in VARCHAR(3)
+    IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_iso2 VARCHAR(2);
-    DECLARE v_iso3 VARCHAR(3);
+    DECLARE v_iso2 INTEGER;
+    DECLARE v_iso3 INTEGER;
     DECLARE v_kontinente INTEGER;
     DECLARE v_laendernamen_de INTEGER;
     DECLARE v_laendernamen_en INTEGER;
@@ -6143,8 +6072,8 @@ CREATE PROCEDURE update_value_laender_kontinente(
     IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_iso2 VARCHAR(2);
-    DECLARE v_iso3 VARCHAR(3);
+    DECLARE v_iso2 INTEGER;
+    DECLARE v_iso3 INTEGER;
     DECLARE v_kontinente INTEGER;
     DECLARE v_laendernamen_de INTEGER;
     DECLARE v_laendernamen_en INTEGER;
@@ -6215,8 +6144,8 @@ CREATE PROCEDURE update_value_laender_laendernamen_de(
     IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_iso2 VARCHAR(2);
-    DECLARE v_iso3 VARCHAR(3);
+    DECLARE v_iso2 INTEGER;
+    DECLARE v_iso3 INTEGER;
     DECLARE v_kontinente INTEGER;
     DECLARE v_laendernamen_de INTEGER;
     DECLARE v_laendernamen_en INTEGER;
@@ -6287,8 +6216,8 @@ CREATE PROCEDURE update_value_laender_laendernamen_en(
     IN value_in INTEGER
 )
 BEGIN
-    DECLARE v_iso2 VARCHAR(2);
-    DECLARE v_iso3 VARCHAR(3);
+    DECLARE v_iso2 INTEGER;
+    DECLARE v_iso3 INTEGER;
     DECLARE v_kontinente INTEGER;
     DECLARE v_laendernamen_de INTEGER;
     DECLARE v_laendernamen_en INTEGER;
@@ -6363,6 +6292,8 @@ BEGIN
     DECLARE v_wert DOUBLE;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
+    DECLARE v_quellen INTEGER;
+    DECLARE v_lizenzen INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -6381,12 +6312,16 @@ BEGIN
         datum,
         wert,
         laender_id,
-        indikatoren_id
+        indikatoren_id,
+        quellen_id,
+        lizenzen_id
     INTO
         v_datum,
         v_wert,
         v_laender,
-        v_indikatoren
+        v_indikatoren,
+        v_quellen,
+        v_lizenzen
     FROM view_daten_aktuell
     WHERE daten_id = daten_id_in;
 
@@ -6402,6 +6337,8 @@ BEGIN
         wert,
         laender_id,
         indikatoren_id,
+        quellen_id,
+        lizenzen_id,
         daten_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -6411,6 +6348,8 @@ BEGIN
         v_wert,
         v_laender,
         v_indikatoren,
+        v_quellen,
+        v_lizenzen,
         daten_id_in
     );
 
@@ -6430,6 +6369,8 @@ BEGIN
     DECLARE v_wert DOUBLE;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
+    DECLARE v_quellen INTEGER;
+    DECLARE v_lizenzen INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -6448,12 +6389,16 @@ BEGIN
         datum,
         wert,
         laender_id,
-        indikatoren_id
+        indikatoren_id,
+        quellen_id,
+        lizenzen_id
     INTO
         v_datum,
         v_wert,
         v_laender,
-        v_indikatoren
+        v_indikatoren,
+        v_quellen,
+        v_lizenzen
     FROM view_daten_aktuell
     WHERE daten_id = daten_id_in;
 
@@ -6469,6 +6414,8 @@ BEGIN
         wert,
         laender_id,
         indikatoren_id,
+        quellen_id,
+        lizenzen_id,
         daten_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -6478,6 +6425,8 @@ BEGIN
         value_in,
         v_laender,
         v_indikatoren,
+        v_quellen,
+        v_lizenzen,
         daten_id_in
     );
 
@@ -6497,6 +6446,8 @@ BEGIN
     DECLARE v_wert DOUBLE;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
+    DECLARE v_quellen INTEGER;
+    DECLARE v_lizenzen INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -6515,12 +6466,16 @@ BEGIN
         datum,
         wert,
         laender_id,
-        indikatoren_id
+        indikatoren_id,
+        quellen_id,
+        lizenzen_id
     INTO
         v_datum,
         v_wert,
         v_laender,
-        v_indikatoren
+        v_indikatoren,
+        v_quellen,
+        v_lizenzen
     FROM view_daten_aktuell
     WHERE daten_id = daten_id_in;
 
@@ -6536,6 +6491,8 @@ BEGIN
         wert,
         laender_id,
         indikatoren_id,
+        quellen_id,
+        lizenzen_id,
         daten_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -6545,6 +6502,8 @@ BEGIN
         v_wert,
         value_in,
         v_indikatoren,
+        v_quellen,
+        v_lizenzen,
         daten_id_in
     );
 
@@ -6564,6 +6523,8 @@ BEGIN
     DECLARE v_wert DOUBLE;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
+    DECLARE v_quellen INTEGER;
+    DECLARE v_lizenzen INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -6582,12 +6543,16 @@ BEGIN
         datum,
         wert,
         laender_id,
-        indikatoren_id
+        indikatoren_id,
+        quellen_id,
+        lizenzen_id
     INTO
         v_datum,
         v_wert,
         v_laender,
-        v_indikatoren
+        v_indikatoren,
+        v_quellen,
+        v_lizenzen
     FROM view_daten_aktuell
     WHERE daten_id = daten_id_in;
 
@@ -6603,6 +6568,8 @@ BEGIN
         wert,
         laender_id,
         indikatoren_id,
+        quellen_id,
+        lizenzen_id,
         daten_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -6611,6 +6578,162 @@ BEGIN
         v_datum,
         v_wert,
         v_laender,
+        value_in,
+        v_quellen,
+        v_lizenzen,
+        daten_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_daten_quellen(
+    IN daten_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_datum DATE;
+    DECLARE v_wert DOUBLE;
+    DECLARE v_laender INTEGER;
+    DECLARE v_indikatoren INTEGER;
+    DECLARE v_quellen INTEGER;
+    DECLARE v_lizenzen INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        datum,
+        wert,
+        laender_id,
+        indikatoren_id,
+        quellen_id,
+        lizenzen_id
+    INTO
+        v_datum,
+        v_wert,
+        v_laender,
+        v_indikatoren,
+        v_quellen,
+        v_lizenzen
+    FROM view_daten_aktuell
+    WHERE daten_id = daten_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_daten(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        datum,
+        wert,
+        laender_id,
+        indikatoren_id,
+        quellen_id,
+        lizenzen_id,
+        daten_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_datum,
+        v_wert,
+        v_laender,
+        v_indikatoren,
+        value_in,
+        v_lizenzen,
+        daten_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_daten_lizenzen(
+    IN daten_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_datum DATE;
+    DECLARE v_wert DOUBLE;
+    DECLARE v_laender INTEGER;
+    DECLARE v_indikatoren INTEGER;
+    DECLARE v_quellen INTEGER;
+    DECLARE v_lizenzen INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        datum,
+        wert,
+        laender_id,
+        indikatoren_id,
+        quellen_id,
+        lizenzen_id
+    INTO
+        v_datum,
+        v_wert,
+        v_laender,
+        v_indikatoren,
+        v_quellen,
+        v_lizenzen
+    FROM view_daten_aktuell
+    WHERE daten_id = daten_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_daten(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        datum,
+        wert,
+        laender_id,
+        indikatoren_id,
+        quellen_id,
+        lizenzen_id,
+        daten_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_datum,
+        v_wert,
+        v_laender,
+        v_indikatoren,
+        v_quellen,
         value_in,
         daten_id_in
     );
@@ -6727,6 +6850,120 @@ BEGIN
         v_laender,
         value_in,
         laendergruppenzuordnungen_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_metadatenzuordnungen_daten(
+    IN metadatenzuordnungen_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_daten INTEGER;
+    DECLARE v_metadaten INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        daten_id,
+        metadaten_id
+    INTO
+        v_daten,
+        v_metadaten
+    FROM view_metadatenzuordnungen_aktuell
+    WHERE metadatenzuordnungen_id = metadatenzuordnungen_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_metadatenzuordnungen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        daten_id,
+        metadaten_id,
+        metadatenzuordnungen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        value_in,
+        v_metadaten,
+        metadatenzuordnungen_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_metadatenzuordnungen_metadaten(
+    IN metadatenzuordnungen_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_daten INTEGER;
+    DECLARE v_metadaten INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        daten_id,
+        metadaten_id
+    INTO
+        v_daten,
+        v_metadaten
+    FROM view_metadatenzuordnungen_aktuell
+    WHERE metadatenzuordnungen_id = metadatenzuordnungen_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_metadatenzuordnungen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        daten_id,
+        metadaten_id,
+        metadatenzuordnungen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_daten,
+        value_in,
+        metadatenzuordnungen_id_in
     );
 
     TRUNCATE TABLE __insert_allowed__;

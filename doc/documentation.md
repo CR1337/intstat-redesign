@@ -31,6 +31,21 @@ config:
 ---
 erDiagram
 
+        tab_lizenzen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER lizenzen_id PK
+
+
+                INTEGER name
+                INTEGER url
+                BOOLEAN extra_bedingungen
+        }
+
+        tab_nutzer ||--o{ tab_lizenzen : "erstellt von"
+
+
         tab_daten {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
@@ -39,6 +54,8 @@ erDiagram
 
                 INTEGER laender_id FK
                 INTEGER indikatoren_id FK
+                INTEGER quellen_id FK
+                INTEGER lizenzen_id FK
 
                 DATE datum
                 DOUBLE wert
@@ -46,6 +63,8 @@ erDiagram
 
             tab_laender ||--o{ tab_daten : "für Land"
             tab_indikatoren ||--o{ tab_daten : "für Indikator"
+            tab_quellen ||--o{ tab_daten : "von Quelle"
+            tab_lizenzen ||--o{ tab_daten : "hat Lizenz"
         tab_nutzer ||--o{ tab_daten : "erstellt von"
 
 
@@ -56,8 +75,8 @@ erDiagram
             INTEGER laendergruppen_id PK
 
 
-                VARCHAR(256) name_de
-                VARCHAR(256) name_en
+                INTEGER name_de
+                INTEGER name_en
         }
 
         tab_nutzer ||--o{ tab_laendergruppen : "erstellt von"
@@ -79,6 +98,20 @@ erDiagram
         tab_nutzer ||--o{ tab_laendergruppenzuordnungen : "erstellt von"
 
 
+        tab_metadaten {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER metadaten_id PK
+
+
+                INTEGER kuerzel
+                INTEGER bezeichnung
+        }
+
+        tab_nutzer ||--o{ tab_metadaten : "erstellt von"
+
+
         tab_nutzer {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
@@ -86,7 +119,7 @@ erDiagram
             INTEGER nutzer_id PK
 
 
-                VARCHAR(256) name
+                VARCHAR(32) name
         }
 
         tab_nutzer ||--o{ tab_nutzer : "erstellt von"
@@ -99,10 +132,10 @@ erDiagram
             INTEGER quellen_id PK
 
 
-                VARCHAR(256) name_de
-                VARCHAR(256) name_en
-                VARCHAR(16) name_kurz_de
-                VARCHAR(16) name_kurz_en
+                INTEGER name_de
+                INTEGER name_en
+                INTEGER name_kurz_de
+                INTEGER name_kurz_en
         }
 
         tab_nutzer ||--o{ tab_quellen : "erstellt von"
@@ -120,10 +153,10 @@ erDiagram
 
                 DOUBLE faktor
                 TINYINT_UNSIGNED dezimalstellen
-                VARCHAR(256) name_de
-                VARCHAR(256) name_en
-                VARCHAR(4096) beschreibung_de
-                VARCHAR(4096) beschreibung_en
+                INTEGER name_de
+                INTEGER name_en
+                INTEGER beschreibung_de
+                INTEGER beschreibung_en
         }
 
             tab_themen ||--o{ tab_indikatoren : "gehört zu Thema"
@@ -139,8 +172,8 @@ erDiagram
             INTEGER themen_id PK
 
 
-                VARCHAR(64) name_de
-                VARCHAR(64) name_en
+                INTEGER name_de
+                INTEGER name_en
                 TINYINT_UNSIGNED farbe_r
                 TINYINT_UNSIGNED farbe_g
                 TINYINT_UNSIGNED farbe_b
@@ -159,8 +192,8 @@ erDiagram
                 INTEGER laendernamen_de_id FK
                 INTEGER laendernamen_en_id FK
 
-                VARCHAR(2) iso2
-                VARCHAR(3) iso3
+                INTEGER iso2
+                INTEGER iso3
         }
 
             tab_kontinente ||--o{ tab_laender : "gehört zu Kontinent"
@@ -178,8 +211,8 @@ erDiagram
                 INTEGER basis_einheiten_id FK
 
                 DOUBLE faktor
-                VARCHAR(64) symbol_de
-                VARCHAR(64) symbol_en
+                INTEGER symbol_de
+                INTEGER symbol_en
         }
 
             tab_einheiten ||--o{ tab_einheiten : "hat Basiseinheit"
@@ -194,11 +227,27 @@ erDiagram
 
                 INTEGER laender_id FK
 
-                VARCHAR(256) name
+                INTEGER name
         }
 
             tab_laender ||--o{ tab_laendernamen : "gehört zu Land"
         tab_nutzer ||--o{ tab_laendernamen : "erstellt von"
+
+
+        tab_metadatenzuordnungen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK 
+            INTEGER metadatenzuordnungen_id PK
+
+                INTEGER daten_id FK
+                INTEGER metadaten_id FK
+
+        }
+
+            tab_daten ||--o{ tab_metadatenzuordnungen : "ordnet Datenpunkt zu"
+            tab_metadaten ||--o{ tab_metadatenzuordnungen : "ordnet Metadatum zu"
+        tab_nutzer ||--o{ tab_metadatenzuordnungen : "erstellt von"
 
 
         tab_kontinente {
@@ -208,8 +257,8 @@ erDiagram
             INTEGER kontinente_id PK
 
 
-                VARCHAR(64) name_de
-                VARCHAR(64) name_en
+                INTEGER name_de
+                INTEGER name_en
         }
 
         tab_nutzer ||--o{ tab_kontinente : "erstellt von"
@@ -291,6 +340,38 @@ WHERE t.ist_aktiv;
 
 ### Bulk insert_into_kontinente
 
-```SQL
+#### Erstellen einer temporären Tabelle
 
+```SQL
+CREATE TEMPORARY TABLE IF NOT EXISTS temp_kontinente_bulk (
+    name_de_in VARCHAR(64),
+    name_en_in VARCHAR(64)
+);
+```
+
+#### Füllen der temporären Tabelle
+
+```SQL
+INSERT INTO temp_kontinente_bulk (name_de_in, name_en_in)
+VALUES
+    ('Europa', 'Europe'),
+    ('Nordamerika', 'North America'),
+    ('Südamerika', 'South America'),
+    ('Asien', 'Asia'),
+    ('Afrika', 'Africa'),
+    ('Ozeanien', 'Oceania'),
+    ('Antarktika', 'Antarctica');
+```
+
+#### Übertragen der Daten in die eigentliche Tabelle
+
+```SQL
+CALL bulk_insert_into_kontinente(@rows_inserted);
+SELECT @rows_inserted AS rows_inserted;
+```
+
+#### Löschen der temporären Tabelle
+
+```SQL
+DROP TEMPORARY TABLE IF EXISTS temp_kontinente_bulk;
 ```

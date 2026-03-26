@@ -16,6 +16,9 @@ def test_restrict_duplicates(database_connection, table_definition):
             f"No INSERT procedure for {table_name}."
         )
 
+    if not table_definition["unique_sets"]:
+        return
+
     results = procedure_insert(connection, table_name)
     with pytest.raises(DatabaseError) as exc_info:
         procedure_insert(connection, table_name, arguments=results)

@@ -104,6 +104,9 @@ def get_random_value(type_: str = "INTEGER", quote_text: bool = False) -> Any:
 
         case "TINYINT UNSIGNED":
             return randint(0, 255)
+
+        case "BOOL" | "BOOLEAN":
+            return randint(0, 1)
         
         case _:
             raise ValueError(f"Unknown type: {type_}")

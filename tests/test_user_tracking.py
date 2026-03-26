@@ -8,13 +8,6 @@ def test_user_tracking(database_connection, table_definition):
     connection, db_name = database_connection
     table_name = table_definition['table_name']
 
-    if (
-        db_name == "intstat2_wot"
-    ):
-        pytest.skip(
-            f"No user tracking for {db_name}."
-        )
-
     new_id = procedure_insert(connection, table_name)[-1]
 
     result = fetch(connection, f"SELECT ersteller_nutzer_id FROM view_{table_name}_aktuell WHERE {table_name}_id = {new_id};")

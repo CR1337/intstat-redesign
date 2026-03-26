@@ -27,9 +27,9 @@ ORDERED_CREATE_STATEMENT_TYPES: List[str] = [
 ]
 ORDERED_TABLE_NAMES: List[str] = [
     "nutzer",
-    "quellen", "themen", "einheiten", "laendernamen", "kontinente", "laendergruppen",
+    "quellen", "themen", "einheiten", "laendernamen", "kontinente", "laendergruppen", "lizenzen", "metadaten",
     "indikatoren", "laender",
-    "daten", "laendergruppenzuordnungen"
+    "daten", "laendergruppenzuordnungen", "metadatenzuordnungen"
 ]
 
 

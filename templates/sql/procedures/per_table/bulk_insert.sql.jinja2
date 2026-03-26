@@ -1,4 +1,4 @@
-DELIMITER $$
+{# DELIMITER $$
 
 CREATE PROCEDURE bulk_insert_into_{{ table_name }}(
     OUT rows_inserted_out INTEGER
@@ -52,11 +52,12 @@ BEGIN
         FETCH cur INTO
             {% for col in columns %}
             {{ col.name }}_val
-            {% if not loop.last %},{% endif %}
+            {% if not loop.last or foreign_keys %},{% endif %}
             {% endfor %}
             {% for fk in foreign_keys %}
-            {% if not loop.first %},{% endif %} {{ fk.name }}_val
-            {% endfor %};
+            {{ fk.name }}_val
+            {% if not loop.last %},{% endif %}
+            {%- endfor -%};
 
         IF done THEN
             LEAVE read_loop;
@@ -108,4 +109,4 @@ BEGIN
     COMMIT;
 END$$
 
-DELIMITER ;
+DELIMITER ; #}

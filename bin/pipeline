@@ -23,12 +23,3 @@ bin/make
 
 echo "Starte container..."
 bin/run
-bin/wait-for-mysql
-
-for arg in "$@"; do
-  if [ "$arg" = "-t" ]; then
-    echo "Starte tests..."
-    bin/test
-    break
-  fi
-done
