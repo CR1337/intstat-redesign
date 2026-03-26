@@ -1,0 +1,28 @@
+{
+    "table_name": "metadatenzuordnungen",
+    "description": "Diese Tabelle ordnet Datenpunkten ihre Metadaten zu.",
+    "columns": [],
+    "foreign_keys": [
+        {
+            "name": "daten",
+            "references": "daten",
+            "min_1": false,
+            "description": "ordnet Datenpunkt zu",
+            "not_null": true
+        },
+        {
+            "name": "metadaten",
+            "references": "metadaten",
+            "min_1": false,
+            "description": "ordnet Metadatum zu",
+            "not_null": true
+        }
+    ],
+    "unique_sets": [
+        [
+            "daten_id",
+            "metadaten_id"
+        ]
+    ],
+    "do_versioning": true
+}

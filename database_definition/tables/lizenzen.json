@@ -1,0 +1,32 @@
+{
+    "table_name": "lizenzen",
+    "description": "TODO",
+    "columns": [
+        {
+            "name": "name",
+            "type": "VARCHAR(64)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "url",
+            "type": "VARCHAR(512)",
+            "not_null": true,
+            "default": "''"
+        },
+        {
+            "name": "extra_bedingungen",
+            "type": "BOOLEAN",
+            "not_null": true,
+            "default": 0,
+            "is_string": false
+        }
+    ],
+    "foreign_keys": [],
+    "unique_sets": [
+        [
+            "name"
+        ]
+    ],
+    "do_versioning": true
+}
