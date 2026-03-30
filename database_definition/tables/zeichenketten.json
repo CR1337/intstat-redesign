@@ -1,0 +1,18 @@
+{
+    "table_name": "zeichenketten",
+    "description": "Enthält alle Zeichenketten, die in dieser Datenbank vorkommen (außer Nutzernamen).",
+    "columns": [
+        {
+            "name": "zeichenkette",
+            "type": "TEXT",
+            "not_null": true,
+            "default": "''"
+        }
+    ],
+    "foreign_keys": [
+
+    ],
+    "unique_sets": [
+
+    ]
+}
