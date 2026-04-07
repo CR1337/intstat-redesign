@@ -8,9 +8,6 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 DEFINITION_DIRECTORY: str = "database_definition"
 TABLE_DEFINITION_DIRECTORY: str = os.path.join(DEFINITION_DIRECTORY, "tables")
-PRIVILEGE_LEVEL_DEFINITION_FILENAME: str = os.path.join(
-    DEFINITION_DIRECTORY, "privileges", "privilege_levels.json"
-)
 USER_DEFINITION_FILENAME: str = os.path.join(
     DEFINITION_DIRECTORY, "users", "users.json"
 )
@@ -30,6 +27,7 @@ ORDERED_CREATE_STATEMENT_TYPES: List[str] = [
     "procedures",
 ]
 ORDERED_TABLE_NAMES: List[str] = [
+    "zeichenketten",
     "nutzer",
     "quellen",
     "themen",
@@ -70,16 +68,10 @@ def get_users() -> List[Dict[str, str]]:
         return json.load(file)
 
 
-def get_privilege_levels() -> Dict[str, List[str]]:
-    with open(PRIVILEGE_LEVEL_DEFINITION_FILENAME, "r") as file:
-        return json.load(file)
-
-
 def make_create_statement(
     env: Environment,
     table_definitions: Dict[str, Dict[str, Any]],
     users: List[Dict[str, str]],
-    privilege_levels: Dict[str, List[str]],
 ) -> str:
     statements = []
 
@@ -119,7 +111,7 @@ def make_create_statement(
 
         for filename in per_db_filenames:
             template = env.get_template(os.path.join(per_db_directory, filename))
-            parameters = {"users": users, "privilege_levels": privilege_levels}
+            parameters = {"users": users}
             statement = template.render(parameters)
             statements.append(statement)
 
@@ -190,11 +182,8 @@ def main() -> None:
 
     table_definitions = get_all_table_definitions()
     users = get_users()
-    privilege_levels = get_privilege_levels()
 
-    create_statement = make_create_statement(
-        env, table_definitions, users, privilege_levels
-    )
+    create_statement = make_create_statement(env, table_definitions, users)
     output_filename = INIT_SQL_FILENAME
 
     with open(output_filename, "w") as file:

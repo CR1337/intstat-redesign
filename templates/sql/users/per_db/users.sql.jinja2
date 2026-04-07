@@ -1,16 +1,3 @@
-{# {% for user in users %}
-CREATE USER IF NOT EXISTS '{{ user.name }}'@'%' IDENTIFIED BY '{{ user.password }}';
-{% for privilege in privilege_levels[user.privilege_level] %}
-GRANT {{ privilege }} ON intstat2.* TO '{{ user.name }}'@'%';
-{% endfor %}
-{% endfor %}
-
-{% for user in users %}
-{% if user.privilege_level == 'super'%}
-GRANT SUPER ON *.* TO '{{ user.name }}'@'%';
-{% endif %}
-{% endfor %} #}
-
 {% for user in users %}
 CREATE USER IF NOT EXISTS '{{ user.name }}'@'%' IDENTIFIED BY '{{ user.password }}';
 {% endfor %}
