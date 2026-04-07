@@ -1,43 +1,48 @@
 {
     "table_name": "indikatoren",
-    "description": "Enthält alle Indikatoren. Jeder Indikator besizt ein Thema, eine Quelle und eine Einheit. Außerdem enthält er einen Faktor, welcher mit zugehörigen Werten multipliziert werden muss und eine Dezimalstellengenauigkeit. ",
+    "description": "Enth\u00e4lt alle Indikatoren. Jeder Indikator besizt ein Thema, eine Quelle und eine Einheit. Au\u00dferdem enth\u00e4lt er einen Faktor, welcher mit zugeh\u00f6rigen Werten multipliziert werden muss und eine Dezimalstellengenauigkeit. ",
     "columns": [
         {
             "name": "faktor",
             "type": "DOUBLE",
             "not_null": true,
-            "default": 0
+            "default": 0,
+            "description": "TODO"
         },
         {
             "name": "dezimalstellen",
             "type": "TINYINT UNSIGNED",
             "not_null": true,
-            "default": 0
+            "default": 0,
+            "description": "TODO"
         },
         {
             "name": "name_de",
             "type": "VARCHAR(256)",
             "not_null": true,
-            "default": "''"
+            "default": "''",
+            "description": "TODO"
         },
         {
             "name": "name_en",
             "type": "VARCHAR(256)",
             "not_null": true,
-            "default": "''"
+            "default": "''",
+            "description": "TODO"
         },
         {
             "name": "beschreibung_de",
             "type": "VARCHAR(4096)",
             "not_null": true,
-            "default": "''"
+            "default": "''",
+            "description": "TODO"
         },
         {
             "name": "beschreibung_en",
             "type": "VARCHAR(4096)",
-            "not_null": true
-            ,
-            "default": "''"
+            "not_null": true,
+            "default": "''",
+            "description": "TODO"
         }
     ],
     "foreign_keys": [
@@ -45,26 +50,33 @@
             "name": "themen",
             "references": "themen",
             "min_1": false,
-            "description": "gehört zu Thema",
-            "not_null": true
+            "description": "TODO",
+            "not_null": true,
+            "diagram_description": "geh\u00f6rt zu Thema"
         },
         {
             "name": "quellen",
             "references": "quellen",
             "min_1": false,
-            "description": "von Quelle",
-            "not_null": true
+            "description": "TODO",
+            "not_null": true,
+            "diagram_description": "von Quelle"
         },
         {
             "name": "einheiten",
             "references": "einheiten",
             "min_1": false,
-            "description": "hat Einheit",
-            "not_null": true
+            "description": "TODO",
+            "not_null": true,
+            "diagram_description": "hat Einheit"
         }
     ],
     "unique_sets": [
-        ["name_de"], 
-        ["name_en"]
+        [
+            "name_de"
+        ],
+        [
+            "name_en"
+        ]
     ]
 }

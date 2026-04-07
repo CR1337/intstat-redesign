@@ -1,12 +1,13 @@
 {
     "table_name": "laendernamen",
-    "description": "Hier sind alle Ländernamen abgelegt. Ein Ländername ist einem Land zugeordnet.",
+    "description": "Hier sind alle L\u00e4ndernamen abgelegt. Ein L\u00e4ndername ist einem Land zugeordnet.",
     "columns": [
         {
             "name": "name",
             "type": "VARCHAR(256)",
             "not_null": true,
-            "default": "''"
+            "default": "''",
+            "description": "TODO"
         }
     ],
     "foreign_keys": [
@@ -14,11 +15,14 @@
             "name": "laender",
             "references": "laender",
             "min_1": false,
-            "description": "gehört zu Land",
-            "not_null": false
+            "description": "TODO",
+            "not_null": false,
+            "diagram_description": "geh\u00f6rt zu Land"
         }
     ],
     "unique_sets": [
-        ["name"]
+        [
+            "name"
+        ]
     ]
 }

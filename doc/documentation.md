@@ -18,7 +18,7 @@ Jede Tabelle enthält dazu zwei weitere Spalten:
 
 2. `ist_aktiv`: Enthält diese Spalte den Wert `FALSE` oder `0`, so zeigt das einen Löschvorgang an. Ist eine Zeile mit `ist_aktiv = FALSE` die aktuelle Zeile, so bedeutet das, das es keine aktuell gültige Version dieser Zeile gibt. Eine solche Zeile wird als _Tombstone_ oder _Grabstein_ bezeichnet.
 
-SQL-Befehle wie `UPDATE` oder `DELETE` sind nicht erlaubt. Nur `INSERT` kann ausgeführt werden. Das wird über entsprechende _Trigger_ sichergestellt. 
+SQL-Befehle wie `UPDATE` oder `DELETE` sind nicht erlaubt. Nur `INSERT` kann ausgeführt werden. Das wird über entsprechende _Trigger_ sichergestellt.
 
 Zur Vereinfachung erfolgt die schreibende Interaktion mit der Datenbank ausschließlich über _Stored Procedures_. Die Lesende Interaktion kann über die Tabelle direkt erfolgen, ist jedoch einfacher über _Views_. So gibt es bspw. eine View, welche nur die aktuell gültigen zeilen anzeigt.
 
@@ -34,7 +34,7 @@ erDiagram
         tab_lizenzen {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER lizenzen_id PK
 
 
@@ -49,7 +49,7 @@ erDiagram
         tab_daten {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER daten_id PK
 
                 INTEGER laender_id FK
@@ -67,7 +67,7 @@ erDiagram
         tab_laendergruppen {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER laendergruppen_id PK
 
 
@@ -81,7 +81,7 @@ erDiagram
         tab_laendergruppenzuordnungen {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER laendergruppenzuordnungen_id PK
 
                 INTEGER laender_id FK
@@ -97,7 +97,7 @@ erDiagram
         tab_metadaten {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER metadaten_id PK
 
 
@@ -111,7 +111,7 @@ erDiagram
         tab_nutzer {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER nutzer_id PK
 
 
@@ -124,7 +124,7 @@ erDiagram
         tab_quellen {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER quellen_id PK
 
 
@@ -140,7 +140,7 @@ erDiagram
         tab_indikatoren {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER indikatoren_id PK
 
                 INTEGER themen_id FK
@@ -164,7 +164,7 @@ erDiagram
         tab_themen {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER themen_id PK
 
 
@@ -181,7 +181,7 @@ erDiagram
         tab_laender {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER laender_id PK
 
                 INTEGER kontinente_id FK
@@ -201,7 +201,7 @@ erDiagram
         tab_einheiten {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER einheiten_id PK
 
                 INTEGER basis_einheiten_id FK
@@ -218,7 +218,7 @@ erDiagram
         tab_laendernamen {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER laendernamen_id PK
 
                 INTEGER laender_id FK
@@ -233,7 +233,7 @@ erDiagram
         tab_metadatenzuordnungen {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER metadatenzuordnungen_id PK
 
                 INTEGER daten_id FK
@@ -249,7 +249,7 @@ erDiagram
         tab_kontinente {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER kontinente_id PK
 
 
@@ -261,6 +261,216 @@ erDiagram
 
 
 ```
+
+## Tabellen
+
+### tab_lizenzen
+
+TODO
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|name|VARCHAR(64)|True|''|TODO|
+|url|VARCHAR(512)|True|''|TODO|
+|extra_bedingungen|BOOLEAN|True|0|TODO|
+
+
+### tab_daten
+
+Speichert die eigentlichen Datenwerte, die mit Ländern und Indikatoren verknüpft sind.
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|datum|DATE|True|'2000-01-01'|TODO|
+|wert|DOUBLE|True|0|TODO|
+
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|laender|tab_laender|True|TODO|
+|indikatoren|tab_indikatoren|True|TODO|
+
+### tab_laendergruppen
+
+Enthält Gruppen, zu welchen Länder gehören können, z.B. EU oder G7.
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|name_de|VARCHAR(256)|True|''|TODO|
+|name_en|VARCHAR(256)|True|''|TODO|
+
+
+### tab_laendergruppenzuordnungen
+
+Diese Tabelle ordnet Ländergruppen ihre Länder zu.
+
+
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|laender|tab_laender|True|TODO|
+|laendergruppen|tab_laendergruppen|True|TODO|
+
+### tab_metadaten
+
+TODO
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|kuerzel|VARCHAR(8)|True|''|TODO|
+|bezeichnung|VARCHAR(256)|True|''|TODO|
+
+
+### tab_nutzer
+
+Diese Tabelle speichert alle Nutzer. Sie ist nur notwendig, wenn Nutzer Tracking angewandt wird.
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|name|VARCHAR(256)|True|''|TODO|
+
+
+### tab_quellen
+
+Hier werden die Quellen gespeichert, aus denen die Werte für die Indikatoren stammen.
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|name_de|VARCHAR(256)|True|''|TODO|
+|name_en|VARCHAR(256)|True|''|TODO|
+|name_kurz_de|VARCHAR(16)|True|''|TODO|
+|name_kurz_en|VARCHAR(16)|True|''|TODO|
+
+
+### tab_indikatoren
+
+Enthält alle Indikatoren. Jeder Indikator besizt ein Thema, eine Quelle und eine Einheit. Außerdem enthält er einen Faktor, welcher mit zugehörigen Werten multipliziert werden muss und eine Dezimalstellengenauigkeit. 
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|faktor|DOUBLE|True|0|TODO|
+|dezimalstellen|TINYINT UNSIGNED|True|0|TODO|
+|name_de|VARCHAR(256)|True|''|TODO|
+|name_en|VARCHAR(256)|True|''|TODO|
+|beschreibung_de|VARCHAR(4096)|True|''|TODO|
+|beschreibung_en|VARCHAR(4096)|True|''|TODO|
+
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|themen|tab_themen|True|TODO|
+|quellen|tab_quellen|True|TODO|
+|einheiten|tab_einheiten|True|TODO|
+
+### tab_themen
+
+Jedes Thema hat einen deutschen und einen englischen namen und eine Farbe.
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|name_de|VARCHAR(64)|True|''|TODO|
+|name_en|VARCHAR(64)|True|''|TODO|
+|farbe_r|TINYINT UNSIGNED|True|0|TODO|
+|farbe_g|TINYINT UNSIGNED|True|0|TODO|
+|farbe_b|TINYINT UNSIGNED|True|0|TODO|
+
+
+### tab_laender
+
+Hier sind die Länder gespeichert. Ein Land hat ISO2- und ISO3-Kennungen. Ein Land kann mehrere Namen haben. Auf die Anzeigenamen verweisen die Fremndschlüssel eines Landes.
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|iso2|VARCHAR(2)|True|''|TODO|
+|iso3|VARCHAR(3)|True|''|TODO|
+
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|kontinente|tab_kontinente|True|TODO|
+|laendernamen_de|tab_laendernamen|True|TODO|
+|laendernamen_en|tab_laendernamen|True|TODO|
+
+### tab_einheiten
+
+Enthält die Einheiten. eine Einheit hat ein Symbol und einen Beasiseinheit, in welche sie sich mittels ein es Faktors umrechnen lässt.
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|faktor|DOUBLE|True|0|TODO|
+|symbol_de|VARCHAR(64)|True|''|TODO|
+|symbol_en|VARCHAR(64)|True|''|TODO|
+
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|basis_einheiten|tab_einheiten|False|TODO|
+
+### tab_laendernamen
+
+Hier sind alle Ländernamen abgelegt. Ein Ländername ist einem Land zugeordnet.
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|name|VARCHAR(256)|True|''|TODO|
+
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|laender|tab_laender|False|TODO|
+
+### tab_metadatenzuordnungen
+
+Diese Tabelle ordnet Datenpunkten ihre Metadaten zu.
+
+
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|daten|tab_daten|True|TODO|
+|metadaten|tab_metadaten|True|TODO|
+
+### tab_kontinente
+
+Jeder Kontinent hat einen deutschen und einen englischen Namen.
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|name_de|VARCHAR(64)|True|''|TODO|
+|name_en|VARCHAR(64)|True|''|TODO|
+
+
 
 ## Interaktion mit der Datenbank
 
@@ -290,7 +500,7 @@ INNER JOIN (
     FROM tab_kontinente
     GROUP BY kontinente_id
 ) latest
-ON t.kontinente_id = latest.kontinente_id 
+ON t.kontinente_id = latest.kontinente_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 ```
@@ -329,34 +539,9 @@ INNER JOIN (
     WHERE gueltig_seit <= '2025-12-31 12:00:00'
     GROUP BY kontinente_id
 ) latest
-ON t.kontinente_id = latest.kontinente_id 
+ON t.kontinente_id = latest.kontinente_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
-```
-
-### Bulk insert_into_kontinente
-
-#### Erstellen einer temporären Tabelle
-
-```SQL
-CREATE TEMPORARY TABLE IF NOT EXISTS temp_kontinente_bulk (
-    name_de_in VARCHAR(64),
-    name_en_in VARCHAR(64)
-);
-```
-
-#### Füllen der temporären Tabelle
-
-```SQL
-INSERT INTO temp_kontinente_bulk (name_de_in, name_en_in)
-VALUES
-    ('Europa', 'Europe'),
-    ('Nordamerika', 'North America'),
-    ('Südamerika', 'South America'),
-    ('Asien', 'Asia'),
-    ('Afrika', 'Africa'),
-    ('Ozeanien', 'Oceania'),
-    ('Antarktika', 'Antarctica');
 ```
 
 #### Übertragen der Daten in die eigentliche Tabelle

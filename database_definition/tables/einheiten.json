@@ -1,24 +1,27 @@
 {
     "table_name": "einheiten",
-    "description": "Enthält die Einheiten. eine Einheit hat ein Symbol und einen Beasiseinheit, in welche sie sich mittels ein es Faktors umrechnen lässt.",
+    "description": "Enth\u00e4lt die Einheiten. eine Einheit hat ein Symbol und einen Beasiseinheit, in welche sie sich mittels ein es Faktors umrechnen l\u00e4sst.",
     "columns": [
         {
             "name": "faktor",
             "type": "DOUBLE",
             "not_null": true,
-            "default": 0
+            "default": 0,
+            "description": "TODO"
         },
         {
             "name": "symbol_de",
             "type": "VARCHAR(64)",
             "not_null": true,
-            "default": "''"
+            "default": "''",
+            "description": "TODO"
         },
         {
             "name": "symbol_en",
             "type": "VARCHAR(64)",
             "not_null": true,
-            "default": "''"
+            "default": "''",
+            "description": "TODO"
         }
     ],
     "foreign_keys": [
@@ -26,12 +29,17 @@
             "name": "basis_einheiten",
             "references": "einheiten",
             "min_1": false,
-            "description": "hat Basiseinheit",
-            "not_null": false
+            "description": "TODO",
+            "not_null": false,
+            "diagram_description": "hat Basiseinheit"
         }
     ],
     "unique_sets": [
-        ["symbol_de"], 
-        ["symbol_en"]
+        [
+            "symbol_de"
+        ],
+        [
+            "symbol_en"
+        ]
     ]
 }

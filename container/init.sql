@@ -2,7 +2,6 @@ CREATE DATABASE IF NOT EXISTS intstat2;
 
 
 
-
 CREATE USER IF NOT EXISTS 'write-1'@'%' IDENTIFIED BY 'password';
 CREATE USER IF NOT EXISTS 'write-2'@'%' IDENTIFIED BY 'password';
 CREATE USER IF NOT EXISTS 'read-1'@'%' IDENTIFIED BY 'password';
@@ -346,85 +345,85 @@ CREATE TABLE IF NOT EXISTS tab_metadatenzuordnungen (
 );
 
 ALTER TABLE tab_einheiten
-ADD CONSTRAINT fk_einheiten_einheiten_b859967e45114807b520  --  hat Basiseinheit
+ADD CONSTRAINT fk_einheiten_einheiten_ff74af60bc0d41b59ebc  --  TODO
 FOREIGN KEY (basis_einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendernamen
-ADD CONSTRAINT fk_laendernamen_laender_3ca3d59d0a584e67aa93  --  gehört zu Land
+ADD CONSTRAINT fk_laendernamen_laender_42212d97fc7249d9a9a5  --  TODO
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_themen_671ae05c2993417ab855  --  gehört zu Thema
+ADD CONSTRAINT fk_indikatoren_themen_f86ce3719aef40d8817e  --  TODO
 FOREIGN KEY (themen_id) REFERENCES tab_themen(themen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_quellen_00ec83ff09094d789e85  --  von Quelle
+ADD CONSTRAINT fk_indikatoren_quellen_1aaf7f16b3954963b833  --  TODO
 FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_einheiten_3264026e3deb402fa514  --  hat Einheit
+ADD CONSTRAINT fk_indikatoren_einheiten_4e940a2073bc4b51a77e  --  TODO
 FOREIGN KEY (einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_kontinente_a4b53eeadfc14fd49d1f  --  gehört zu Kontinent
+ADD CONSTRAINT fk_laender_kontinente_1e71661d2a8d46ce885a  --  TODO
 FOREIGN KEY (kontinente_id) REFERENCES tab_kontinente(kontinente_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_3040b1caa1d94530a48e  --  hat dt. Namen
+ADD CONSTRAINT fk_laender_laendernamen_13729b6be6274d458f6c  --  TODO
 FOREIGN KEY (laendernamen_de_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_e6d768850c7a49918f8f  --  hat en. Namen
+ADD CONSTRAINT fk_laender_laendernamen_e80592294d2c4a239194  --  TODO
 FOREIGN KEY (laendernamen_en_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_laender_270351e2269941518def  --  für Land
+ADD CONSTRAINT fk_daten_laender_26a4c8a529ca4eff9707  --  TODO
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_indikatoren_edb8685290aa414a95b4  --  für Indikator
+ADD CONSTRAINT fk_daten_indikatoren_8ea03040732a4e98979a  --  TODO
 FOREIGN KEY (indikatoren_id) REFERENCES tab_indikatoren(indikatoren_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_beba181a6928490b8260  --  ordnet Land zu
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_3eb1f5dbf9bc419bb36e  --  TODO
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_18d0991d199f45279273  --  ordnet Länderguppe zu
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_afb23ac813ca49e7945a  --  TODO
 FOREIGN KEY (laendergruppen_id) REFERENCES tab_laendergruppen(laendergruppen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_metadatenzuordnungen
-ADD CONSTRAINT fk_metadatenzuordnungen_daten_80c43ef018d94e9aa69f  --  ordnet Datenpunkt zu
+ADD CONSTRAINT fk_metadatenzuordnungen_daten_ce8c75b8c9c6421da2c3  --  TODO
 FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_metadatenzuordnungen
-ADD CONSTRAINT fk_metadatenzuordnungen_metadaten_42c9cddb07364c7aa508  --  ordnet Metadatum zu
+ADD CONSTRAINT fk_metadatenzuordnungen_metadaten_daa4e2551af044f59455  --  TODO
 FOREIGN KEY (metadaten_id) REFERENCES tab_metadaten(metadaten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;

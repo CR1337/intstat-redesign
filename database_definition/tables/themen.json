@@ -6,38 +6,45 @@
             "name": "name_de",
             "type": "VARCHAR(64)",
             "not_null": true,
-            "default": "''"
+            "default": "''",
+            "description": "TODO"
         },
         {
             "name": "name_en",
             "type": "VARCHAR(64)",
             "not_null": true,
-            "default": "''"
+            "default": "''",
+            "description": "TODO"
         },
         {
             "name": "farbe_r",
             "type": "TINYINT UNSIGNED",
             "not_null": true,
-            "default": 0
+            "default": 0,
+            "description": "TODO"
         },
         {
             "name": "farbe_g",
             "type": "TINYINT UNSIGNED",
             "not_null": true,
-            "default": 0
+            "default": 0,
+            "description": "TODO"
         },
         {
             "name": "farbe_b",
             "type": "TINYINT UNSIGNED",
             "not_null": true,
-            "default": 0
+            "default": 0,
+            "description": "TODO"
         }
     ],
-    "foreign_keys": [
-        
-    ],
+    "foreign_keys": [],
     "unique_sets": [
-        ["name_de"], 
-        ["name_en"]
+        [
+            "name_de"
+        ],
+        [
+            "name_en"
+        ]
     ]
 }

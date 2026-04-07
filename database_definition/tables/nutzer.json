@@ -6,13 +6,14 @@
             "name": "name",
             "type": "VARCHAR(256)",
             "not_null": true,
-            "default": "''"
+            "default": "''",
+            "description": "TODO"
         }
     ],
-    "foreign_keys": [
-
-    ],
+    "foreign_keys": [],
     "unique_sets": [
-        ["name"]
+        [
+            "name"
+        ]
     ]
 }

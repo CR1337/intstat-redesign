@@ -1,6 +1,7 @@
 from __future__ import annotations
 import os
 import json
+from sqlfmt.core import format as sql_format
 from uuid import uuid4
 from typing import Any, Dict, List
 
@@ -27,7 +28,6 @@ ORDERED_CREATE_STATEMENT_TYPES: List[str] = [
     "procedures",
 ]
 ORDERED_TABLE_NAMES: List[str] = [
-    "zeichenketten",
     "nutzer",
     "quellen",
     "themen",
@@ -186,8 +186,10 @@ def main() -> None:
     create_statement = make_create_statement(env, table_definitions, users)
     output_filename = INIT_SQL_FILENAME
 
+    formatted_create_statement = sql_format(create_statement)
+
     with open(output_filename, "w") as file:
-        file.write(create_statement)
+        file.write(formatted_create_statement)
 
     diagram = make_diagram(env, table_definitions)
 

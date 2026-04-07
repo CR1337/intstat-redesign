@@ -18,7 +18,7 @@ Jede Tabelle enthält dazu zwei weitere Spalten:
 
 2. `ist_aktiv`: Enthält diese Spalte den Wert `FALSE` oder `0`, so zeigt das einen Löschvorgang an. Ist eine Zeile mit `ist_aktiv = FALSE` die aktuelle Zeile, so bedeutet das, das es keine aktuell gültige Version dieser Zeile gibt. Eine solche Zeile wird als _Tombstone_ oder _Grabstein_ bezeichnet.
 
-SQL-Befehle wie `UPDATE` oder `DELETE` sind nicht erlaubt. Nur `INSERT` kann ausgeführt werden. Das wird über entsprechende _Trigger_ sichergestellt. 
+SQL-Befehle wie `UPDATE` oder `DELETE` sind nicht erlaubt. Nur `INSERT` kann ausgeführt werden. Das wird über entsprechende _Trigger_ sichergestellt.
 
 Zur Vereinfachung erfolgt die schreibende Interaktion mit der Datenbank ausschließlich über _Stored Procedures_. Die Lesende Interaktion kann über die Tabelle direkt erfolgen, ist jedoch einfacher über _Views_. So gibt es bspw. eine View, welche nur die aktuell gültigen zeilen anzeigt.
 
@@ -27,6 +27,35 @@ Zur Vereinfachung erfolgt die schreibende Interaktion mit der Datenbank ausschli
 ```mermaid
 {{ diagram }}
 ```
+
+## Tabellen
+
+{% for table in tables %}
+### tab_{{ table.table_name }}
+
+{{ table.description }}
+
+{% if table.columns %}
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+{% for col in table.columns %}
+|{{ col.name }}|{{ col.type }}|{{ col.not_null }}|{{ col.default }}|{{ col.description}}|
+{% endfor %}
+{% endif %}
+
+{% if table.foreign_keys %}
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+{% for col in table.foreign_keys %}
+|{{ col.name }}|tab_{{ col.references }}|{{ col.not_null }}|{{ col.description}}|
+{% endfor %}
+{% endif %}
+
+{% endfor %}
 
 ## Interaktion mit der Datenbank
 
@@ -56,7 +85,7 @@ INNER JOIN (
     FROM tab_kontinente
     GROUP BY kontinente_id
 ) latest
-ON t.kontinente_id = latest.kontinente_id 
+ON t.kontinente_id = latest.kontinente_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 ```
@@ -95,34 +124,9 @@ INNER JOIN (
     WHERE gueltig_seit <= '2025-12-31 12:00:00'
     GROUP BY kontinente_id
 ) latest
-ON t.kontinente_id = latest.kontinente_id 
+ON t.kontinente_id = latest.kontinente_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
-```
-
-### Bulk insert_into_kontinente
-
-#### Erstellen einer temporären Tabelle
-
-```SQL
-CREATE TEMPORARY TABLE IF NOT EXISTS temp_kontinente_bulk (
-    name_de_in VARCHAR(64),
-    name_en_in VARCHAR(64)
-);
-```
-
-#### Füllen der temporären Tabelle
-
-```SQL
-INSERT INTO temp_kontinente_bulk (name_de_in, name_en_in)
-VALUES
-    ('Europa', 'Europe'),
-    ('Nordamerika', 'North America'),
-    ('Südamerika', 'South America'),
-    ('Asien', 'Asia'),
-    ('Afrika', 'Africa'),
-    ('Ozeanien', 'Oceania'),
-    ('Antarktika', 'Antarctica');
 ```
 
 #### Übertragen der Daten in die eigentliche Tabelle

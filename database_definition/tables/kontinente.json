@@ -6,20 +6,24 @@
             "name": "name_de",
             "type": "VARCHAR(64)",
             "not_null": true,
-            "default": "''"
+            "default": "''",
+            "description": "TODO"
         },
         {
             "name": "name_en",
             "type": "VARCHAR(64)",
             "not_null": true,
-            "default": "''"
+            "default": "''",
+            "description": "TODO"
         }
     ],
-    "foreign_keys": [
-    
-    ],
+    "foreign_keys": [],
     "unique_sets": [
-        ["name_de"], 
-        ["name_en"]
+        [
+            "name_de"
+        ],
+        [
+            "name_en"
+        ]
     ]
 }

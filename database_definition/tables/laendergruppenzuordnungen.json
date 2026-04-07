@@ -1,26 +1,29 @@
 {
     "table_name": "laendergruppenzuordnungen",
-    "description": "Diese Tabelle ordnet Ländergruppen ihre Länder zu.",
-    "columns": [
-
-    ],
+    "description": "Diese Tabelle ordnet L\u00e4ndergruppen ihre L\u00e4nder zu.",
+    "columns": [],
     "foreign_keys": [
         {
             "name": "laender",
             "references": "laender",
             "min_1": false,
-            "description": "ordnet Land zu",
-            "not_null": true
+            "description": "TODO",
+            "not_null": true,
+            "diagram_description": "ordnet Land zu"
         },
         {
             "name": "laendergruppen",
             "references": "laendergruppen",
             "min_1": false,
-            "description": "ordnet Länderguppe zu",
-            "not_null": true
+            "description": "TODO",
+            "not_null": true,
+            "diagram_description": "ordnet L\u00e4nderguppe zu"
         }
     ],
     "unique_sets": [
-        ["laender_id", "laendergruppen_id"]
+        [
+            "laender_id",
+            "laendergruppen_id"
+        ]
     ]
 }

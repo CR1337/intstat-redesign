@@ -8,7 +8,7 @@ erDiagram
         tab_{{ tab.table_name }} {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK 
+            INTEGER ersteller_nutzer_id FK
             INTEGER {{ tab.table_name }}_id PK
 
             {% for fk in tab.foreign_keys %}
@@ -21,7 +21,7 @@ erDiagram
         }
 
         {% for fk in tab.foreign_keys %}
-            tab_{{ fk.references }} ||--{% if fk.min_1 %}|{% else %}o{% endif %}{ tab_{{ tab.table_name }} : "{{ fk.description }}"
+            tab_{{ fk.references }} ||--{% if fk.min_1 %}|{% else %}o{% endif %}{ tab_{{ tab.table_name }} : "{{ fk.diagram_description }}"
         {% endfor %}
         tab_nutzer ||--o{ tab_{{ tab.table_name }} : "erstellt von"
 
