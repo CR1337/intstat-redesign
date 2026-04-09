@@ -1,20 +1,20 @@
 {
     "table_name": "daten",
-    "description": "Speichert die eigentlichen Datenwerte, die mit L\u00e4ndern und Indikatoren verkn\u00fcpft sind.",
+    "description": "Tabelle für die Speicherung von statistischen Einzelwerten (Zeitreihen) zu Ländern und Indikatoren.",
     "columns": [
         {
             "name": "datum",
             "type": "DATE",
             "not_null": true,
             "default": "'2000-01-01'",
-            "description": "TODO"
+            "description": "Datum, an dem der Wert erhoben oder veröffentlicht wurde."
         },
         {
             "name": "wert",
             "type": "DOUBLE",
             "not_null": true,
             "default": 0,
-            "description": "TODO"
+            "description": "Erfasster numerischer Wert für das jeweilige Land und den Indikator am angegebenen Datum."
         }
     ],
     "foreign_keys": [
@@ -22,7 +22,7 @@
             "name": "laender",
             "references": "laender",
             "min_1": false,
-            "description": "TODO",
+            "description": "Verweis auf das Land, für das der Wert gilt.",
             "not_null": true,
             "diagram_description": "f\u00fcr Land"
         },
@@ -30,7 +30,7 @@
             "name": "indikatoren",
             "references": "indikatoren",
             "min_1": false,
-            "description": "TODO",
+            "description": "Verweis auf den Indikator, zu dem der Wert gehört.",
             "not_null": true,
             "diagram_description": "f\u00fcr Indikator"
         }

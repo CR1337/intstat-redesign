@@ -1,41 +1,41 @@
 {
     "table_name": "themen",
-    "description": "Jedes Thema hat einen deutschen und einen englischen namen und eine Farbe.",
+    "description": "Tabelle welche Themen verwaltet, denen Indikatoren zugeordnet sind.",
     "columns": [
         {
             "name": "name_de",
             "type": "VARCHAR(64)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Name des Themas auf Deutsch."
         },
         {
             "name": "name_en",
             "type": "VARCHAR(64)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Name des Themas auf Englisch."
         },
         {
             "name": "farbe_r",
             "type": "TINYINT UNSIGNED",
             "not_null": true,
             "default": 0,
-            "description": "TODO"
+            "description": "Rotwert der Farbzuordnung für das Thema (0-255)."
         },
         {
             "name": "farbe_g",
             "type": "TINYINT UNSIGNED",
             "not_null": true,
             "default": 0,
-            "description": "TODO"
+            "description": "Grünwert der Farbzuordnung für das Thema (0-255)."
         },
         {
             "name": "farbe_b",
             "type": "TINYINT UNSIGNED",
             "not_null": true,
             "default": 0,
-            "description": "TODO"
+            "description": "Blauwert der Farbzuordnung für das Thema (0-255)."
         }
     ],
     "foreign_keys": [],

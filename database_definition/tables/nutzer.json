@@ -1,13 +1,13 @@
 {
     "table_name": "nutzer",
-    "description": "Diese Tabelle speichert alle Nutzer. Sie ist nur notwendig, wenn Nutzer Tracking angewandt wird.",
+    "description": "Diese Tabelle speichert alle Nutzer.",
     "columns": [
         {
             "name": "name",
             "type": "VARCHAR(256)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Name des Nutzers."
         }
     ],
     "foreign_keys": [],

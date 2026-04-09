@@ -1,20 +1,20 @@
 {
     "table_name": "kontinente",
-    "description": "Jeder Kontinent hat einen deutschen und einen englischen Namen.",
+    "description": "Tabelle zur Verwaltung der Kontinente, denen Länder zugeordnet werden können.",
     "columns": [
         {
             "name": "name_de",
             "type": "VARCHAR(64)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Name des Kontinents auf Deutsch."
         },
         {
             "name": "name_en",
             "type": "VARCHAR(64)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Name des Kontinents auf Englisch."
         }
     ],
     "foreign_keys": [],

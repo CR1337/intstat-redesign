@@ -7,7 +7,7 @@
             "name": "daten",
             "references": "daten",
             "min_1": false,
-            "description": "TODO",
+            "description": "Verweis auf den zugeordneten Datenpunkt.",
             "not_null": true,
             "diagram_description": "ordnet Datenpunkt zu"
         },
@@ -15,7 +15,7 @@
             "name": "metadaten",
             "references": "metadaten",
             "min_1": false,
-            "description": "TODO",
+            "description": "Verweis auf das zugeordnete Metadatum.",
             "not_null": true,
             "diagram_description": "ordnet Metadatum zu"
         }

@@ -32,7 +32,7 @@ END$$
 DELIMITER ;
 
 CREATE TABLE IF NOT EXISTS tab_nutzer (
-    -- Diese Tabelle speichert alle Nutzer. Sie ist nur notwendig, wenn Nutzer Tracking angewandt wird.
+    -- Diese Tabelle speichert alle Nutzer.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS tab_nutzer (
 );
 
 CREATE TABLE IF NOT EXISTS tab_quellen (
-    -- Hier werden die Quellen gespeichert, aus denen die Werte für die Indikatoren stammen.
+    -- Tabelle zur Verwaltung von Datenquellen.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS tab_quellen (
 );
 
 CREATE TABLE IF NOT EXISTS tab_themen (
-    -- Jedes Thema hat einen deutschen und einen englischen namen und eine Farbe.
+    -- Tabelle welche Themen verwaltet, denen Indikatoren zugeordnet sind.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS tab_themen (
 );
 
 CREATE TABLE IF NOT EXISTS tab_einheiten (
-    -- Enthält die Einheiten. eine Einheit hat ein Symbol und einen Beasiseinheit, in welche sie sich mittels ein es Faktors umrechnen lässt.
+    -- Tabelle zur Verwaltung der Einheiten, in denen statistische Werte angegeben werden.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS tab_einheiten (
 );
 
 CREATE TABLE IF NOT EXISTS tab_laendernamen (
-    -- Hier sind alle Ländernamen abgelegt. Ein Ländername ist einem Land zugeordnet.
+    -- Tabelle zuer Verwaltung von Ländernamen. Ein Land kann mehrere Ländernamen haben. Jedes Land hat einen deutschen und einen englischen Namen.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS tab_laendernamen (
 );
 
 CREATE TABLE IF NOT EXISTS tab_kontinente (
-    -- Jeder Kontinent hat einen deutschen und einen englischen Namen.
+    -- Tabelle zur Verwaltung der Kontinente, denen Länder zugeordnet werden können.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS tab_kontinente (
 );
 
 CREATE TABLE IF NOT EXISTS tab_laendergruppen (
-    -- Enthält Gruppen, zu welchen Länder gehören können, z.B. EU oder G7.
+    -- Tabelle zur Verwaltung von Ländergruppen (z.B. EU, OECD, G7).
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS tab_laendergruppen (
 );
 
 CREATE TABLE IF NOT EXISTS tab_lizenzen (
-    -- TODO
+    -- Tabelle zur Verwaltung der Lizenzen, unter denen die statistischen Daten veröffentlicht werden.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS tab_lizenzen (
 );
 
 CREATE TABLE IF NOT EXISTS tab_metadaten (
-    -- TODO
+    -- Tabelle zur Verwaltung von Metadaten, die Datenpunkten zugeordnet werden können (z.B. methodische Hinweise, Fußnoten).
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS tab_metadaten (
 );
 
 CREATE TABLE IF NOT EXISTS tab_indikatoren (
-    -- Enthält alle Indikatoren. Jeder Indikator besizt ein Thema, eine Quelle und eine Einheit. Außerdem enthält er einen Faktor, welcher mit zugehörigen Werten multipliziert werden muss und eine Dezimalstellengenauigkeit. 
+    -- Tabelle zur Verwaltung der statistischen Indikatoren.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
@@ -257,7 +257,7 @@ CREATE TABLE IF NOT EXISTS tab_indikatoren (
 );
 
 CREATE TABLE IF NOT EXISTS tab_laender (
-    -- Hier sind die Länder gespeichert. Ein Land hat ISO2- und ISO3-Kennungen. Ein Land kann mehrere Namen haben. Auf die Anzeigenamen verweisen die Fremndschlüssel eines Landes.
+    -- Tabelle zur Verwaltung der Länder mit ISO-Codes und Namensreferenzen.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
@@ -281,7 +281,7 @@ CREATE TABLE IF NOT EXISTS tab_laender (
 );
 
 CREATE TABLE IF NOT EXISTS tab_daten (
-    -- Speichert die eigentlichen Datenwerte, die mit Ländern und Indikatoren verknüpft sind.
+    -- Tabelle für die Speicherung von statistischen Einzelwerten (Zeitreihen) zu Ländern und Indikatoren.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
@@ -304,7 +304,7 @@ CREATE TABLE IF NOT EXISTS tab_daten (
 );
 
 CREATE TABLE IF NOT EXISTS tab_laendergruppenzuordnungen (
-    -- Diese Tabelle ordnet Ländergruppen ihre Länder zu.
+    -- Tabelle zur Zuordnung von Ländern zu Ländergruppen (z.B. Mitgliedschaft eines Landes in einer Gruppe).
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
@@ -346,85 +346,85 @@ CREATE TABLE IF NOT EXISTS tab_metadatenzuordnungen (
 );
 
 ALTER TABLE tab_einheiten
-ADD CONSTRAINT fk_einheiten_einheiten_cee90bd5b3de4f4089d4  --  TODO
+ADD CONSTRAINT fk_einheiten_einheiten_22c0aef1cd4b470192ec  --  Optionale Referenz auf eine Basiseinheit, falls die Einheit abgeleitet ist.
 FOREIGN KEY (basis_einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendernamen
-ADD CONSTRAINT fk_laendernamen_laender_e4812b60acd2457db117  --  TODO
+ADD CONSTRAINT fk_laendernamen_laender_5f084940840348c18bd3  --  Verweis auf das Land, dem der Name zugeordnet ist. (optional)
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_themen_6f744643b24d43db9ab0  --  TODO
+ADD CONSTRAINT fk_indikatoren_themen_20c2db346bcf4add9ccf  --  Verweis auf das Thema, dem der Indikator zugeordnet ist.
 FOREIGN KEY (themen_id) REFERENCES tab_themen(themen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_quellen_5cef987a346b4f968702  --  TODO
+ADD CONSTRAINT fk_indikatoren_quellen_25c25f9ee5b342fb9a8d  --  Verweis auf die Quelle, aus der die Daten für den Indikator stammen.
 FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_einheiten_16bb0f295f0549b18059  --  TODO
+ADD CONSTRAINT fk_indikatoren_einheiten_f1112349dbec49d0ac00  --  Verweis auf die Einheit, in der der Indikator gemessen wird.
 FOREIGN KEY (einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_kontinente_b086bfcd7c45420c95f0  --  TODO
+ADD CONSTRAINT fk_laender_kontinente_17c117a2dce34bc385dd  --  Verweis auf den Kontinent, dem das Land zugeordnet ist.
 FOREIGN KEY (kontinente_id) REFERENCES tab_kontinente(kontinente_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_38d186ffe2b54aa6b167  --  TODO
+ADD CONSTRAINT fk_laender_laendernamen_8466f955251a47c8a70e  --  Verweis auf den deutschen Namen des Landes.
 FOREIGN KEY (laendernamen_de_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_89014324513648978b42  --  TODO
+ADD CONSTRAINT fk_laender_laendernamen_64b663d8d6b046d78c36  --  Verweis auf den englischen Namen des Landes.
 FOREIGN KEY (laendernamen_en_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_laender_0ea60df5e85543ec91ba  --  TODO
+ADD CONSTRAINT fk_daten_laender_e7f3eb2de10c4ac584cc  --  Verweis auf das Land, für das der Wert gilt.
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_indikatoren_ccc5f444f13c49b180df  --  TODO
+ADD CONSTRAINT fk_daten_indikatoren_aa36d5cb675242128089  --  Verweis auf den Indikator, zu dem der Wert gehört.
 FOREIGN KEY (indikatoren_id) REFERENCES tab_indikatoren(indikatoren_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_ff92a22b368840de9e9d  --  TODO
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_cf6fad1ca4384a1bac1b  --  Verweis auf das zugeordnete Land.
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_4620ff78bd90403192f9  --  TODO
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_1bec22fa458542f9b605  --  Verweis auf die zugeordnete Ländergruppe.
 FOREIGN KEY (laendergruppen_id) REFERENCES tab_laendergruppen(laendergruppen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_metadatenzuordnungen
-ADD CONSTRAINT fk_metadatenzuordnungen_daten_4c2f0fe5fe164b97b942  --  TODO
+ADD CONSTRAINT fk_metadatenzuordnungen_daten_194b386dddf94e359146  --  Verweis auf den zugeordneten Datenpunkt.
 FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_metadatenzuordnungen
-ADD CONSTRAINT fk_metadatenzuordnungen_metadaten_4f853ad3957247438507  --  TODO
+ADD CONSTRAINT fk_metadatenzuordnungen_metadaten_07d7040cd8534fc8acd7  --  Verweis auf das zugeordnete Metadatum.
 FOREIGN KEY (metadaten_id) REFERENCES tab_metadaten(metadaten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;

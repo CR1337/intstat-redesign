@@ -1,55 +1,55 @@
 {
     "table_name": "indikatoren",
-    "description": "Enth\u00e4lt alle Indikatoren. Jeder Indikator besizt ein Thema, eine Quelle und eine Einheit. Au\u00dferdem enth\u00e4lt er einen Faktor, welcher mit zugeh\u00f6rigen Werten multipliziert werden muss und eine Dezimalstellengenauigkeit. ",
+    "description": "Tabelle zur Verwaltung der statistischen Indikatoren.",
     "columns": [
         {
             "name": "faktor",
             "type": "DOUBLE",
             "not_null": true,
             "default": 0,
-            "description": "TODO"
+            "description": "Faktor zur Multiplikation mit dem Indikatorwerts, um den korrekten Wert zu erhalten."
         },
         {
             "name": "dezimalstellen",
             "type": "TINYINT UNSIGNED",
             "not_null": true,
             "default": 0,
-            "description": "TODO"
+            "description": "Anzahl der Dezimalstellen, mit denen der Wert angezeigt wird."
         },
         {
             "name": "name_de",
             "type": "VARCHAR(256)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Name des Indikators auf Deutsch."
         },
         {
             "name": "name_en",
             "type": "VARCHAR(256)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Name des Indikators auf Englisch."
         },
         {
             "name": "beschreibung_de",
             "type": "VARCHAR(4096)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Ausführliche Beschreibung des Indikators auf Deutsch."
         },
         {
             "name": "beschreibung_en",
             "type": "VARCHAR(4096)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Ausführliche Beschreibung des Indikators auf Englisch."
         },
         {
             "name": "quellen_indikatoren_id",
             "type": "VARCHAR(128)",
             "not_null": false,
             "default": "''",
-            "description": "TODO"
+            "description": "ID des Indikators bei der jeweiligen Quelle (optional)."
         }
     ],
     "foreign_keys": [
@@ -57,7 +57,7 @@
             "name": "themen",
             "references": "themen",
             "min_1": false,
-            "description": "TODO",
+            "description": "Verweis auf das Thema, dem der Indikator zugeordnet ist.",
             "not_null": true,
             "diagram_description": "geh\u00f6rt zu Thema"
         },
@@ -65,7 +65,7 @@
             "name": "quellen",
             "references": "quellen",
             "min_1": false,
-            "description": "TODO",
+            "description": "Verweis auf die Quelle, aus der die Daten für den Indikator stammen.",
             "not_null": true,
             "diagram_description": "von Quelle"
         },
@@ -73,7 +73,7 @@
             "name": "einheiten",
             "references": "einheiten",
             "min_1": false,
-            "description": "TODO",
+            "description": "Verweis auf die Einheit, in der der Indikator gemessen wird.",
             "not_null": true,
             "diagram_description": "hat Einheit"
         }

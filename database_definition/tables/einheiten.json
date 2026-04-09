@@ -1,27 +1,27 @@
 {
     "table_name": "einheiten",
-    "description": "Enth\u00e4lt die Einheiten. eine Einheit hat ein Symbol und einen Beasiseinheit, in welche sie sich mittels ein es Faktors umrechnen l\u00e4sst.",
+    "description": "Tabelle zur Verwaltung der Einheiten, in denen statistische Werte angegeben werden.",
     "columns": [
         {
             "name": "faktor",
             "type": "DOUBLE",
             "not_null": true,
             "default": 0,
-            "description": "TODO"
+            "description": "Faktor zur Umrechnung in die Basiseinheit."
         },
         {
             "name": "symbol_de",
             "type": "VARCHAR(64)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Symbol der Einheit auf Deutsch."
         },
         {
             "name": "symbol_en",
             "type": "VARCHAR(64)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Symbol der Einheit auf Englisch."
         }
     ],
     "foreign_keys": [
@@ -29,7 +29,7 @@
             "name": "basis_einheiten",
             "references": "einheiten",
             "min_1": false,
-            "description": "TODO",
+            "description": "Optionale Referenz auf eine Basiseinheit, falls die Einheit abgeleitet ist.",
             "not_null": false,
             "diagram_description": "hat Basiseinheit"
         }

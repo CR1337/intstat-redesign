@@ -1,20 +1,20 @@
 {
     "table_name": "metadaten",
-    "description": "TODO",
+    "description": "Tabelle zur Verwaltung von Metadaten, die Datenpunkten zugeordnet werden können (z.B. methodische Hinweise, Fußnoten).",
     "columns": [
         {
             "name": "kuerzel",
             "type": "VARCHAR(8)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Kürzel für das Metadatum."
         },
         {
             "name": "bezeichnung",
             "type": "VARCHAR(256)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Ausführliche Bezeichnung des Metadatums."
         }
     ],
     "foreign_keys": [],

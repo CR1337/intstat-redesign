@@ -1,20 +1,20 @@
 {
     "table_name": "laender",
-    "description": "Hier sind die L\u00e4nder gespeichert. Ein Land hat ISO2- und ISO3-Kennungen. Ein Land kann mehrere Namen haben. Auf die Anzeigenamen verweisen die Fremndschl\u00fcssel eines Landes.",
+    "description": "Tabelle zur Verwaltung der Länder mit ISO-Codes und Namensreferenzen.",
     "columns": [
         {
             "name": "iso2",
             "type": "VARCHAR(2)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "ISO-2-Ländercode gemäß internationalem Standard (z.B. 'DE' für Deutschland)."
         },
         {
             "name": "iso3",
             "type": "VARCHAR(3)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "ISO-3-Ländercode gemäß internationalem Standard (z.B. 'DEU' für Deutschland)."
         }
     ],
     "foreign_keys": [
@@ -22,7 +22,7 @@
             "name": "kontinente",
             "references": "kontinente",
             "min_1": false,
-            "description": "TODO",
+            "description": "Verweis auf den Kontinent, dem das Land zugeordnet ist.",
             "not_null": true,
             "diagram_description": "geh\u00f6rt zu Kontinent"
         },
@@ -30,7 +30,7 @@
             "name": "laendernamen_de",
             "references": "laendernamen",
             "min_1": false,
-            "description": "TODO",
+            "description": "Verweis auf den deutschen Namen des Landes.",
             "not_null": true,
             "diagram_description": "hat dt. Namen"
         },
@@ -38,7 +38,7 @@
             "name": "laendernamen_en",
             "references": "laendernamen",
             "min_1": false,
-            "description": "TODO",
+            "description": "Verweis auf den englischen Namen des Landes.",
             "not_null": true,
             "diagram_description": "hat en. Namen"
         }

@@ -1,34 +1,34 @@
 {
     "table_name": "quellen",
-    "description": "Hier werden die Quellen gespeichert, aus denen die Werte f\u00fcr die Indikatoren stammen.",
+    "description": "Tabelle zur Verwaltung von Datenquellen.",
     "columns": [
         {
             "name": "name_de",
             "type": "VARCHAR(256)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Vollständiger Name der Quelle auf Deutsch."
         },
         {
             "name": "name_en",
             "type": "VARCHAR(256)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Vollständiger Name der Quelle auf Englisch."
         },
         {
             "name": "name_kurz_de",
             "type": "VARCHAR(16)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Kurzer Name der Quelle auf Deutsch."
         },
         {
             "name": "name_kurz_en",
             "type": "VARCHAR(16)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Kurzer Name der Quelle auf Englisch."
         }
     ],
     "foreign_keys": [],

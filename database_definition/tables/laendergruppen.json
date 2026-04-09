@@ -1,20 +1,20 @@
 {
     "table_name": "laendergruppen",
-    "description": "Enth\u00e4lt Gruppen, zu welchen L\u00e4nder geh\u00f6ren k\u00f6nnen, z.B. EU oder G7.",
+    "description": "Tabelle zur Verwaltung von Ländergruppen (z.B. EU, OECD, G7).",
     "columns": [
         {
             "name": "name_de",
             "type": "VARCHAR(256)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Name der Ländergruppe auf Deutsch."
         },
         {
             "name": "name_en",
             "type": "VARCHAR(256)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Name der Ländergruppe auf Englisch."
         }
     ],
     "foreign_keys": [],

@@ -1,13 +1,13 @@
 {
     "table_name": "laendergruppenzuordnungen",
-    "description": "Diese Tabelle ordnet L\u00e4ndergruppen ihre L\u00e4nder zu.",
+    "description": "Tabelle zur Zuordnung von Ländern zu Ländergruppen (z.B. Mitgliedschaft eines Landes in einer Gruppe).",
     "columns": [],
     "foreign_keys": [
         {
             "name": "laender",
             "references": "laender",
             "min_1": false,
-            "description": "TODO",
+            "description": "Verweis auf das zugeordnete Land.",
             "not_null": true,
             "diagram_description": "ordnet Land zu"
         },
@@ -15,7 +15,7 @@
             "name": "laendergruppen",
             "references": "laendergruppen",
             "min_1": false,
-            "description": "TODO",
+            "description": "Verweis auf die zugeordnete Ländergruppe.",
             "not_null": true,
             "diagram_description": "ordnet L\u00e4nderguppe zu"
         }

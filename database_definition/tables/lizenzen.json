@@ -1,20 +1,20 @@
 {
     "table_name": "lizenzen",
-    "description": "TODO",
+    "description": "Tabelle zur Verwaltung der Lizenzen, unter denen die statistischen Daten veröffentlicht werden.",
     "columns": [
         {
             "name": "name",
             "type": "VARCHAR(64)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "Name der Lizenz (z.B. CC BY 4.0)."
         },
         {
             "name": "url",
             "type": "VARCHAR(512)",
             "not_null": true,
             "default": "''",
-            "description": "TODO"
+            "description": "URL zur vollständigen Lizenzbeschreibung."
         },
         {
             "name": "extra_bedingungen",
@@ -22,7 +22,7 @@
             "not_null": true,
             "default": 0,
             "is_string": false,
-            "description": "TODO"
+            "description": "Gibt an, ob zusätzliche Bedingungen für die Nutzung der Daten bestehen."
         }
     ],
     "foreign_keys": [],

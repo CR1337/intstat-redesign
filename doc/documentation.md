@@ -267,187 +267,187 @@ erDiagram
 
 ### tab_lizenzen
 
-TODO
+Tabelle zur Verwaltung der Lizenzen, unter denen die statistischen Daten veröffentlicht werden.
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|name|VARCHAR(64)|True|''|TODO|
-|url|VARCHAR(512)|True|''|TODO|
-|extra_bedingungen|BOOLEAN|True|0|TODO|
+|name|VARCHAR(64)|True|''|Name der Lizenz (z.B. CC BY 4.0).|
+|url|VARCHAR(512)|True|''|URL zur vollständigen Lizenzbeschreibung.|
+|extra_bedingungen|BOOLEAN|True|0|Gibt an, ob zusätzliche Bedingungen für die Nutzung der Daten bestehen.|
 
 
 ### tab_daten
 
-Speichert die eigentlichen Datenwerte, die mit Ländern und Indikatoren verknüpft sind.
+Tabelle für die Speicherung von statistischen Einzelwerten (Zeitreihen) zu Ländern und Indikatoren.
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|datum|DATE|True|'2000-01-01'|TODO|
-|wert|DOUBLE|True|0|TODO|
+|datum|DATE|True|'2000-01-01'|Datum, an dem der Wert erhoben oder veröffentlicht wurde.|
+|wert|DOUBLE|True|0|Erfasster numerischer Wert für das jeweilige Land und den Indikator am angegebenen Datum.|
 
 #### Fremdschlüssel
 
 |Name|Referenztabelle|Nicht NULL|Beschreibung|
 |----|---------------|----------|------------|
-|laender|tab_laender|True|TODO|
-|indikatoren|tab_indikatoren|True|TODO|
+|laender|tab_laender|True|Verweis auf das Land, für das der Wert gilt.|
+|indikatoren|tab_indikatoren|True|Verweis auf den Indikator, zu dem der Wert gehört.|
 
 ### tab_laendergruppen
 
-Enthält Gruppen, zu welchen Länder gehören können, z.B. EU oder G7.
+Tabelle zur Verwaltung von Ländergruppen (z.B. EU, OECD, G7).
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|name_de|VARCHAR(256)|True|''|TODO|
-|name_en|VARCHAR(256)|True|''|TODO|
+|name_de|VARCHAR(256)|True|''|Name der Ländergruppe auf Deutsch.|
+|name_en|VARCHAR(256)|True|''|Name der Ländergruppe auf Englisch.|
 
 
 ### tab_laendergruppenzuordnungen
 
-Diese Tabelle ordnet Ländergruppen ihre Länder zu.
+Tabelle zur Zuordnung von Ländern zu Ländergruppen (z.B. Mitgliedschaft eines Landes in einer Gruppe).
 
 
 #### Fremdschlüssel
 
 |Name|Referenztabelle|Nicht NULL|Beschreibung|
 |----|---------------|----------|------------|
-|laender|tab_laender|True|TODO|
-|laendergruppen|tab_laendergruppen|True|TODO|
+|laender|tab_laender|True|Verweis auf das zugeordnete Land.|
+|laendergruppen|tab_laendergruppen|True|Verweis auf die zugeordnete Ländergruppe.|
 
 ### tab_metadaten
 
-TODO
+Tabelle zur Verwaltung von Metadaten, die Datenpunkten zugeordnet werden können (z.B. methodische Hinweise, Fußnoten).
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|kuerzel|VARCHAR(8)|True|''|TODO|
-|bezeichnung|VARCHAR(256)|True|''|TODO|
+|kuerzel|VARCHAR(8)|True|''|Kürzel für das Metadatum.|
+|bezeichnung|VARCHAR(256)|True|''|Ausführliche Bezeichnung des Metadatums.|
 
 
 ### tab_nutzer
 
-Diese Tabelle speichert alle Nutzer. Sie ist nur notwendig, wenn Nutzer Tracking angewandt wird.
+Diese Tabelle speichert alle Nutzer.
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|name|VARCHAR(256)|True|''|TODO|
+|name|VARCHAR(256)|True|''|Name des Nutzers.|
 
 
 ### tab_quellen
 
-Hier werden die Quellen gespeichert, aus denen die Werte für die Indikatoren stammen.
+Tabelle zur Verwaltung von Datenquellen.
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|name_de|VARCHAR(256)|True|''|TODO|
-|name_en|VARCHAR(256)|True|''|TODO|
-|name_kurz_de|VARCHAR(16)|True|''|TODO|
-|name_kurz_en|VARCHAR(16)|True|''|TODO|
+|name_de|VARCHAR(256)|True|''|Vollständiger Name der Quelle auf Deutsch.|
+|name_en|VARCHAR(256)|True|''|Vollständiger Name der Quelle auf Englisch.|
+|name_kurz_de|VARCHAR(16)|True|''|Kurzer Name der Quelle auf Deutsch.|
+|name_kurz_en|VARCHAR(16)|True|''|Kurzer Name der Quelle auf Englisch.|
 
 
 ### tab_indikatoren
 
-Enthält alle Indikatoren. Jeder Indikator besizt ein Thema, eine Quelle und eine Einheit. Außerdem enthält er einen Faktor, welcher mit zugehörigen Werten multipliziert werden muss und eine Dezimalstellengenauigkeit. 
+Tabelle zur Verwaltung der statistischen Indikatoren.
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|faktor|DOUBLE|True|0|TODO|
-|dezimalstellen|TINYINT UNSIGNED|True|0|TODO|
-|name_de|VARCHAR(256)|True|''|TODO|
-|name_en|VARCHAR(256)|True|''|TODO|
-|beschreibung_de|VARCHAR(4096)|True|''|TODO|
-|beschreibung_en|VARCHAR(4096)|True|''|TODO|
-|quellen_indikatoren_id|VARCHAR(128)|False|''|TODO|
+|faktor|DOUBLE|True|0|Faktor zur Multiplikation mit dem Indikatorwerts, um den korrekten Wert zu erhalten.|
+|dezimalstellen|TINYINT UNSIGNED|True|0|Anzahl der Dezimalstellen, mit denen der Wert angezeigt wird.|
+|name_de|VARCHAR(256)|True|''|Name des Indikators auf Deutsch.|
+|name_en|VARCHAR(256)|True|''|Name des Indikators auf Englisch.|
+|beschreibung_de|VARCHAR(4096)|True|''|Ausführliche Beschreibung des Indikators auf Deutsch.|
+|beschreibung_en|VARCHAR(4096)|True|''|Ausführliche Beschreibung des Indikators auf Englisch.|
+|quellen_indikatoren_id|VARCHAR(128)|False|''|ID des Indikators bei der jeweiligen Quelle (optional).|
 
 #### Fremdschlüssel
 
 |Name|Referenztabelle|Nicht NULL|Beschreibung|
 |----|---------------|----------|------------|
-|themen|tab_themen|True|TODO|
-|quellen|tab_quellen|True|TODO|
-|einheiten|tab_einheiten|True|TODO|
+|themen|tab_themen|True|Verweis auf das Thema, dem der Indikator zugeordnet ist.|
+|quellen|tab_quellen|True|Verweis auf die Quelle, aus der die Daten für den Indikator stammen.|
+|einheiten|tab_einheiten|True|Verweis auf die Einheit, in der der Indikator gemessen wird.|
 
 ### tab_themen
 
-Jedes Thema hat einen deutschen und einen englischen namen und eine Farbe.
+Tabelle welche Themen verwaltet, denen Indikatoren zugeordnet sind.
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|name_de|VARCHAR(64)|True|''|TODO|
-|name_en|VARCHAR(64)|True|''|TODO|
-|farbe_r|TINYINT UNSIGNED|True|0|TODO|
-|farbe_g|TINYINT UNSIGNED|True|0|TODO|
-|farbe_b|TINYINT UNSIGNED|True|0|TODO|
+|name_de|VARCHAR(64)|True|''|Name des Themas auf Deutsch.|
+|name_en|VARCHAR(64)|True|''|Name des Themas auf Englisch.|
+|farbe_r|TINYINT UNSIGNED|True|0|Rotwert der Farbzuordnung für das Thema (0-255).|
+|farbe_g|TINYINT UNSIGNED|True|0|Grünwert der Farbzuordnung für das Thema (0-255).|
+|farbe_b|TINYINT UNSIGNED|True|0|Blauwert der Farbzuordnung für das Thema (0-255).|
 
 
 ### tab_laender
 
-Hier sind die Länder gespeichert. Ein Land hat ISO2- und ISO3-Kennungen. Ein Land kann mehrere Namen haben. Auf die Anzeigenamen verweisen die Fremndschlüssel eines Landes.
+Tabelle zur Verwaltung der Länder mit ISO-Codes und Namensreferenzen.
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|iso2|VARCHAR(2)|True|''|TODO|
-|iso3|VARCHAR(3)|True|''|TODO|
+|iso2|VARCHAR(2)|True|''|ISO-2-Ländercode gemäß internationalem Standard (z.B. 'DE' für Deutschland).|
+|iso3|VARCHAR(3)|True|''|ISO-3-Ländercode gemäß internationalem Standard (z.B. 'DEU' für Deutschland).|
 
 #### Fremdschlüssel
 
 |Name|Referenztabelle|Nicht NULL|Beschreibung|
 |----|---------------|----------|------------|
-|kontinente|tab_kontinente|True|TODO|
-|laendernamen_de|tab_laendernamen|True|TODO|
-|laendernamen_en|tab_laendernamen|True|TODO|
+|kontinente|tab_kontinente|True|Verweis auf den Kontinent, dem das Land zugeordnet ist.|
+|laendernamen_de|tab_laendernamen|True|Verweis auf den deutschen Namen des Landes.|
+|laendernamen_en|tab_laendernamen|True|Verweis auf den englischen Namen des Landes.|
 
 ### tab_einheiten
 
-Enthält die Einheiten. eine Einheit hat ein Symbol und einen Beasiseinheit, in welche sie sich mittels ein es Faktors umrechnen lässt.
+Tabelle zur Verwaltung der Einheiten, in denen statistische Werte angegeben werden.
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|faktor|DOUBLE|True|0|TODO|
-|symbol_de|VARCHAR(64)|True|''|TODO|
-|symbol_en|VARCHAR(64)|True|''|TODO|
+|faktor|DOUBLE|True|0|Faktor zur Umrechnung in die Basiseinheit.|
+|symbol_de|VARCHAR(64)|True|''|Symbol der Einheit auf Deutsch.|
+|symbol_en|VARCHAR(64)|True|''|Symbol der Einheit auf Englisch.|
 
 #### Fremdschlüssel
 
 |Name|Referenztabelle|Nicht NULL|Beschreibung|
 |----|---------------|----------|------------|
-|basis_einheiten|tab_einheiten|False|TODO|
+|basis_einheiten|tab_einheiten|False|Optionale Referenz auf eine Basiseinheit, falls die Einheit abgeleitet ist.|
 
 ### tab_laendernamen
 
-Hier sind alle Ländernamen abgelegt. Ein Ländername ist einem Land zugeordnet.
+Tabelle zuer Verwaltung von Ländernamen. Ein Land kann mehrere Ländernamen haben. Jedes Land hat einen deutschen und einen englischen Namen.
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|name|VARCHAR(256)|True|''|TODO|
+|name|VARCHAR(256)|True|''|Name eines Landes.|
 
 #### Fremdschlüssel
 
 |Name|Referenztabelle|Nicht NULL|Beschreibung|
 |----|---------------|----------|------------|
-|laender|tab_laender|False|TODO|
+|laender|tab_laender|False|Verweis auf das Land, dem der Name zugeordnet ist. (optional)|
 
 ### tab_metadatenzuordnungen
 
@@ -458,19 +458,19 @@ Diese Tabelle ordnet Datenpunkten ihre Metadaten zu.
 
 |Name|Referenztabelle|Nicht NULL|Beschreibung|
 |----|---------------|----------|------------|
-|daten|tab_daten|True|TODO|
-|metadaten|tab_metadaten|True|TODO|
+|daten|tab_daten|True|Verweis auf den zugeordneten Datenpunkt.|
+|metadaten|tab_metadaten|True|Verweis auf das zugeordnete Metadatum.|
 
 ### tab_kontinente
 
-Jeder Kontinent hat einen deutschen und einen englischen Namen.
+Tabelle zur Verwaltung der Kontinente, denen Länder zugeordnet werden können.
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|name_de|VARCHAR(64)|True|''|TODO|
-|name_en|VARCHAR(64)|True|''|TODO|
+|name_de|VARCHAR(64)|True|''|Name des Kontinents auf Deutsch.|
+|name_en|VARCHAR(64)|True|''|Name des Kontinents auf Englisch.|
 
 
 
@@ -544,17 +544,4 @@ INNER JOIN (
 ON t.kontinente_id = latest.kontinente_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
-```
-
-#### Übertragen der Daten in die eigentliche Tabelle
-
-```SQL
-CALL bulk_insert_into_kontinente(@rows_inserted);
-SELECT @rows_inserted AS rows_inserted;
-```
-
-#### Löschen der temporären Tabelle
-
-```SQL
-DROP TEMPORARY TABLE IF EXISTS temp_kontinente_bulk;
 ```
