@@ -128,16 +128,3 @@ ON t.kontinente_id = latest.kontinente_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 ```
-
-#### Übertragen der Daten in die eigentliche Tabelle
-
-```SQL
-CALL bulk_insert_into_kontinente(@rows_inserted);
-SELECT @rows_inserted AS rows_inserted;
-```
-
-#### Löschen der temporären Tabelle
-
-```SQL
-DROP TEMPORARY TABLE IF EXISTS temp_kontinente_bulk;
-```
