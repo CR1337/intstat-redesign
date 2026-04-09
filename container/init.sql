@@ -246,6 +246,7 @@ CREATE TABLE IF NOT EXISTS tab_indikatoren (
     name_en VARCHAR(256) NOT NULL DEFAULT '',
     beschreibung_de VARCHAR(4096) NOT NULL DEFAULT '',
     beschreibung_en VARCHAR(4096) NOT NULL DEFAULT '',
+    quellen_indikatoren_id VARCHAR(128)  DEFAULT '',
 
     FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
         REFERENCES tab_nutzer(nutzer_id)
@@ -345,85 +346,85 @@ CREATE TABLE IF NOT EXISTS tab_metadatenzuordnungen (
 );
 
 ALTER TABLE tab_einheiten
-ADD CONSTRAINT fk_einheiten_einheiten_ff74af60bc0d41b59ebc  --  TODO
+ADD CONSTRAINT fk_einheiten_einheiten_cee90bd5b3de4f4089d4  --  TODO
 FOREIGN KEY (basis_einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendernamen
-ADD CONSTRAINT fk_laendernamen_laender_42212d97fc7249d9a9a5  --  TODO
+ADD CONSTRAINT fk_laendernamen_laender_e4812b60acd2457db117  --  TODO
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_themen_f86ce3719aef40d8817e  --  TODO
+ADD CONSTRAINT fk_indikatoren_themen_6f744643b24d43db9ab0  --  TODO
 FOREIGN KEY (themen_id) REFERENCES tab_themen(themen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_quellen_1aaf7f16b3954963b833  --  TODO
+ADD CONSTRAINT fk_indikatoren_quellen_5cef987a346b4f968702  --  TODO
 FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_einheiten_4e940a2073bc4b51a77e  --  TODO
+ADD CONSTRAINT fk_indikatoren_einheiten_16bb0f295f0549b18059  --  TODO
 FOREIGN KEY (einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_kontinente_1e71661d2a8d46ce885a  --  TODO
+ADD CONSTRAINT fk_laender_kontinente_b086bfcd7c45420c95f0  --  TODO
 FOREIGN KEY (kontinente_id) REFERENCES tab_kontinente(kontinente_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_13729b6be6274d458f6c  --  TODO
+ADD CONSTRAINT fk_laender_laendernamen_38d186ffe2b54aa6b167  --  TODO
 FOREIGN KEY (laendernamen_de_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_e80592294d2c4a239194  --  TODO
+ADD CONSTRAINT fk_laender_laendernamen_89014324513648978b42  --  TODO
 FOREIGN KEY (laendernamen_en_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_laender_26a4c8a529ca4eff9707  --  TODO
+ADD CONSTRAINT fk_daten_laender_0ea60df5e85543ec91ba  --  TODO
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_indikatoren_8ea03040732a4e98979a  --  TODO
+ADD CONSTRAINT fk_daten_indikatoren_ccc5f444f13c49b180df  --  TODO
 FOREIGN KEY (indikatoren_id) REFERENCES tab_indikatoren(indikatoren_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_3eb1f5dbf9bc419bb36e  --  TODO
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_ff92a22b368840de9e9d  --  TODO
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_afb23ac813ca49e7945a  --  TODO
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_4620ff78bd90403192f9  --  TODO
 FOREIGN KEY (laendergruppen_id) REFERENCES tab_laendergruppen(laendergruppen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_metadatenzuordnungen
-ADD CONSTRAINT fk_metadatenzuordnungen_daten_ce8c75b8c9c6421da2c3  --  TODO
+ADD CONSTRAINT fk_metadatenzuordnungen_daten_4c2f0fe5fe164b97b942  --  TODO
 FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_metadatenzuordnungen
-ADD CONSTRAINT fk_metadatenzuordnungen_metadaten_daa4e2551af044f59455  --  TODO
+ADD CONSTRAINT fk_metadatenzuordnungen_metadaten_4f853ad3957247438507  --  TODO
 FOREIGN KEY (metadaten_id) REFERENCES tab_metadaten(metadaten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -2288,6 +2289,7 @@ CREATE PROCEDURE insert_into_indikatoren(
     IN name_en_in VARCHAR(256),
     IN beschreibung_de_in VARCHAR(4096),
     IN beschreibung_en_in VARCHAR(4096),
+    IN quellen_indikatoren_id_in VARCHAR(128),
     IN themen_in INTEGER,
     IN quellen_in INTEGER,
     IN einheiten_in INTEGER,
@@ -2329,6 +2331,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id,
@@ -2343,6 +2346,7 @@ BEGIN
         name_en_in,
         beschreibung_de_in,
         beschreibung_en_in,
+        quellen_indikatoren_id_in,
         themen_in,
         quellen_in,
         einheiten_in,
@@ -3165,6 +3169,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_beschreibung_de VARCHAR(4096);
     DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -3189,6 +3194,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id
@@ -3199,6 +3205,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten
@@ -3219,6 +3226,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id,
@@ -3233,6 +3241,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten,
@@ -5094,6 +5103,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_beschreibung_de VARCHAR(4096);
     DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5118,6 +5128,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id
@@ -5128,6 +5139,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten
@@ -5148,6 +5160,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id,
@@ -5162,6 +5175,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten,
@@ -5186,6 +5200,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_beschreibung_de VARCHAR(4096);
     DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5210,6 +5225,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id
@@ -5220,6 +5236,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten
@@ -5240,6 +5257,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id,
@@ -5254,6 +5272,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten,
@@ -5278,6 +5297,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_beschreibung_de VARCHAR(4096);
     DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5302,6 +5322,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id
@@ -5312,6 +5333,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten
@@ -5332,6 +5354,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id,
@@ -5346,6 +5369,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten,
@@ -5370,6 +5394,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_beschreibung_de VARCHAR(4096);
     DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5394,6 +5419,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id
@@ -5404,6 +5430,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten
@@ -5424,6 +5451,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id,
@@ -5438,6 +5466,7 @@ BEGIN
         value_in,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten,
@@ -5462,6 +5491,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_beschreibung_de VARCHAR(4096);
     DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5486,6 +5516,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id
@@ -5496,6 +5527,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten
@@ -5516,6 +5548,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id,
@@ -5530,6 +5563,7 @@ BEGIN
         v_name_en,
         value_in,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten,
@@ -5554,6 +5588,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_beschreibung_de VARCHAR(4096);
     DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5578,6 +5613,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id
@@ -5588,6 +5624,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten
@@ -5608,6 +5645,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id,
@@ -5621,6 +5659,104 @@ BEGIN
         v_name_de,
         v_name_en,
         v_beschreibung_de,
+        value_in,
+        v_quellen_indikatoren_id,
+        v_themen,
+        v_quellen,
+        v_einheiten,
+        indikatoren_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_indikatoren_quellen_indikatoren_id(
+    IN indikatoren_id_in INTEGER,
+    IN value_in VARCHAR(128)
+)
+BEGIN
+    DECLARE v_faktor DOUBLE;
+    DECLARE v_dezimalstellen TINYINT UNSIGNED;
+    DECLARE v_name_de VARCHAR(256);
+    DECLARE v_name_en VARCHAR(256);
+    DECLARE v_beschreibung_de VARCHAR(4096);
+    DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_quellen_indikatoren_id VARCHAR(128);
+    DECLARE v_themen INTEGER;
+    DECLARE v_quellen INTEGER;
+    DECLARE v_einheiten INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        faktor,
+        dezimalstellen,
+        name_de,
+        name_en,
+        beschreibung_de,
+        beschreibung_en,
+        quellen_indikatoren_id,
+        themen_id,
+        quellen_id,
+        einheiten_id
+    INTO
+        v_faktor,
+        v_dezimalstellen,
+        v_name_de,
+        v_name_en,
+        v_beschreibung_de,
+        v_beschreibung_en,
+        v_quellen_indikatoren_id,
+        v_themen,
+        v_quellen,
+        v_einheiten
+    FROM view_indikatoren_aktuell
+    WHERE indikatoren_id = indikatoren_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_indikatoren(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        faktor,
+        dezimalstellen,
+        name_de,
+        name_en,
+        beschreibung_de,
+        beschreibung_en,
+        quellen_indikatoren_id,
+        themen_id,
+        quellen_id,
+        einheiten_id,
+        indikatoren_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_faktor,
+        v_dezimalstellen,
+        v_name_de,
+        v_name_en,
+        v_beschreibung_de,
+        v_beschreibung_en,
         value_in,
         v_themen,
         v_quellen,
@@ -5646,6 +5782,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_beschreibung_de VARCHAR(4096);
     DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5670,6 +5807,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id
@@ -5680,6 +5818,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten
@@ -5700,6 +5839,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id,
@@ -5714,6 +5854,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         value_in,
         v_quellen,
         v_einheiten,
@@ -5738,6 +5879,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_beschreibung_de VARCHAR(4096);
     DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5762,6 +5904,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id
@@ -5772,6 +5915,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten
@@ -5792,6 +5936,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id,
@@ -5806,6 +5951,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         value_in,
         v_einheiten,
@@ -5830,6 +5976,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_beschreibung_de VARCHAR(4096);
     DECLARE v_beschreibung_en VARCHAR(4096);
+    DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
     DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
@@ -5854,6 +6001,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id
@@ -5864,6 +6012,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         v_einheiten
@@ -5884,6 +6033,7 @@ BEGIN
         name_en,
         beschreibung_de,
         beschreibung_en,
+        quellen_indikatoren_id,
         themen_id,
         quellen_id,
         einheiten_id,
@@ -5898,6 +6048,7 @@ BEGIN
         v_name_en,
         v_beschreibung_de,
         v_beschreibung_en,
+        v_quellen_indikatoren_id,
         v_themen,
         v_quellen,
         value_in,

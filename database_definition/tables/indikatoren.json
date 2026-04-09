@@ -43,6 +43,13 @@
             "not_null": true,
             "default": "''",
             "description": "TODO"
+        },
+        {
+            "name": "quellen_indikatoren_id",
+            "type": "VARCHAR(128)",
+            "not_null": false,
+            "default": "''",
+            "description": "TODO"
         }
     ],
     "foreign_keys": [

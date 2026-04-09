@@ -153,6 +153,7 @@ erDiagram
                 VARCHAR(256) name_en
                 VARCHAR(4096) beschreibung_de
                 VARCHAR(4096) beschreibung_en
+                VARCHAR(128) quellen_indikatoren_id
         }
 
             tab_themen ||--o{ tab_indikatoren : "gehört zu Thema"
@@ -370,6 +371,7 @@ Enthält alle Indikatoren. Jeder Indikator besizt ein Thema, eine Quelle und ein
 |name_en|VARCHAR(256)|True|''|TODO|
 |beschreibung_de|VARCHAR(4096)|True|''|TODO|
 |beschreibung_en|VARCHAR(4096)|True|''|TODO|
+|quellen_indikatoren_id|VARCHAR(128)|False|''|TODO|
 
 #### Fremdschlüssel
 
