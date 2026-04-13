@@ -33,6 +33,22 @@
             "description": "Verweis auf den Indikator, zu dem der Wert gehört.",
             "not_null": true,
             "diagram_description": "f\u00fcr Indikator"
+        },
+        {
+            "name": "lizenzen",
+            "references": "lizenzen",
+            "min_1": false,
+            "description": "Verweis auf die Lizenz, unter welcher der Wert steht.",
+            "not_null": false,
+            "diagram_description": "hat Lizenz"
+        },
+        {
+            "name": "quellen",
+            "references": "quellen",
+            "min_1": false,
+            "description": "Verweis auf die Quelle, aus welcher der Wert stammt.",
+            "not_null": false,
+            "diagram_description": "hat Quelle"
         }
     ],
     "unique_sets": [

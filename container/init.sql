@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS tab_quellen (
     name_en VARCHAR(256) NOT NULL DEFAULT '',
     name_kurz_de VARCHAR(16) NOT NULL DEFAULT '',
     name_kurz_en VARCHAR(16) NOT NULL DEFAULT '',
+    url VARCHAR(512) NOT NULL DEFAULT '',
 
     FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
         REFERENCES tab_nutzer(nutzer_id)
@@ -237,7 +238,6 @@ CREATE TABLE IF NOT EXISTS tab_indikatoren (
     indikatoren_id INTEGER NOT NULL,
 
     themen_id INTEGER NOT NULL,
-    quellen_id INTEGER NOT NULL,
     einheiten_id INTEGER NOT NULL,
 
     faktor DOUBLE NOT NULL DEFAULT 0,
@@ -291,6 +291,8 @@ CREATE TABLE IF NOT EXISTS tab_daten (
 
     laender_id INTEGER NOT NULL,
     indikatoren_id INTEGER NOT NULL,
+    lizenzen_id INTEGER ,
+    quellen_id INTEGER ,
 
     datum DATE NOT NULL DEFAULT '2000-01-01',
     wert DOUBLE NOT NULL DEFAULT 0,
@@ -346,85 +348,91 @@ CREATE TABLE IF NOT EXISTS tab_metadatenzuordnungen (
 );
 
 ALTER TABLE tab_einheiten
-ADD CONSTRAINT fk_einheiten_einheiten_22c0aef1cd4b470192ec  --  Optionale Referenz auf eine Basiseinheit, falls die Einheit abgeleitet ist.
+ADD CONSTRAINT fk_einheiten_einheiten_d7f2ed8d34ea4754b6c7  --  Optionale Referenz auf eine Basiseinheit, falls die Einheit abgeleitet ist.
 FOREIGN KEY (basis_einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendernamen
-ADD CONSTRAINT fk_laendernamen_laender_5f084940840348c18bd3  --  Verweis auf das Land, dem der Name zugeordnet ist. (optional)
+ADD CONSTRAINT fk_laendernamen_laender_470b526cda694a8f9d34  --  Verweis auf das Land, dem der Name zugeordnet ist. (optional)
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_themen_20c2db346bcf4add9ccf  --  Verweis auf das Thema, dem der Indikator zugeordnet ist.
+ADD CONSTRAINT fk_indikatoren_themen_5238869e49b745a2b47d  --  Verweis auf das Thema, dem der Indikator zugeordnet ist.
 FOREIGN KEY (themen_id) REFERENCES tab_themen(themen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_quellen_25c25f9ee5b342fb9a8d  --  Verweis auf die Quelle, aus der die Daten für den Indikator stammen.
-FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT;
-
-ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_einheiten_f1112349dbec49d0ac00  --  Verweis auf die Einheit, in der der Indikator gemessen wird.
+ADD CONSTRAINT fk_indikatoren_einheiten_df36da62574847e2ab2b  --  Verweis auf die Einheit, in der der Indikator gemessen wird.
 FOREIGN KEY (einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_kontinente_17c117a2dce34bc385dd  --  Verweis auf den Kontinent, dem das Land zugeordnet ist.
+ADD CONSTRAINT fk_laender_kontinente_20b333750b6a49688cea  --  Verweis auf den Kontinent, dem das Land zugeordnet ist.
 FOREIGN KEY (kontinente_id) REFERENCES tab_kontinente(kontinente_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_8466f955251a47c8a70e  --  Verweis auf den deutschen Namen des Landes.
+ADD CONSTRAINT fk_laender_laendernamen_292fb8c9b5a043ef879e  --  Verweis auf den deutschen Namen des Landes.
 FOREIGN KEY (laendernamen_de_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_64b663d8d6b046d78c36  --  Verweis auf den englischen Namen des Landes.
+ADD CONSTRAINT fk_laender_laendernamen_4abe241d779546658165  --  Verweis auf den englischen Namen des Landes.
 FOREIGN KEY (laendernamen_en_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_laender_e7f3eb2de10c4ac584cc  --  Verweis auf das Land, für das der Wert gilt.
+ADD CONSTRAINT fk_daten_laender_a3c48c99a3634dd09fb5  --  Verweis auf das Land, für das der Wert gilt.
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_indikatoren_aa36d5cb675242128089  --  Verweis auf den Indikator, zu dem der Wert gehört.
+ADD CONSTRAINT fk_daten_indikatoren_4f9bf46b9df041489d67  --  Verweis auf den Indikator, zu dem der Wert gehört.
 FOREIGN KEY (indikatoren_id) REFERENCES tab_indikatoren(indikatoren_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
+ALTER TABLE tab_daten
+ADD CONSTRAINT fk_daten_lizenzen_c270b6afa5684ac8a94a  --  Verweis auf die Lizenz, unter welcher der Wert steht.
+FOREIGN KEY (lizenzen_id) REFERENCES tab_lizenzen(lizenzen_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE tab_daten
+ADD CONSTRAINT fk_daten_quellen_2ecf9edb1d46411eb6f6  --  Verweis auf die Quelle, aus welcher der Wert stammt.
+FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_cf6fad1ca4384a1bac1b  --  Verweis auf das zugeordnete Land.
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_d43b4dce59d942d99d0c  --  Verweis auf das zugeordnete Land.
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_1bec22fa458542f9b605  --  Verweis auf die zugeordnete Ländergruppe.
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_e6b129d6919f4db5a41f  --  Verweis auf die zugeordnete Ländergruppe.
 FOREIGN KEY (laendergruppen_id) REFERENCES tab_laendergruppen(laendergruppen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_metadatenzuordnungen
-ADD CONSTRAINT fk_metadatenzuordnungen_daten_194b386dddf94e359146  --  Verweis auf den zugeordneten Datenpunkt.
+ADD CONSTRAINT fk_metadatenzuordnungen_daten_2fabacd7f42e410ab6cc  --  Verweis auf den zugeordneten Datenpunkt.
 FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_metadatenzuordnungen
-ADD CONSTRAINT fk_metadatenzuordnungen_metadaten_07d7040cd8534fc8acd7  --  Verweis auf das zugeordnete Metadatum.
+ADD CONSTRAINT fk_metadatenzuordnungen_metadaten_58a286043ec64a2cb325  --  Verweis auf das zugeordnete Metadatum.
 FOREIGN KEY (metadaten_id) REFERENCES tab_metadaten(metadaten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -1799,6 +1807,7 @@ CREATE PROCEDURE insert_into_quellen(
     IN name_en_in VARCHAR(256),
     IN name_kurz_de_in VARCHAR(16),
     IN name_kurz_en_in VARCHAR(16),
+    IN url_in VARCHAR(512),
     OUT new_quellen_id_out INTEGER
 )
 BEGIN
@@ -1835,6 +1844,7 @@ BEGIN
         name_en,
         name_kurz_de,
         name_kurz_en,
+        url,
         quellen_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -1844,6 +1854,7 @@ BEGIN
         name_en_in,
         name_kurz_de_in,
         name_kurz_en_in,
+        url_in,
         v_new_id
     );
 
@@ -2291,7 +2302,6 @@ CREATE PROCEDURE insert_into_indikatoren(
     IN beschreibung_en_in VARCHAR(4096),
     IN quellen_indikatoren_id_in VARCHAR(128),
     IN themen_in INTEGER,
-    IN quellen_in INTEGER,
     IN einheiten_in INTEGER,
     OUT new_indikatoren_id_out INTEGER
 )
@@ -2333,7 +2343,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id,
         indikatoren_id
     ) VALUES (
@@ -2348,7 +2357,6 @@ BEGIN
         beschreibung_en_in,
         quellen_indikatoren_id_in,
         themen_in,
-        quellen_in,
         einheiten_in,
         v_new_id
     );
@@ -2436,6 +2444,8 @@ CREATE PROCEDURE insert_into_daten(
     IN wert_in DOUBLE,
     IN laender_in INTEGER,
     IN indikatoren_in INTEGER,
+    IN lizenzen_in INTEGER,
+    IN quellen_in INTEGER,
     OUT new_daten_id_out INTEGER
 )
 BEGIN
@@ -2472,6 +2482,8 @@ BEGIN
         wert,
         laender_id,
         indikatoren_id,
+        lizenzen_id,
+        quellen_id,
         daten_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -2481,6 +2493,8 @@ BEGIN
         wert_in,
         laender_in,
         indikatoren_in,
+        lizenzen_in,
+        quellen_in,
         v_new_id
     );
 
@@ -2671,6 +2685,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_name_kurz_de VARCHAR(16);
     DECLARE v_name_kurz_en VARCHAR(16);
+    DECLARE v_url VARCHAR(512);
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -2689,12 +2704,14 @@ BEGIN
         name_de,
         name_en,
         name_kurz_de,
-        name_kurz_en
+        name_kurz_en,
+        url
     INTO
         v_name_de,
         v_name_en,
         v_name_kurz_de,
-        v_name_kurz_en
+        v_name_kurz_en,
+        v_url
     FROM view_quellen_aktuell
     WHERE quellen_id = quellen_id_to_delete;
 
@@ -2710,6 +2727,7 @@ BEGIN
         name_en,
         name_kurz_de,
         name_kurz_en,
+        url,
         quellen_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -2719,6 +2737,7 @@ BEGIN
         v_name_en,
         v_name_kurz_de,
         v_name_kurz_en,
+        v_url,
         quellen_id_to_delete
     );
 
@@ -3171,7 +3190,6 @@ BEGIN
     DECLARE v_beschreibung_en VARCHAR(4096);
     DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
-    DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -3196,7 +3214,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id
     INTO
         v_faktor,
@@ -3207,7 +3224,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten
     FROM view_indikatoren_aktuell
     WHERE indikatoren_id = indikatoren_id_to_delete;
@@ -3228,7 +3244,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id,
         indikatoren_id
     ) VALUES (
@@ -3243,7 +3258,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten,
         indikatoren_id_to_delete
     );
@@ -3336,6 +3350,8 @@ BEGIN
     DECLARE v_wert DOUBLE;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
+    DECLARE v_lizenzen INTEGER;
+    DECLARE v_quellen INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -3354,12 +3370,16 @@ BEGIN
         datum,
         wert,
         laender_id,
-        indikatoren_id
+        indikatoren_id,
+        lizenzen_id,
+        quellen_id
     INTO
         v_datum,
         v_wert,
         v_laender,
-        v_indikatoren
+        v_indikatoren,
+        v_lizenzen,
+        v_quellen
     FROM view_daten_aktuell
     WHERE daten_id = daten_id_to_delete;
 
@@ -3375,6 +3395,8 @@ BEGIN
         wert,
         laender_id,
         indikatoren_id,
+        lizenzen_id,
+        quellen_id,
         daten_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -3384,6 +3406,8 @@ BEGIN
         v_wert,
         v_laender,
         v_indikatoren,
+        v_lizenzen,
+        v_quellen,
         daten_id_to_delete
     );
 
@@ -3563,6 +3587,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_name_kurz_de VARCHAR(16);
     DECLARE v_name_kurz_en VARCHAR(16);
+    DECLARE v_url VARCHAR(512);
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -3581,12 +3606,14 @@ BEGIN
         name_de,
         name_en,
         name_kurz_de,
-        name_kurz_en
+        name_kurz_en,
+        url
     INTO
         v_name_de,
         v_name_en,
         v_name_kurz_de,
-        v_name_kurz_en
+        v_name_kurz_en,
+        v_url
     FROM view_quellen_aktuell
     WHERE quellen_id = quellen_id_in;
 
@@ -3602,6 +3629,7 @@ BEGIN
         name_en,
         name_kurz_de,
         name_kurz_en,
+        url,
         quellen_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -3611,6 +3639,7 @@ BEGIN
         v_name_en,
         v_name_kurz_de,
         v_name_kurz_en,
+        v_url,
         quellen_id_in
     );
 
@@ -3630,6 +3659,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_name_kurz_de VARCHAR(16);
     DECLARE v_name_kurz_en VARCHAR(16);
+    DECLARE v_url VARCHAR(512);
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -3648,12 +3678,14 @@ BEGIN
         name_de,
         name_en,
         name_kurz_de,
-        name_kurz_en
+        name_kurz_en,
+        url
     INTO
         v_name_de,
         v_name_en,
         v_name_kurz_de,
-        v_name_kurz_en
+        v_name_kurz_en,
+        v_url
     FROM view_quellen_aktuell
     WHERE quellen_id = quellen_id_in;
 
@@ -3669,6 +3701,7 @@ BEGIN
         name_en,
         name_kurz_de,
         name_kurz_en,
+        url,
         quellen_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -3678,6 +3711,7 @@ BEGIN
         value_in,
         v_name_kurz_de,
         v_name_kurz_en,
+        v_url,
         quellen_id_in
     );
 
@@ -3697,6 +3731,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_name_kurz_de VARCHAR(16);
     DECLARE v_name_kurz_en VARCHAR(16);
+    DECLARE v_url VARCHAR(512);
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -3715,12 +3750,14 @@ BEGIN
         name_de,
         name_en,
         name_kurz_de,
-        name_kurz_en
+        name_kurz_en,
+        url
     INTO
         v_name_de,
         v_name_en,
         v_name_kurz_de,
-        v_name_kurz_en
+        v_name_kurz_en,
+        v_url
     FROM view_quellen_aktuell
     WHERE quellen_id = quellen_id_in;
 
@@ -3736,6 +3773,7 @@ BEGIN
         name_en,
         name_kurz_de,
         name_kurz_en,
+        url,
         quellen_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -3745,6 +3783,7 @@ BEGIN
         v_name_en,
         value_in,
         v_name_kurz_en,
+        v_url,
         quellen_id_in
     );
 
@@ -3764,6 +3803,7 @@ BEGIN
     DECLARE v_name_en VARCHAR(256);
     DECLARE v_name_kurz_de VARCHAR(16);
     DECLARE v_name_kurz_en VARCHAR(16);
+    DECLARE v_url VARCHAR(512);
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -3782,12 +3822,14 @@ BEGIN
         name_de,
         name_en,
         name_kurz_de,
-        name_kurz_en
+        name_kurz_en,
+        url
     INTO
         v_name_de,
         v_name_en,
         v_name_kurz_de,
-        v_name_kurz_en
+        v_name_kurz_en,
+        v_url
     FROM view_quellen_aktuell
     WHERE quellen_id = quellen_id_in;
 
@@ -3803,6 +3845,7 @@ BEGIN
         name_en,
         name_kurz_de,
         name_kurz_en,
+        url,
         quellen_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -3811,6 +3854,79 @@ BEGIN
         v_name_de,
         v_name_en,
         v_name_kurz_de,
+        value_in,
+        v_url,
+        quellen_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_quellen_url(
+    IN quellen_id_in INTEGER,
+    IN value_in VARCHAR(512)
+)
+BEGIN
+    DECLARE v_name_de VARCHAR(256);
+    DECLARE v_name_en VARCHAR(256);
+    DECLARE v_name_kurz_de VARCHAR(16);
+    DECLARE v_name_kurz_en VARCHAR(16);
+    DECLARE v_url VARCHAR(512);
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        name_de,
+        name_en,
+        name_kurz_de,
+        name_kurz_en,
+        url
+    INTO
+        v_name_de,
+        v_name_en,
+        v_name_kurz_de,
+        v_name_kurz_en,
+        v_url
+    FROM view_quellen_aktuell
+    WHERE quellen_id = quellen_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_quellen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name_de,
+        name_en,
+        name_kurz_de,
+        name_kurz_en,
+        url,
+        quellen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_name_de,
+        v_name_en,
+        v_name_kurz_de,
+        v_name_kurz_en,
         value_in,
         quellen_id_in
     );
@@ -5105,7 +5221,6 @@ BEGIN
     DECLARE v_beschreibung_en VARCHAR(4096);
     DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
-    DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -5130,7 +5245,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id
     INTO
         v_faktor,
@@ -5141,7 +5255,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten
     FROM view_indikatoren_aktuell
     WHERE indikatoren_id = indikatoren_id_in;
@@ -5162,7 +5275,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id,
         indikatoren_id
     ) VALUES (
@@ -5177,7 +5289,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten,
         indikatoren_id_in
     );
@@ -5202,7 +5313,6 @@ BEGIN
     DECLARE v_beschreibung_en VARCHAR(4096);
     DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
-    DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -5227,7 +5337,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id
     INTO
         v_faktor,
@@ -5238,7 +5347,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten
     FROM view_indikatoren_aktuell
     WHERE indikatoren_id = indikatoren_id_in;
@@ -5259,7 +5367,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id,
         indikatoren_id
     ) VALUES (
@@ -5274,7 +5381,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten,
         indikatoren_id_in
     );
@@ -5299,7 +5405,6 @@ BEGIN
     DECLARE v_beschreibung_en VARCHAR(4096);
     DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
-    DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -5324,7 +5429,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id
     INTO
         v_faktor,
@@ -5335,7 +5439,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten
     FROM view_indikatoren_aktuell
     WHERE indikatoren_id = indikatoren_id_in;
@@ -5356,7 +5459,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id,
         indikatoren_id
     ) VALUES (
@@ -5371,7 +5473,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten,
         indikatoren_id_in
     );
@@ -5396,7 +5497,6 @@ BEGIN
     DECLARE v_beschreibung_en VARCHAR(4096);
     DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
-    DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -5421,7 +5521,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id
     INTO
         v_faktor,
@@ -5432,7 +5531,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten
     FROM view_indikatoren_aktuell
     WHERE indikatoren_id = indikatoren_id_in;
@@ -5453,7 +5551,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id,
         indikatoren_id
     ) VALUES (
@@ -5468,7 +5565,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten,
         indikatoren_id_in
     );
@@ -5493,7 +5589,6 @@ BEGIN
     DECLARE v_beschreibung_en VARCHAR(4096);
     DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
-    DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -5518,7 +5613,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id
     INTO
         v_faktor,
@@ -5529,7 +5623,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten
     FROM view_indikatoren_aktuell
     WHERE indikatoren_id = indikatoren_id_in;
@@ -5550,7 +5643,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id,
         indikatoren_id
     ) VALUES (
@@ -5565,7 +5657,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten,
         indikatoren_id_in
     );
@@ -5590,7 +5681,6 @@ BEGIN
     DECLARE v_beschreibung_en VARCHAR(4096);
     DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
-    DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -5615,7 +5705,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id
     INTO
         v_faktor,
@@ -5626,7 +5715,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten
     FROM view_indikatoren_aktuell
     WHERE indikatoren_id = indikatoren_id_in;
@@ -5647,7 +5735,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id,
         indikatoren_id
     ) VALUES (
@@ -5662,7 +5749,6 @@ BEGIN
         value_in,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten,
         indikatoren_id_in
     );
@@ -5687,7 +5773,6 @@ BEGIN
     DECLARE v_beschreibung_en VARCHAR(4096);
     DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
-    DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -5712,7 +5797,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id
     INTO
         v_faktor,
@@ -5723,7 +5807,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten
     FROM view_indikatoren_aktuell
     WHERE indikatoren_id = indikatoren_id_in;
@@ -5744,7 +5827,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id,
         indikatoren_id
     ) VALUES (
@@ -5759,7 +5841,6 @@ BEGIN
         v_beschreibung_en,
         value_in,
         v_themen,
-        v_quellen,
         v_einheiten,
         indikatoren_id_in
     );
@@ -5784,7 +5865,6 @@ BEGIN
     DECLARE v_beschreibung_en VARCHAR(4096);
     DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
-    DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -5809,7 +5889,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id
     INTO
         v_faktor,
@@ -5820,7 +5899,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten
     FROM view_indikatoren_aktuell
     WHERE indikatoren_id = indikatoren_id_in;
@@ -5841,7 +5919,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id,
         indikatoren_id
     ) VALUES (
@@ -5855,104 +5932,6 @@ BEGIN
         v_beschreibung_de,
         v_beschreibung_en,
         v_quellen_indikatoren_id,
-        value_in,
-        v_quellen,
-        v_einheiten,
-        indikatoren_id_in
-    );
-
-    TRUNCATE TABLE __insert_allowed__;
-END$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE PROCEDURE update_value_indikatoren_quellen(
-    IN indikatoren_id_in INTEGER,
-    IN value_in INTEGER
-)
-BEGIN
-    DECLARE v_faktor DOUBLE;
-    DECLARE v_dezimalstellen TINYINT UNSIGNED;
-    DECLARE v_name_de VARCHAR(256);
-    DECLARE v_name_en VARCHAR(256);
-    DECLARE v_beschreibung_de VARCHAR(4096);
-    DECLARE v_beschreibung_en VARCHAR(4096);
-    DECLARE v_quellen_indikatoren_id VARCHAR(128);
-    DECLARE v_themen INTEGER;
-    DECLARE v_quellen INTEGER;
-    DECLARE v_einheiten INTEGER;
-
-    DECLARE v_nutzer_id INTEGER;
-    DECLARE v_current_username VARCHAR(256);
-    
-    CALL insert_current_nutzer();
-
-    SET v_current_username = get_aktuellen_nutzer_namen();
-    SET v_nutzer_id = (
-        SELECT nutzer_id
-        FROM view_nutzer_aktuell
-        WHERE name = v_current_username
-        LIMIT 1
-    );
-
-    SELECT 
-        faktor,
-        dezimalstellen,
-        name_de,
-        name_en,
-        beschreibung_de,
-        beschreibung_en,
-        quellen_indikatoren_id,
-        themen_id,
-        quellen_id,
-        einheiten_id
-    INTO
-        v_faktor,
-        v_dezimalstellen,
-        v_name_de,
-        v_name_en,
-        v_beschreibung_de,
-        v_beschreibung_en,
-        v_quellen_indikatoren_id,
-        v_themen,
-        v_quellen,
-        v_einheiten
-    FROM view_indikatoren_aktuell
-    WHERE indikatoren_id = indikatoren_id_in;
-
-    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
-    TRUNCATE TABLE __insert_allowed__;
-    INSERT INTO __insert_allowed__ VALUES(TRUE);
-
-    INSERT INTO tab_indikatoren(
-        gueltig_seit,
-        ist_aktiv,
-        ersteller_nutzer_id,
-        faktor,
-        dezimalstellen,
-        name_de,
-        name_en,
-        beschreibung_de,
-        beschreibung_en,
-        quellen_indikatoren_id,
-        themen_id,
-        quellen_id,
-        einheiten_id,
-        indikatoren_id
-    ) VALUES (
-        CURRENT_TIMESTAMP(6),
-        TRUE,
-        v_nutzer_id,
-        v_faktor,
-        v_dezimalstellen,
-        v_name_de,
-        v_name_en,
-        v_beschreibung_de,
-        v_beschreibung_en,
-        v_quellen_indikatoren_id,
-        v_themen,
         value_in,
         v_einheiten,
         indikatoren_id_in
@@ -5978,7 +5957,6 @@ BEGIN
     DECLARE v_beschreibung_en VARCHAR(4096);
     DECLARE v_quellen_indikatoren_id VARCHAR(128);
     DECLARE v_themen INTEGER;
-    DECLARE v_quellen INTEGER;
     DECLARE v_einheiten INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
@@ -6003,7 +5981,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id
     INTO
         v_faktor,
@@ -6014,7 +5991,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         v_einheiten
     FROM view_indikatoren_aktuell
     WHERE indikatoren_id = indikatoren_id_in;
@@ -6035,7 +6011,6 @@ BEGIN
         beschreibung_en,
         quellen_indikatoren_id,
         themen_id,
-        quellen_id,
         einheiten_id,
         indikatoren_id
     ) VALUES (
@@ -6050,7 +6025,6 @@ BEGIN
         v_beschreibung_en,
         v_quellen_indikatoren_id,
         v_themen,
-        v_quellen,
         value_in,
         indikatoren_id_in
     );
@@ -6431,6 +6405,8 @@ BEGIN
     DECLARE v_wert DOUBLE;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
+    DECLARE v_lizenzen INTEGER;
+    DECLARE v_quellen INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -6449,12 +6425,16 @@ BEGIN
         datum,
         wert,
         laender_id,
-        indikatoren_id
+        indikatoren_id,
+        lizenzen_id,
+        quellen_id
     INTO
         v_datum,
         v_wert,
         v_laender,
-        v_indikatoren
+        v_indikatoren,
+        v_lizenzen,
+        v_quellen
     FROM view_daten_aktuell
     WHERE daten_id = daten_id_in;
 
@@ -6470,6 +6450,8 @@ BEGIN
         wert,
         laender_id,
         indikatoren_id,
+        lizenzen_id,
+        quellen_id,
         daten_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -6479,6 +6461,8 @@ BEGIN
         v_wert,
         v_laender,
         v_indikatoren,
+        v_lizenzen,
+        v_quellen,
         daten_id_in
     );
 
@@ -6498,6 +6482,8 @@ BEGIN
     DECLARE v_wert DOUBLE;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
+    DECLARE v_lizenzen INTEGER;
+    DECLARE v_quellen INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -6516,12 +6502,16 @@ BEGIN
         datum,
         wert,
         laender_id,
-        indikatoren_id
+        indikatoren_id,
+        lizenzen_id,
+        quellen_id
     INTO
         v_datum,
         v_wert,
         v_laender,
-        v_indikatoren
+        v_indikatoren,
+        v_lizenzen,
+        v_quellen
     FROM view_daten_aktuell
     WHERE daten_id = daten_id_in;
 
@@ -6537,6 +6527,8 @@ BEGIN
         wert,
         laender_id,
         indikatoren_id,
+        lizenzen_id,
+        quellen_id,
         daten_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -6546,6 +6538,8 @@ BEGIN
         value_in,
         v_laender,
         v_indikatoren,
+        v_lizenzen,
+        v_quellen,
         daten_id_in
     );
 
@@ -6565,6 +6559,8 @@ BEGIN
     DECLARE v_wert DOUBLE;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
+    DECLARE v_lizenzen INTEGER;
+    DECLARE v_quellen INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -6583,12 +6579,16 @@ BEGIN
         datum,
         wert,
         laender_id,
-        indikatoren_id
+        indikatoren_id,
+        lizenzen_id,
+        quellen_id
     INTO
         v_datum,
         v_wert,
         v_laender,
-        v_indikatoren
+        v_indikatoren,
+        v_lizenzen,
+        v_quellen
     FROM view_daten_aktuell
     WHERE daten_id = daten_id_in;
 
@@ -6604,6 +6604,8 @@ BEGIN
         wert,
         laender_id,
         indikatoren_id,
+        lizenzen_id,
+        quellen_id,
         daten_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -6613,6 +6615,8 @@ BEGIN
         v_wert,
         value_in,
         v_indikatoren,
+        v_lizenzen,
+        v_quellen,
         daten_id_in
     );
 
@@ -6632,6 +6636,8 @@ BEGIN
     DECLARE v_wert DOUBLE;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
+    DECLARE v_lizenzen INTEGER;
+    DECLARE v_quellen INTEGER;
 
     DECLARE v_nutzer_id INTEGER;
     DECLARE v_current_username VARCHAR(256);
@@ -6650,12 +6656,16 @@ BEGIN
         datum,
         wert,
         laender_id,
-        indikatoren_id
+        indikatoren_id,
+        lizenzen_id,
+        quellen_id
     INTO
         v_datum,
         v_wert,
         v_laender,
-        v_indikatoren
+        v_indikatoren,
+        v_lizenzen,
+        v_quellen
     FROM view_daten_aktuell
     WHERE daten_id = daten_id_in;
 
@@ -6671,6 +6681,8 @@ BEGIN
         wert,
         laender_id,
         indikatoren_id,
+        lizenzen_id,
+        quellen_id,
         daten_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
@@ -6679,6 +6691,162 @@ BEGIN
         v_datum,
         v_wert,
         v_laender,
+        value_in,
+        v_lizenzen,
+        v_quellen,
+        daten_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_daten_lizenzen(
+    IN daten_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_datum DATE;
+    DECLARE v_wert DOUBLE;
+    DECLARE v_laender INTEGER;
+    DECLARE v_indikatoren INTEGER;
+    DECLARE v_lizenzen INTEGER;
+    DECLARE v_quellen INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        datum,
+        wert,
+        laender_id,
+        indikatoren_id,
+        lizenzen_id,
+        quellen_id
+    INTO
+        v_datum,
+        v_wert,
+        v_laender,
+        v_indikatoren,
+        v_lizenzen,
+        v_quellen
+    FROM view_daten_aktuell
+    WHERE daten_id = daten_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_daten(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        datum,
+        wert,
+        laender_id,
+        indikatoren_id,
+        lizenzen_id,
+        quellen_id,
+        daten_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_datum,
+        v_wert,
+        v_laender,
+        v_indikatoren,
+        value_in,
+        v_quellen,
+        daten_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_daten_quellen(
+    IN daten_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_datum DATE;
+    DECLARE v_wert DOUBLE;
+    DECLARE v_laender INTEGER;
+    DECLARE v_indikatoren INTEGER;
+    DECLARE v_lizenzen INTEGER;
+    DECLARE v_quellen INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        datum,
+        wert,
+        laender_id,
+        indikatoren_id,
+        lizenzen_id,
+        quellen_id
+    INTO
+        v_datum,
+        v_wert,
+        v_laender,
+        v_indikatoren,
+        v_lizenzen,
+        v_quellen
+    FROM view_daten_aktuell
+    WHERE daten_id = daten_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_daten(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        datum,
+        wert,
+        laender_id,
+        indikatoren_id,
+        lizenzen_id,
+        quellen_id,
+        daten_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_datum,
+        v_wert,
+        v_laender,
+        v_indikatoren,
+        v_lizenzen,
         value_in,
         daten_id_in
     );

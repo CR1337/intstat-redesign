@@ -29,6 +29,13 @@
             "not_null": true,
             "default": "''",
             "description": "Kurzer Name der Quelle auf Englisch."
+        },
+        {
+            "name": "url",
+            "type": "VARCHAR(512)",
+            "not_null": true,
+            "default": "''",
+            "description": "Link zu der Quelle."
         }
     ],
     "foreign_keys": [],

@@ -62,14 +62,6 @@
             "diagram_description": "geh\u00f6rt zu Thema"
         },
         {
-            "name": "quellen",
-            "references": "quellen",
-            "min_1": false,
-            "description": "Verweis auf die Quelle, aus der die Daten für den Indikator stammen.",
-            "not_null": true,
-            "diagram_description": "von Quelle"
-        },
-        {
             "name": "einheiten",
             "references": "einheiten",
             "min_1": false,
