@@ -13,7 +13,7 @@ USER_DEFINITION_FILENAME: str = os.path.join(
     DEFINITION_DIRECTORY, "users", "users.json"
 )
 SQL_TEMPLATE_DIRECTORY: str = os.path.join("templates", "sql")
-DOCUMENTATION_FILENAME: str = os.path.join("doc", "documentation.md")
+DOC_TEMPLATE_DIRECTORY: str = os.path.join("templates", "documentation")
 INIT_SQL_FILENAME: str = os.path.join("container", "init.sql")
 
 ORDERED_CREATE_STATEMENT_TYPES: List[str] = [
@@ -156,7 +156,7 @@ def make_create_statement(
 
 
 def make_diagram(env: Environment, table_definitions: Dict[str, Dict[str, Any]]) -> str:
-    template = env.get_template("diagram.mermaid.jinja2")
+    template = env.get_template("documentation/diagram.mermaid.jinja2")
     parameters = {"tables": table_definitions.values()}
     diagram = template.render(parameters)
     return diagram
@@ -165,10 +165,25 @@ def make_diagram(env: Environment, table_definitions: Dict[str, Dict[str, Any]])
 def make_documentation(
     env: Environment, diagram: str, table_definitions: Dict[str, Dict[str, Any]]
 ) -> str:
-    template = env.get_template("documentation.md.jinja2")
-    parameters = {"tables": table_definitions.values()} | {"diagram": diagram}
-    documentation = template.render(parameters)
-    return documentation
+    template_filenames = sorted(
+        [fn for fn in os.listdir(DOC_TEMPLATE_DIRECTORY) if fn[2] == "_"]
+    )
+    doc_string = ""
+
+    for filename in template_filenames:
+        if filename.endswith(".jinja2"):
+            template = env.get_template(f"documentation/{filename}")
+            parameters = {"tables": table_definitions.values()} | {"diagram": diagram}
+            doc_string += template.render(parameters)
+
+        else:
+            full_filename = os.path.join(DOC_TEMPLATE_DIRECTORY, filename)
+            with open(full_filename, "r", encoding="utf-8") as f:
+                doc_string += f.read()
+
+        doc_string += "\n\n"
+
+    return doc_string
 
 
 def main() -> None:
@@ -195,7 +210,7 @@ def main() -> None:
 
     documentation = make_documentation(env, diagram, table_definitions)
 
-    with open(DOCUMENTATION_FILENAME, "w") as file:
+    with open("doc/documentation.md", "w") as file:
         file.write(documentation)
 
 

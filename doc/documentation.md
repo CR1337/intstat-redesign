@@ -1,26 +1,227 @@
-# Dokumantation für das INTSTAT Redesign
+# Dokumentation Intstat2
 
-## Nutzertracking
+## Inhalt
 
-Bisher haben wir uns alle mit dem selben Benutzernamen mit der Intstat verbunden. Dies können wir so beibehalten. Es gibt jedoch auch die Möglichkeit, aus Gründen der Nachvollziehbarkeit, zu tracken, welcher Benutzer welche Änderungen vorgenommen hat. Dazu wären folgende Schritte notwendig:
+- [Funktionale Features](#funktionale-features)
+    - [Versionierung](#versionierung)
+    - [Nutzertracking](#nutzertracking)
+- [Inhaltliche Features](#inhaltliche-features)
+    - [Metadaten](#metadaten)
+    - [Ländergruppen](#ländergruppen)
+    - [Quellen](#quellen)
+    - [Lizenzen](#lizenzen)
+    - [Einheiten](#einheiten)
+- [ER-Diagramm](#entity-relationship-diagramm)
+- [Tabellen](#tabellen)
+    - [tab_lizenzen](#tab_lizenzen)
+    - [tab_daten](#tab_daten)
+    - [tab_laendergruppen](#tab_laendergruppen)
+    - [tab_laendergruppenzuordnungen](#tab_laendergruppenzuordnungen)
+    - [tab_metadaten](#tab_metadaten)
+    - [tab_nutzer](#tab_nutzer)
+    - [tab_quellen](#tab_quellen)
+    - [tab_indikatoren](#tab_indikatoren)
+    - [tab_themen](#tab_themen)
+    - [tab_laender](#tab_laender)
+    - [tab_einheiten](#tab_einheiten)
+    - [tab_laendernamen](#tab_laendernamen)
+    - [tab_metadatenzuordnungen](#tab_metadatenzuordnungen)
+    - [tab_kontinente](#tab_kontinente)
+- [Benutzung der Datenbank](#benutzung-der-datenbank)
+    - [Einfügen einer Zeile](#einfügen-einer-zeile)
+    - [Auslesen einer aktuell gültigen Zeile](#auslesen-einer-aktuell-gültigen-zeile)
+    - [Aktualisieren einer Zeile](#aktualisieren-einer-zeile)
+    - [Löschen einer Zeile](#löschen-einer-zeile)
+    - [Auslesen einer älteren Version einer Zeile](#auslesen-einer-älteren-version-einer-zeile)
 
-1. Erstellen eines Accounts für **jeden** Nutzer der Intstat.
-2. Erstellen einer Tabelle `nutzer`.
-3. Verweis auf die Tabelle `nutzer` in **jeder** Zeile **jeder** Tabelle mittels `ersteller_nutzer_id`.
+## Funktionale Features
 
-## Versionierung
+### Versionierung
 
-MySQL unterstützt keine automatische Versionierung, wie es z.B. MariaDB mit `WITH SYSTEM VERSIONING` tut. Mithilfe von zusätzlichen Spalten, _Views_, _SQL-Triggers_ und _Stored Procedures_ kann eine solche Versionierung jedoch manuell implementiert werden.
+Um Änderungen an den Daten auch nachträglich nachvollziehbar zu machen, arbeitet die Datenbank mit einem Versionierungssystem ähnlich [SCD Typ 2](https://de.wikipedia.org/wiki/Slowly_Changing_Dimensions#Typ_2).
 
-Jede Tabelle enthält dazu zwei weitere Spalten:
+Grundsätzlich werden dabei für vollständige Nachvollziehbarkeit niemals Daten gelöscht. Jede Veränderung oder Löschung eines Datensatzes zieht stattdessen die Erstellung eines neuen Datensatzes nach sich.
 
-1. `gueltig_seit`: Speichert das Datum, an welchem die Zeile hinzugefügt wurde. Existiert keine weitere Zeile mit der gleichen `id` und einem späteren Datum in `gueltig_seit`, so ist die Zeile die aktuell gültige Zeile.
+Um dies zu realisieren besitzt jede Tabelle die beiden Spalten `gueltig_seit` und `ist_aktiv`. Die Spalte `gueltig_seit` beinhaltet das Datum der Erstellung einer Zeile. Die Spalte `ist_aktiv` gibt an, ob es sich bei einer Zeile um einen aktiven Datensatz handelt.
 
-2. `ist_aktiv`: Enthält diese Spalte den Wert `FALSE` oder `0`, so zeigt das einen Löschvorgang an. Ist eine Zeile mit `ist_aktiv = FALSE` die aktuelle Zeile, so bedeutet das, das es keine aktuell gültige Version dieser Zeile gibt. Eine solche Zeile wird als _Tombstone_ oder _Grabstein_ bezeichnet.
+Die `id`-Spalte einer Tabelle bildet zusammen mit `gueltig_seit` den Primärschlüssel. Für alle Zeilen mit identischer `id` ist jene mit dem jüngsten Eintrag in `gueltig_seit` die aktuell gültige Zeile. Alle anderen Zeilen gehören zur Historie und können im normalen Betrieb ignoriert werden.
 
-SQL-Befehle wie `UPDATE` oder `DELETE` sind nicht erlaubt. Nur `INSERT` kann ausgeführt werden. Das wird über entsprechende _Trigger_ sichergestellt.
+Beim Ändern einer bestehenden Zeile wird also tatsächlich eine Neue Zeile mit dem aktuellen Datum in `gueltig_seit` erzeugt, siehe nachfolgendes Beispiel:
 
-Zur Vereinfachung erfolgt die schreibende Interaktion mit der Datenbank ausschließlich über _Stored Procedures_. Die Lesende Interaktion kann über die Tabelle direkt erfolgen, ist jedoch einfacher über _Views_. So gibt es bspw. eine View, welche nur die aktuell gültigen zeilen anzeigt.
+|gueltig_seit|ist_aktiv|ersteller_nutzer_id|kontinente_id|name_de|name_en|
+|------------|---------|-------------------|-------------|-------|-------|
+|  2026-01-01|        1|                 42|            3| Europa| Europa|
+
+Dem Nutzer ist ein Schreibfehler im englischen Namen des Kontinentes Europa aufgefallen. Er führt am zweiten Februar folgenden SQL-Befehl aus, um den Fehler zu korrigieren:
+
+```SQL
+CALL update_value_kontinente_name_en(3, 'Europe');
+```
+
+Das Ergebnis ist folgendes:
+
+|gueltig_seit|ist_aktiv|ersteller_nutzer_id|kontinente_id|name_de|name_en|
+|------------|---------|-------------------|-------------|-------|-------|
+|  2026-01-01|        1|                 42|            3| Europa| Europa|
+|  2026-02-02|        1|                 42|            3| Europa| Europe|
+
+
+Beim Löschen einer Zeile wird stattdessen eine neue Zeile mit `ist_aktiv = 0` dem aktuellen Datum in `gueltig_seit` erzeugt. Folgendes Beispiel verdeutlicht das Löschen:
+
+Der Nutzer löscht nun am dritten März den Eintrag für Europa durch Ausführen des folgenden SQL-Befehles:
+
+```SQL
+CALL delete_from_kontinente(3);
+```
+
+Das Ergebnis ist folgendes:
+
+|gueltig_seit|ist_aktiv|ersteller_nutzer_id|kontinente_id|name_de|name_en|
+|------------|---------|-------------------|-------------|-------|-------|
+|  2026-01-01|        1|                 42|            3| Europa| Europa|
+|  2026-02-02|        1|                 42|            3| Europa| Europe|
+|  2026-03-03|        0|                 42|            3| Europa| Europe|
+
+Um die Arbeit mit der Datenbank zu vereinfachen existieren für jede Tabelle `tab_<NAME>` zwei Views:
+
+- `view_<NAME>_historie`
+- `view_<NAME>_aktuell`
+
+`view_<NAME>_historie` enthält den gesamten Inhalt der Tabelle sortiert nach `id` und `gueltig_seit`.
+
+`view_<NAME>_aktuell` enthält nur die aktuell gültigen Zeilen. Für jede `id` wird nur die Zeile mit dem jüngsten Wert in `gueltig_seit` angezeigt. Zeilen mit `ist_aktiv = 0` werden nicht angezeigt. Diese View simuliert das Aussehen einer Tabelle ohne Versionierung und Historie.
+
+### Nutzertracking
+
+Die Tabelle `tab_nutzer` enthält alle Nutzer der Datenbank. Interagiert ein Nutzer, welcher noch nicht in `tab_nutzer` enthalten ist, mit der Datenbank, so wird er automatisch zu `tab_nutzer` hinzugefügt.
+
+Jede Tabelle besitzt die Spalte `ersteller_nutzer_id` welche ein Fremdschlüssel für die Tabelle `tab_nutzer` ist. Somit enthält jede Zeile jeder Tabelle einen Verweis auf einen Nutzer. Dieser Verweis wird automatisch erstellt und gibt den Nutzer an, welcher für die Erstellung der entsprechenden Zeile verantwortlich ist.
+
+Das automatische Hizufügen von Nutzern und das automatische Erstellen der Nutzerverweise funktioniert nur, wenn zur Interaktion mit der Datenbank die vordefinierten _Stored procedures_ verwendet werden.
+
+Ein ausschließlich lesender Zugriff erzeugt keine neuen Nutzer oder Nutzerverweise.
+
+## Inhaltliche Features
+
+### Metadaten
+
+Die Datenbank ermöglicht die flexible Zuordnung von Metadaten zu einzelnen Datenpunkten. Metadaten dienen hier als zusätzliche Informationen, die den Kontext, die Qualität oder die Besonderheiten eines statistischen Werts beschreiben – etwa methodische Hinweise, Fußnoten oder spezifische Anmerkungen zur Datenerhebung.
+
+```mermaid
+erDiagram
+    tab_daten {
+        INTEGER daten_id PK
+    }
+
+    tab_metadaten {
+        INTEGER metadaten_id PK
+        VARCHAR(8) kuerzel
+        VARCHAR(256) bezeichnung
+    }
+
+    tab_metadatenzuordnungen {
+        INTEGER metadatenzuordnungen_id PK
+        INTEGER daten_id FK
+        INTEGER metadaten_id FK
+    }
+
+    tab_metadatenzuordnungen ||--o{ tab_daten : ""
+    tab_metadatenzuordnungen ||--o{ tab_metadaten : ""
+```
+
+### Ländergruppen
+
+Ländergruppen ermöglichen die logische Gruppierung von Ländern nach politischen, wirtschaftlichen oder geografischen Kriterien (z.B. EU, OECD, G7). Dies vereinfacht Abfragen und Analysen, die sich auf bestimmte Länderblöcke beziehen.
+
+```mermaid
+erDiagram
+    tab_laender {
+        INTEGER laender_id PK
+    }
+
+    tab_laendergruppen {
+        INTEGER laendergruppen_id PK
+        VARCHAR(256) name_de
+        VARCHAR(256) name_en
+    }
+
+    tab_laendergruppenzuordnungen {
+        INTEGER laendergruppenzuordnungen_id PK
+        INTEGER laender_id FK
+        INTEGER laendergruppen_id FK
+    }
+
+    tab_laendergruppenzuordnungen ||--o{ tab_laender : ""
+    tab_laendergruppenzuordnungen ||--o{ tab_laendergruppen : ""
+```
+
+### Quellen
+
+Die Datenbank verwaltet Quellenangaben für jeden Datenpunkt einzeln, um auch Indikatoren mit gemischten Quellen unterstützen zu können.
+
+```mermaid
+erDiagram
+    tab_daten {
+        INTEGER daten_id PK
+        INTEGER quellen_id FK
+    }
+
+    tab_quellen {
+        INTEGER quellen_id PK
+        VARCHAR(256) name_de
+        VARCHAR(256) name_en
+        VARCHAR(16) name_kurz_de
+        VARCHAR(16) name_kurz_de
+        VARCHAR(512) url
+    }
+
+    tab_quellen ||--o{ tab_daten : ""
+```
+
+### Lizenzen
+
+Jedem Datenpunkt ist eine Lizenz zugeordnet. Die Lizenz gibt an, wie der Datenpunkt verwendet werden darf. Die Spalte `extra_bedingungen` gibt an, ob weitere Bedingungen bei der Verwendung des Datenpunktes zu beachten sind.
+
+```mermaid
+erDiagram
+    tab_daten {
+        INTEGER daten_id PK
+        INTEGER lizenzen_id FK
+    }
+
+    tab_lizenzen {
+        INTEGER lizenzen_id PK
+        VARCHAR(64) name
+        VARCHAR(512) url
+        BOOLEAN extra_bedingungen
+    }
+
+    tab_lizenzen ||--o{ tab_daten : ""
+```
+
+### Einheiten
+
+Jeder Indikator besitzt eine Einheit. Einheiten lassen sich durch einen Faktor und Angabe der jeweiligen Basiseinheit in einander umrechnen (z.B. m² in km²).
+
+```mermaid
+erDiagram
+    tab_einheiten {
+        INTEGER einheiten_id PK
+        DOUBLE faktor
+        VARCHAR(64) symbol_de
+        VARCHAR(64) symbol_en
+        INTEGER basis_einheiten_id FK
+    }
+
+    tab_indikatoren {
+        INTEGER indikatoren_id PK
+        INTEGER einheiten_id FK
+    }
+
+    tab_einheiten ||--o{ tab_indikatoren : ""
+    tab_einheiten ||--o{ tab_einheiten : ""
+```
+
 
 ## Entity Relationship Diagramm
 
@@ -54,6 +255,8 @@ erDiagram
 
                 INTEGER laender_id FK
                 INTEGER indikatoren_id FK
+                INTEGER lizenzen_id FK
+                INTEGER quellen_id FK
 
                 DATE datum
                 DOUBLE wert
@@ -61,6 +264,8 @@ erDiagram
 
             tab_laender ||--o{ tab_daten : "für Land"
             tab_indikatoren ||--o{ tab_daten : "für Indikator"
+            tab_lizenzen ||--o{ tab_daten : "hat Lizenz"
+            tab_quellen ||--o{ tab_daten : "hat Quelle"
         tab_nutzer ||--o{ tab_daten : "erstellt von"
 
 
@@ -132,6 +337,7 @@ erDiagram
                 VARCHAR(256) name_en
                 VARCHAR(16) name_kurz_de
                 VARCHAR(16) name_kurz_en
+                VARCHAR(512) url
         }
 
         tab_nutzer ||--o{ tab_quellen : "erstellt von"
@@ -144,7 +350,6 @@ erDiagram
             INTEGER indikatoren_id PK
 
                 INTEGER themen_id FK
-                INTEGER quellen_id FK
                 INTEGER einheiten_id FK
 
                 DOUBLE faktor
@@ -157,7 +362,6 @@ erDiagram
         }
 
             tab_themen ||--o{ tab_indikatoren : "gehört zu Thema"
-            tab_quellen ||--o{ tab_indikatoren : "von Quelle"
             tab_einheiten ||--o{ tab_indikatoren : "hat Einheit"
         tab_nutzer ||--o{ tab_indikatoren : "erstellt von"
 
@@ -295,6 +499,8 @@ Tabelle für die Speicherung von statistischen Einzelwerten (Zeitreihen) zu Län
 |----|---------------|----------|------------|
 |laender|tab_laender|True|Verweis auf das Land, für das der Wert gilt.|
 |indikatoren|tab_indikatoren|True|Verweis auf den Indikator, zu dem der Wert gehört.|
+|lizenzen|tab_lizenzen|False|Verweis auf die Lizenz, unter welcher der Wert steht.|
+|quellen|tab_quellen|False|Verweis auf die Quelle, aus welcher der Wert stammt.|
 
 ### tab_laendergruppen
 
@@ -355,6 +561,7 @@ Tabelle zur Verwaltung von Datenquellen.
 |name_en|VARCHAR(256)|True|''|Vollständiger Name der Quelle auf Englisch.|
 |name_kurz_de|VARCHAR(16)|True|''|Kurzer Name der Quelle auf Deutsch.|
 |name_kurz_en|VARCHAR(16)|True|''|Kurzer Name der Quelle auf Englisch.|
+|url|VARCHAR(512)|True|''|Link zu der Quelle.|
 
 
 ### tab_indikatoren
@@ -378,7 +585,6 @@ Tabelle zur Verwaltung der statistischen Indikatoren.
 |Name|Referenztabelle|Nicht NULL|Beschreibung|
 |----|---------------|----------|------------|
 |themen|tab_themen|True|Verweis auf das Thema, dem der Indikator zugeordnet ist.|
-|quellen|tab_quellen|True|Verweis auf die Quelle, aus der die Daten für den Indikator stammen.|
 |einheiten|tab_einheiten|True|Verweis auf die Einheit, in der der Indikator gemessen wird.|
 
 ### tab_themen
@@ -474,9 +680,12 @@ Tabelle zur Verwaltung der Kontinente, denen Länder zugeordnet werden können.
 
 
 
-## Interaktion mit der Datenbank
 
-### Einfügen einer Zeile (`INSERT`)
+## Benutzung der Datenbank
+
+### Einfügen einer Zeile
+
+Das Einfügen einer neuen Zeile in die Tabelle `tab_<NAME>` geschieht durch Ausführen der _Procedure_ `insert_into_<NAME>`. Durch folgenden SQL-Code kann z.B. ein neuer Kontinent "_Atlantis_" eingefügt werden:
 
 ```SQL
 SET @neue_id = 0;
@@ -490,9 +699,11 @@ CALL insert_into_kontinente(
 SELECT @neue_id;
 ```
 
-### Auslesen einer aktuell gültigen Zeile (`SELECT`)
+Die `id` für den neuen Eintrag wird automatisch vergeben und kann durch die Kombination von `SET` und `SELECT` ausgegeben werden. Für die folgenden Beispiele sei diese `id = 3`.
 
-#### Aus der Tabelle
+### Auslesen einer aktuell gültigen Zeile
+
+Um die aktuell gültige Version einer Zeile auszulesen kann ein normales SELECT-Statement verwendet werden. Das Auslesen der Zeile mit der `id = 3` aus der Tabelle `tab_kontinente` funktiontiert so:
 
 ```SQL
 SELECT t.*
@@ -504,33 +715,38 @@ INNER JOIN (
 ) latest
 ON t.kontinente_id = latest.kontinente_id
 AND t.gueltig_seit = latest.max_gueltig_seit
-WHERE t.ist_aktiv;
+WHERE t.ist_aktiv AND t.kontinente_id = 3;
 ```
 
-#### Aus der View
+Weil das sehr aufwändig uns schwer zu lesen ist, existiert für jede Tabelle eine View `view_<NAME>_aktuell`, welche diesen Vorgang erleichtert:
 
 ```SQL
-SELECT * from view_kontinente_aktuell;
+SELECT * from view_kontinente_aktuell WHERE kontinente_id = 3;
 ```
 
-### Aktualisieren einer Zeile (`UPDATE`)
+Es wird empfohlen, für sämtliche Abfragen, welche nicht die Historie benötigen, nur diese Views zu verwenden.
+
+### Aktualisieren einer Zeile
+
+Das Aktualisieren einer Zeile mittels des UPDATE-Statements ist nicht möglich, um Datenverlust in der Historie zu verhindern. Stattdessen existieren für jede Tabelle `tab_<NAME>` mehrere _Procedures_ `update_value_<NAME>_<SPALTENNAME>`, eine für jede Spalte.
+
+Um die Groß-Klein-Schreibung des deutschen Namens des Kontinentes Atlantis zu verändern, kann folgender SQL.Befehl verwendet werden:
 
 ```SQL
-CALL update_value_kontinente_name_de(
-    atlantis_id,
-    'Atlantis'
-);
+CALL update_value_kontinente_name_de(3, 'Atlantis');
 ```
 
-### Löschen einer Zeile (`DELETE`)
+### Löschen einer Zeile
+
+Genauso wie das direkte Aktualisieren mit UPDATE ist auch das direkte Löschen mit DELETE nicht möglich. Stattdessen gibt es die _Procedure_ `delete_from_<NAME>`. Um den Kontinent Atlanis zu löschen kann also folgender Befehl benutzt werden:
 
 ```SQL
-CALL delete_from_kontinente(
-    atlantis_id
-);
+CALL delete_from_kontinente(3);
 ```
 
-### Auslesen einer älteren Version einer Zeile (`SELECT`)
+### Auslesen einer älteren Version einer Zeile
+
+Um ältere Versionen eine Zeile auszulesen existiert keine View. Es kann allerdings mit einem SELECT-Statement gearbeitet werden. Um z.B. den Stand der Tabelle `tab_kontinente` zum Zeitpunkt `2025-12-31 12:00:00` zu erhalten, kann dieser SQL-Befehl ausgeführt werden:
 
 ```SQL
 SELECT t.*
@@ -545,3 +761,4 @@ ON t.kontinente_id = latest.kontinente_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 ```
+

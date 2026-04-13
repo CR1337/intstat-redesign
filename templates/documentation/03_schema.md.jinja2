@@ -1,0 +1,34 @@
+## Entity Relationship Diagramm
+
+```mermaid
+{{ diagram }}
+```
+
+## Tabellen
+
+{% for table in tables %}
+### tab_{{ table.table_name }}
+
+{{ table.description }}
+
+{% if table.columns %}
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+{% for col in table.columns %}
+|{{ col.name }}|{{ col.type }}|{{ col.not_null }}|{{ col.default }}|{{ col.description}}|
+{% endfor %}
+{% endif %}
+
+{% if table.foreign_keys %}
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+{% for col in table.foreign_keys %}
+|{{ col.name }}|tab_{{ col.references }}|{{ col.not_null }}|{{ col.description}}|
+{% endfor %}
+{% endif %}
+
+{% endfor %}
