@@ -30,7 +30,7 @@ Das Ergebnis ist folgendes:
 |  2026-02-02|        1|                 42|            3| Europa| Europe|
 
 
-Beim Löschen einer Zeile wird stattdessen eine neue Zeile mit `ist_aktiv = 0` dem aktuellen Datum in `gueltig_seit` erzeugt. Folgendes Beispiel verdeutlicht das Löschen:
+Beim Löschen einer Zeile wird stattdessen eine neue Zeile (ein [_Tombstone_](https://en.wikipedia.org/wiki/Tombstone_(data_store))) mit `ist_aktiv = 0` dem aktuellen Datum in `gueltig_seit` erzeugt. Folgendes Beispiel verdeutlicht das Löschen:
 
 Der Nutzer löscht nun am dritten März den Eintrag für Europa durch Ausführen des folgenden SQL-Befehles:
 
