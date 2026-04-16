@@ -15,6 +15,13 @@
             "not_null": true,
             "default": 0,
             "description": "Erfasster numerischer Wert für das jeweilige Land und den Indikator am angegebenen Datum."
+        },
+        {
+            "name": "berechnet",
+            "type": "BOOLEAN",
+            "not_null": true,
+            "default": 0,
+            "description": "Gibt an, ob der Wert berechnet wurde."
         }
     ],
     "foreign_keys": [

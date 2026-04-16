@@ -54,13 +54,13 @@ erDiagram
 
 ### Quellen
 
-Die Datenbank verwaltet Quellenangaben für jeden Datenpunkt einzeln, um auch Indikatoren mit gemischten Quellen unterstützen zu können.
+Die Datenbank verwaltet Quellenangaben für jeden Datenpunkt einzeln, um auch Indikatoren mit gemischten Quellen unterstützen zu können. Es wird auch erfasst, ob ein Datenpunkt berechnet wurde. Weil berechnete Datenpunkte aus mehreren Quellen stammen können, kann jedem Datenpunkt eine beliege Menge an Quellen zugeordnet werden. Außerdem wird unterschieden zwischen _Quellen_, aus denen die Daten ursprünglich stammen und _Download-Quellen_, aus welchen die Daten geladen wurden.
 
 ```mermaid
 erDiagram
     tab_daten {
         INTEGER daten_id PK
-        INTEGER quellen_id FK
+        BOOLEAN berechnet
     }
 
     tab_quellen {
@@ -72,7 +72,23 @@ erDiagram
         VARCHAR(512) url
     }
 
-    tab_quellen ||--o{ tab_daten : ""
+    tab_quellenzuordnungen {
+        INTEGER quellenzuordnungen_id PK
+        INTEGER daten_id FK
+        INTEGER quellen_id FK
+    }
+
+    tab_downloadquellenzuordnungen {
+        INTEGER quellenzuordnungen_id PK
+        INTEGER daten_id FK
+        INTEGER quellen_id FK
+    }
+
+    tab_quellenzuordnungen ||--o{ tab_daten : ""
+    tab_quellenzuordnungen ||--o{ tab_quellen : ""
+
+    tab_downloadquellenzuordnungen ||--o{ tab_daten : ""
+    tab_downloadquellenzuordnungen ||--o{ tab_quellen : ""
 ```
 
 ### Lizenzen

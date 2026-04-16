@@ -1,0 +1,30 @@
+{
+    "table_name": "quellenzuordnungen",
+    "description": "Diese Tabelle ordnet Datenpunkten ihre Quellen zu.",
+    "columns": [],
+    "foreign_keys": [
+        {
+            "name": "daten",
+            "references": "daten",
+            "min_1": false,
+            "description": "Verweis auf den zugeordneten Datenpunkt.",
+            "not_null": true,
+            "diagram_description": "ordnet Datenpunkt zu"
+        },
+        {
+            "name": "quellen",
+            "references": "quellen",
+            "min_1": false,
+            "description": "Verweis auf die zugeordnete Quelle.",
+            "not_null": true,
+            "diagram_description": "ordnet Quelle zu"
+        }
+    ],
+    "unique_sets": [
+        [
+            "daten_id",
+            "quellen_id"
+        ]
+    ],
+    "do_versioning": true
+}

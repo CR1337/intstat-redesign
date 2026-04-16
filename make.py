@@ -42,6 +42,8 @@ ORDERED_TABLE_NAMES: List[str] = [
     "daten",
     "laendergruppenzuordnungen",
     "metadatenzuordnungen",
+    "quellenzuordnungen",
+    "downloadquellenzuordnungen",
 ]
 
 

@@ -16,11 +16,13 @@
     - [tab_lizenzen](#tab_lizenzen)
     - [tab_daten](#tab_daten)
     - [tab_laendergruppen](#tab_laendergruppen)
+    - [tab_downloadquellenzuordnungen](#tab_downloadquellenzuordnungen)
     - [tab_laendergruppenzuordnungen](#tab_laendergruppenzuordnungen)
     - [tab_metadaten](#tab_metadaten)
     - [tab_nutzer](#tab_nutzer)
     - [tab_quellen](#tab_quellen)
     - [tab_indikatoren](#tab_indikatoren)
+    - [tab_quellenzuordnungen](#tab_quellenzuordnungen)
     - [tab_themen](#tab_themen)
     - [tab_laender](#tab_laender)
     - [tab_einheiten](#tab_einheiten)
@@ -157,13 +159,13 @@ erDiagram
 
 ### Quellen
 
-Die Datenbank verwaltet Quellenangaben für jeden Datenpunkt einzeln, um auch Indikatoren mit gemischten Quellen unterstützen zu können.
+Die Datenbank verwaltet Quellenangaben für jeden Datenpunkt einzeln, um auch Indikatoren mit gemischten Quellen unterstützen zu können. Es wird auch erfasst, ob ein Datenpunkt berechnet wurde. Weil berechnete Datenpunkte aus mehreren Quellen stammen können, kann jedem Datenpunkt eine beliege Menge an Quellen zugeordnet werden. Außerdem wird unterschieden zwischen _Quellen_, aus denen die Daten ursprünglich stammen und _Download-Quellen_, aus welchen die Daten geladen wurden.
 
 ```mermaid
 erDiagram
     tab_daten {
         INTEGER daten_id PK
-        INTEGER quellen_id FK
+        BOOLEAN berechnet
     }
 
     tab_quellen {
@@ -175,7 +177,23 @@ erDiagram
         VARCHAR(512) url
     }
 
-    tab_quellen ||--o{ tab_daten : ""
+    tab_quellenzuordnungen {
+        INTEGER quellenzuordnungen_id PK
+        INTEGER daten_id FK
+        INTEGER quellen_id FK
+    }
+
+    tab_downloadquellenzuordnungen {
+        INTEGER quellenzuordnungen_id PK
+        INTEGER daten_id FK
+        INTEGER quellen_id FK
+    }
+
+    tab_quellenzuordnungen ||--o{ tab_daten : ""
+    tab_quellenzuordnungen ||--o{ tab_quellen : ""
+
+    tab_downloadquellenzuordnungen ||--o{ tab_daten : ""
+    tab_downloadquellenzuordnungen ||--o{ tab_quellen : ""
 ```
 
 ### Lizenzen
@@ -260,6 +278,7 @@ erDiagram
 
                 DATE datum
                 DOUBLE wert
+                BOOLEAN berechnet
         }
 
             tab_laender ||--o{ tab_daten : "für Land"
@@ -281,6 +300,22 @@ erDiagram
         }
 
         tab_nutzer ||--o{ tab_laendergruppen : "erstellt von"
+
+
+        tab_downloadquellenzuordnungen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK
+            INTEGER downloadquellenzuordnungen_id PK
+
+                INTEGER daten_id FK
+                INTEGER quellen_id FK
+
+        }
+
+            tab_daten ||--o{ tab_downloadquellenzuordnungen : "ordnet Datenpunkt zu"
+            tab_quellen ||--o{ tab_downloadquellenzuordnungen : "ordnet Download-Quelle zu"
+        tab_nutzer ||--o{ tab_downloadquellenzuordnungen : "erstellt von"
 
 
         tab_laendergruppenzuordnungen {
@@ -364,6 +399,22 @@ erDiagram
             tab_themen ||--o{ tab_indikatoren : "gehört zu Thema"
             tab_einheiten ||--o{ tab_indikatoren : "hat Einheit"
         tab_nutzer ||--o{ tab_indikatoren : "erstellt von"
+
+
+        tab_quellenzuordnungen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK
+            INTEGER quellenzuordnungen_id PK
+
+                INTEGER daten_id FK
+                INTEGER quellen_id FK
+
+        }
+
+            tab_daten ||--o{ tab_quellenzuordnungen : "ordnet Datenpunkt zu"
+            tab_quellen ||--o{ tab_quellenzuordnungen : "ordnet Quelle zu"
+        tab_nutzer ||--o{ tab_quellenzuordnungen : "erstellt von"
 
 
         tab_themen {
@@ -492,6 +543,7 @@ Tabelle für die Speicherung von statistischen Einzelwerten (Zeitreihen) zu Län
 |----|---|----------|------------|------------|
 |datum|DATE|True|'2000-01-01'|Datum, an dem der Wert erhoben oder veröffentlicht wurde.|
 |wert|DOUBLE|True|0|Erfasster numerischer Wert für das jeweilige Land und den Indikator am angegebenen Datum.|
+|berechnet|BOOLEAN|True|0|Gibt an, ob der Wert berechnet wurde.|
 
 #### Fremdschlüssel
 
@@ -513,6 +565,18 @@ Tabelle zur Verwaltung von Ländergruppen (z.B. EU, OECD, G7).
 |name_de|VARCHAR(256)|True|''|Name der Ländergruppe auf Deutsch.|
 |name_en|VARCHAR(256)|True|''|Name der Ländergruppe auf Englisch.|
 
+
+### tab_downloadquellenzuordnungen
+
+Diese Tabelle ordnet Datenpunkten ihre Download-Quellen zu.
+
+
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|daten|tab_daten|True|Verweis auf den zugeordneten Datenpunkt.|
+|quellen|tab_quellen|True|Verweis auf die zugeordnete Download-Quelle.|
 
 ### tab_laendergruppenzuordnungen
 
@@ -586,6 +650,18 @@ Tabelle zur Verwaltung der statistischen Indikatoren.
 |----|---------------|----------|------------|
 |themen|tab_themen|True|Verweis auf das Thema, dem der Indikator zugeordnet ist.|
 |einheiten|tab_einheiten|True|Verweis auf die Einheit, in der der Indikator gemessen wird.|
+
+### tab_quellenzuordnungen
+
+Diese Tabelle ordnet Datenpunkten ihre Quellen zu.
+
+
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|daten|tab_daten|True|Verweis auf den zugeordneten Datenpunkt.|
+|quellen|tab_quellen|True|Verweis auf die zugeordnete Quelle.|
 
 ### tab_themen
 

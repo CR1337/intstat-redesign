@@ -296,6 +296,7 @@ CREATE TABLE IF NOT EXISTS tab_daten (
 
     datum DATE NOT NULL DEFAULT '2000-01-01',
     wert DOUBLE NOT NULL DEFAULT 0,
+    berechnet BOOLEAN NOT NULL DEFAULT 0,
 
     FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
         REFERENCES tab_nutzer(nutzer_id)
@@ -347,93 +348,159 @@ CREATE TABLE IF NOT EXISTS tab_metadatenzuordnungen (
     PRIMARY KEY (metadatenzuordnungen_id, gueltig_seit)
 );
 
+CREATE TABLE IF NOT EXISTS tab_quellenzuordnungen (
+    -- Diese Tabelle ordnet Datenpunkten ihre Quellen zu.
+    gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ist_aktiv BOOL NOT NULL,
+
+    ersteller_nutzer_id INTEGER NOT NULL,
+
+    quellenzuordnungen_id INTEGER NOT NULL,
+
+    daten_id INTEGER NOT NULL,
+    quellen_id INTEGER NOT NULL,
+
+
+    FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
+        REFERENCES tab_nutzer(nutzer_id)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+
+    PRIMARY KEY (quellenzuordnungen_id, gueltig_seit)
+);
+
+CREATE TABLE IF NOT EXISTS tab_downloadquellenzuordnungen (
+    -- Diese Tabelle ordnet Datenpunkten ihre Download-Quellen zu.
+    gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ist_aktiv BOOL NOT NULL,
+
+    ersteller_nutzer_id INTEGER NOT NULL,
+
+    downloadquellenzuordnungen_id INTEGER NOT NULL,
+
+    daten_id INTEGER NOT NULL,
+    quellen_id INTEGER NOT NULL,
+
+
+    FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
+        REFERENCES tab_nutzer(nutzer_id)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+
+    PRIMARY KEY (downloadquellenzuordnungen_id, gueltig_seit)
+);
+
 ALTER TABLE tab_einheiten
-ADD CONSTRAINT fk_einheiten_einheiten_70a9b6576bb44684ba4b  --  Optionale Referenz auf eine Basiseinheit, falls die Einheit abgeleitet ist.
+ADD CONSTRAINT fk_einheiten_einheiten_65364060914942b9b30c  --  Optionale Referenz auf eine Basiseinheit, falls die Einheit abgeleitet ist.
 FOREIGN KEY (basis_einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendernamen
-ADD CONSTRAINT fk_laendernamen_laender_37f2f63704184b96908f  --  Verweis auf das Land, dem der Name zugeordnet ist. (optional)
+ADD CONSTRAINT fk_laendernamen_laender_7f689c85eee1444286d2  --  Verweis auf das Land, dem der Name zugeordnet ist. (optional)
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_themen_9fd49db0d5864b33acde  --  Verweis auf das Thema, dem der Indikator zugeordnet ist.
+ADD CONSTRAINT fk_indikatoren_themen_3f1e2bf7a02b463a8f21  --  Verweis auf das Thema, dem der Indikator zugeordnet ist.
 FOREIGN KEY (themen_id) REFERENCES tab_themen(themen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_einheiten_c879029dabc748868f19  --  Verweis auf die Einheit, in der der Indikator gemessen wird.
+ADD CONSTRAINT fk_indikatoren_einheiten_ec3f0abad09d4ff3b947  --  Verweis auf die Einheit, in der der Indikator gemessen wird.
 FOREIGN KEY (einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_kontinente_0874f1f4f18d4f64b214  --  Verweis auf den Kontinent, dem das Land zugeordnet ist.
+ADD CONSTRAINT fk_laender_kontinente_15f591d6998d4effba63  --  Verweis auf den Kontinent, dem das Land zugeordnet ist.
 FOREIGN KEY (kontinente_id) REFERENCES tab_kontinente(kontinente_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_56ffc3851642443e809f  --  Verweis auf den deutschen Namen des Landes.
+ADD CONSTRAINT fk_laender_laendernamen_d26a301d39704f8fb629  --  Verweis auf den deutschen Namen des Landes.
 FOREIGN KEY (laendernamen_de_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_c45f6b3afad4497f8618  --  Verweis auf den englischen Namen des Landes.
+ADD CONSTRAINT fk_laender_laendernamen_78c17aa30f1949919290  --  Verweis auf den englischen Namen des Landes.
 FOREIGN KEY (laendernamen_en_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_laender_3f9fbebce3d44c04b93e  --  Verweis auf das Land, für das der Wert gilt.
+ADD CONSTRAINT fk_daten_laender_38f74b343084445ebbf4  --  Verweis auf das Land, für das der Wert gilt.
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_indikatoren_ebe28079bbd24a42acb9  --  Verweis auf den Indikator, zu dem der Wert gehört.
+ADD CONSTRAINT fk_daten_indikatoren_a5af88888dc44c04a786  --  Verweis auf den Indikator, zu dem der Wert gehört.
 FOREIGN KEY (indikatoren_id) REFERENCES tab_indikatoren(indikatoren_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_lizenzen_f15b61491a984db1ad0f  --  Verweis auf die Lizenz, unter welcher der Wert steht.
+ADD CONSTRAINT fk_daten_lizenzen_18fd867005634dd49afc  --  Verweis auf die Lizenz, unter welcher der Wert steht.
 FOREIGN KEY (lizenzen_id) REFERENCES tab_lizenzen(lizenzen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_quellen_6cad8f4cbee14b7aa72b  --  Verweis auf die Quelle, aus welcher der Wert stammt.
+ADD CONSTRAINT fk_daten_quellen_a3d7975d9d0b4cfd8485  --  Verweis auf die Quelle, aus welcher der Wert stammt.
 FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_a428041d50e448eda5d3  --  Verweis auf das zugeordnete Land.
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_be125c2e48b744338f23  --  Verweis auf das zugeordnete Land.
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_f718ea300e9848dab745  --  Verweis auf die zugeordnete Ländergruppe.
+ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_e0371581dd5749c1aecd  --  Verweis auf die zugeordnete Ländergruppe.
 FOREIGN KEY (laendergruppen_id) REFERENCES tab_laendergruppen(laendergruppen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_metadatenzuordnungen
-ADD CONSTRAINT fk_metadatenzuordnungen_daten_328b6b97383b42d1b67f  --  Verweis auf den zugeordneten Datenpunkt.
+ADD CONSTRAINT fk_metadatenzuordnungen_daten_5dc6c6e5de974a2b9655  --  Verweis auf den zugeordneten Datenpunkt.
 FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_metadatenzuordnungen
-ADD CONSTRAINT fk_metadatenzuordnungen_metadaten_e04f3e305a264a069da1  --  Verweis auf das zugeordnete Metadatum.
+ADD CONSTRAINT fk_metadatenzuordnungen_metadaten_a04f7c0d0a7e4258918d  --  Verweis auf das zugeordnete Metadatum.
 FOREIGN KEY (metadaten_id) REFERENCES tab_metadaten(metadaten_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE tab_quellenzuordnungen
+ADD CONSTRAINT fk_quellenzuordnungen_daten_e545ed8ae12544688e39  --  Verweis auf den zugeordneten Datenpunkt.
+FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE tab_quellenzuordnungen
+ADD CONSTRAINT fk_quellenzuordnungen_quellen_697d98e01c4d478eb3b2  --  Verweis auf die zugeordnete Quelle.
+FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE tab_downloadquellenzuordnungen
+ADD CONSTRAINT fk_downloadquellenzuordnungen_daten_f0428b29088245988443  --  Verweis auf den zugeordneten Datenpunkt.
+FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE tab_downloadquellenzuordnungen
+ADD CONSTRAINT fk_downloadquellenzuordnungen_quellen_52bd3b38e9d142bfa0bd  --  Verweis auf die zugeordnete Download-Quelle.
+FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
@@ -535,6 +602,20 @@ CREATE INDEX idx_metadatenzuordnungen_latest
     );
     
 
+CREATE INDEX idx_quellenzuordnungen_latest 
+    ON tab_quellenzuordnungen (
+        quellenzuordnungen_id, 
+        gueltig_seit DESC
+    );
+    
+
+CREATE INDEX idx_downloadquellenzuordnungen_latest 
+    ON tab_downloadquellenzuordnungen (
+        downloadquellenzuordnungen_id, 
+        gueltig_seit DESC
+    );
+    
+
 CREATE OR REPLACE VIEW view_nutzer_historie AS
 SELECT *
 FROM tab_nutzer
@@ -604,6 +685,16 @@ CREATE OR REPLACE VIEW view_metadatenzuordnungen_historie AS
 SELECT *
 FROM tab_metadatenzuordnungen
 ORDER BY metadatenzuordnungen_id, gueltig_seit DESC;
+
+CREATE OR REPLACE VIEW view_quellenzuordnungen_historie AS
+SELECT *
+FROM tab_quellenzuordnungen
+ORDER BY quellenzuordnungen_id, gueltig_seit DESC;
+
+CREATE OR REPLACE VIEW view_downloadquellenzuordnungen_historie AS
+SELECT *
+FROM tab_downloadquellenzuordnungen
+ORDER BY downloadquellenzuordnungen_id, gueltig_seit DESC;
 
 CREATE OR REPLACE VIEW view_nutzer_aktuell AS
 SELECT t.*
@@ -773,6 +864,30 @@ ON t.metadatenzuordnungen_id = latest.metadatenzuordnungen_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 
+CREATE OR REPLACE VIEW view_quellenzuordnungen_aktuell AS
+SELECT t.*
+from tab_quellenzuordnungen t
+INNER JOIN (
+    SELECT quellenzuordnungen_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_quellenzuordnungen
+    GROUP BY quellenzuordnungen_id
+) latest
+ON t.quellenzuordnungen_id = latest.quellenzuordnungen_id 
+AND t.gueltig_seit = latest.max_gueltig_seit
+WHERE t.ist_aktiv;
+
+CREATE OR REPLACE VIEW view_downloadquellenzuordnungen_aktuell AS
+SELECT t.*
+from tab_downloadquellenzuordnungen t
+INNER JOIN (
+    SELECT downloadquellenzuordnungen_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_downloadquellenzuordnungen
+    GROUP BY downloadquellenzuordnungen_id
+) latest
+ON t.downloadquellenzuordnungen_id = latest.downloadquellenzuordnungen_id 
+AND t.gueltig_seit = latest.max_gueltig_seit
+WHERE t.ist_aktiv;
+
 CREATE OR REPLACE VIEW view_nutzer_neue_id AS
 SELECT
     COALESCE(MAX(nutzer_id), 0) + 1 AS neue_nutzer_id
@@ -855,6 +970,18 @@ CREATE OR REPLACE VIEW view_metadatenzuordnungen_neue_id AS
 SELECT
     COALESCE(MAX(metadatenzuordnungen_id), 0) + 1 AS neue_metadatenzuordnungen_id
 FROM tab_metadatenzuordnungen
+LIMIT 1;
+
+CREATE OR REPLACE VIEW view_quellenzuordnungen_neue_id AS
+SELECT
+    COALESCE(MAX(quellenzuordnungen_id), 0) + 1 AS neue_quellenzuordnungen_id
+FROM tab_quellenzuordnungen
+LIMIT 1;
+
+CREATE OR REPLACE VIEW view_downloadquellenzuordnungen_neue_id AS
+SELECT
+    COALESCE(MAX(downloadquellenzuordnungen_id), 0) + 1 AS neue_downloadquellenzuordnungen_id
+FROM tab_downloadquellenzuordnungen
 LIMIT 1;
 
 DELIMITER $$
@@ -1027,6 +1154,30 @@ DELIMITER ;
 
 DELIMITER $$
 
+CREATE TRIGGER trg_quellenzuordnungen_delete
+BEFORE DELETE ON tab_quellenzuordnungen
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_downloadquellenzuordnungen_delete
+BEFORE DELETE ON tab_downloadquellenzuordnungen
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
 CREATE TRIGGER trg_nutzer_update
 BEFORE UPDATE ON tab_nutzer
 FOR EACH ROW
@@ -1185,6 +1336,30 @@ DELIMITER $$
 
 CREATE TRIGGER trg_metadatenzuordnungen_update
 BEFORE UPDATE ON tab_metadatenzuordnungen
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_quellenzuordnungen_update
+BEFORE UPDATE ON tab_quellenzuordnungen
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_downloadquellenzuordnungen_update
+BEFORE UPDATE ON tab_downloadquellenzuordnungen
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
@@ -1672,6 +1847,60 @@ DELIMITER ;
 
 DELIMITER $$
 
+CREATE TRIGGER trg_quellenzuordnungen_insert
+BEFORE INSERT ON tab_quellenzuordnungen
+FOR EACH ROW
+BEGIN
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+    END IF;
+
+    IF EXISTS (
+        SELECT 1
+        FROM tab_quellenzuordnungen
+        WHERE
+             daten_id = NEW.daten_id
+            AND quellen_id = NEW.quellen_id
+            AND quellenzuordnungen_id <> NEW.quellenzuordnungen_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( daten_id  quellen_id ) in quellenzuordnungen ist nicht erlaubt!';
+    END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_downloadquellenzuordnungen_insert
+BEFORE INSERT ON tab_downloadquellenzuordnungen
+FOR EACH ROW
+BEGIN
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+    END IF;
+
+    IF EXISTS (
+        SELECT 1
+        FROM tab_downloadquellenzuordnungen
+        WHERE
+             daten_id = NEW.daten_id
+            AND quellen_id = NEW.quellen_id
+            AND downloadquellenzuordnungen_id <> NEW.downloadquellenzuordnungen_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( daten_id  quellen_id ) in downloadquellenzuordnungen ist nicht erlaubt!';
+    END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
 CREATE PROCEDURE insert_current_nutzer()
 BEGIN
     DECLARE v_current_username VARCHAR(256);
@@ -1716,6 +1945,10 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+
+
 
 
 
@@ -2442,6 +2675,7 @@ DELIMITER $$
 CREATE PROCEDURE insert_into_daten(
     IN datum_in DATE,
     IN wert_in DOUBLE,
+    IN berechnet_in BOOLEAN,
     IN laender_in INTEGER,
     IN indikatoren_in INTEGER,
     IN lizenzen_in INTEGER,
@@ -2480,6 +2714,7 @@ BEGIN
         ersteller_nutzer_id,
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -2491,6 +2726,7 @@ BEGIN
         v_nutzer_id,
         datum_in,
         wert_in,
+        berechnet_in,
         laender_in,
         indikatoren_in,
         lizenzen_in,
@@ -2617,6 +2853,122 @@ BEGIN
     TRUNCATE TABLE __insert_allowed__;
 
     SET new_metadatenzuordnungen_id_out = v_new_id;
+    
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE insert_into_quellenzuordnungen(
+    IN daten_in INTEGER,
+    IN quellen_in INTEGER,
+    OUT new_quellenzuordnungen_id_out INTEGER
+)
+BEGIN
+    DECLARE v_new_id INTEGER;
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    SET v_new_id = (
+        SELECT neue_quellenzuordnungen_id
+        FROM view_quellenzuordnungen_neue_id
+    );
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_quellenzuordnungen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        daten_id,
+        quellen_id,
+        quellenzuordnungen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        daten_in,
+        quellen_in,
+        v_new_id
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+
+    SET new_quellenzuordnungen_id_out = v_new_id;
+    
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE insert_into_downloadquellenzuordnungen(
+    IN daten_in INTEGER,
+    IN quellen_in INTEGER,
+    OUT new_downloadquellenzuordnungen_id_out INTEGER
+)
+BEGIN
+    DECLARE v_new_id INTEGER;
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    SET v_new_id = (
+        SELECT neue_downloadquellenzuordnungen_id
+        FROM view_downloadquellenzuordnungen_neue_id
+    );
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_downloadquellenzuordnungen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        daten_id,
+        quellen_id,
+        downloadquellenzuordnungen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        daten_in,
+        quellen_in,
+        v_new_id
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+
+    SET new_downloadquellenzuordnungen_id_out = v_new_id;
     
     COMMIT;
 END$$
@@ -3348,6 +3700,7 @@ CREATE PROCEDURE delete_from_daten(
 BEGIN
     DECLARE v_datum DATE;
     DECLARE v_wert DOUBLE;
+    DECLARE v_berechnet BOOLEAN;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
     DECLARE v_lizenzen INTEGER;
@@ -3369,6 +3722,7 @@ BEGIN
     SELECT 
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -3376,6 +3730,7 @@ BEGIN
     INTO
         v_datum,
         v_wert,
+        v_berechnet,
         v_laender,
         v_indikatoren,
         v_lizenzen,
@@ -3393,6 +3748,7 @@ BEGIN
         ersteller_nutzer_id,
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -3404,6 +3760,7 @@ BEGIN
         v_nutzer_id,
         v_datum,
         v_wert,
+        v_berechnet,
         v_laender,
         v_indikatoren,
         v_lizenzen,
@@ -3523,6 +3880,120 @@ BEGIN
         v_daten,
         v_metadaten,
         metadatenzuordnungen_id_to_delete
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+   
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE delete_from_quellenzuordnungen(
+    IN quellenzuordnungen_id_to_delete INTEGER
+)
+BEGIN
+    DECLARE v_daten INTEGER;
+    DECLARE v_quellen INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+    
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        daten_id,
+        quellen_id
+    INTO
+        v_daten,
+        v_quellen
+    FROM view_quellenzuordnungen_aktuell
+    WHERE quellenzuordnungen_id = quellenzuordnungen_id_to_delete;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_quellenzuordnungen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        daten_id,
+        quellen_id,
+        quellenzuordnungen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        FALSE,
+        v_nutzer_id,
+        v_daten,
+        v_quellen,
+        quellenzuordnungen_id_to_delete
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+   
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE delete_from_downloadquellenzuordnungen(
+    IN downloadquellenzuordnungen_id_to_delete INTEGER
+)
+BEGIN
+    DECLARE v_daten INTEGER;
+    DECLARE v_quellen INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+    
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        daten_id,
+        quellen_id
+    INTO
+        v_daten,
+        v_quellen
+    FROM view_downloadquellenzuordnungen_aktuell
+    WHERE downloadquellenzuordnungen_id = downloadquellenzuordnungen_id_to_delete;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_downloadquellenzuordnungen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        daten_id,
+        quellen_id,
+        downloadquellenzuordnungen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        FALSE,
+        v_nutzer_id,
+        v_daten,
+        v_quellen,
+        downloadquellenzuordnungen_id_to_delete
     );
 
     TRUNCATE TABLE __insert_allowed__;
@@ -6403,6 +6874,7 @@ CREATE PROCEDURE update_value_daten_datum(
 BEGIN
     DECLARE v_datum DATE;
     DECLARE v_wert DOUBLE;
+    DECLARE v_berechnet BOOLEAN;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
     DECLARE v_lizenzen INTEGER;
@@ -6424,6 +6896,7 @@ BEGIN
     SELECT 
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -6431,6 +6904,7 @@ BEGIN
     INTO
         v_datum,
         v_wert,
+        v_berechnet,
         v_laender,
         v_indikatoren,
         v_lizenzen,
@@ -6448,6 +6922,7 @@ BEGIN
         ersteller_nutzer_id,
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -6459,6 +6934,7 @@ BEGIN
         v_nutzer_id,
         value_in,
         v_wert,
+        v_berechnet,
         v_laender,
         v_indikatoren,
         v_lizenzen,
@@ -6480,6 +6956,7 @@ CREATE PROCEDURE update_value_daten_wert(
 BEGIN
     DECLARE v_datum DATE;
     DECLARE v_wert DOUBLE;
+    DECLARE v_berechnet BOOLEAN;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
     DECLARE v_lizenzen INTEGER;
@@ -6501,6 +6978,7 @@ BEGIN
     SELECT 
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -6508,6 +6986,7 @@ BEGIN
     INTO
         v_datum,
         v_wert,
+        v_berechnet,
         v_laender,
         v_indikatoren,
         v_lizenzen,
@@ -6525,6 +7004,7 @@ BEGIN
         ersteller_nutzer_id,
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -6535,6 +7015,89 @@ BEGIN
         TRUE,
         v_nutzer_id,
         v_datum,
+        value_in,
+        v_berechnet,
+        v_laender,
+        v_indikatoren,
+        v_lizenzen,
+        v_quellen,
+        daten_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_daten_berechnet(
+    IN daten_id_in INTEGER,
+    IN value_in BOOLEAN
+)
+BEGIN
+    DECLARE v_datum DATE;
+    DECLARE v_wert DOUBLE;
+    DECLARE v_berechnet BOOLEAN;
+    DECLARE v_laender INTEGER;
+    DECLARE v_indikatoren INTEGER;
+    DECLARE v_lizenzen INTEGER;
+    DECLARE v_quellen INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        datum,
+        wert,
+        berechnet,
+        laender_id,
+        indikatoren_id,
+        lizenzen_id,
+        quellen_id
+    INTO
+        v_datum,
+        v_wert,
+        v_berechnet,
+        v_laender,
+        v_indikatoren,
+        v_lizenzen,
+        v_quellen
+    FROM view_daten_aktuell
+    WHERE daten_id = daten_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_daten(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        datum,
+        wert,
+        berechnet,
+        laender_id,
+        indikatoren_id,
+        lizenzen_id,
+        quellen_id,
+        daten_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_datum,
+        v_wert,
         value_in,
         v_laender,
         v_indikatoren,
@@ -6557,6 +7120,7 @@ CREATE PROCEDURE update_value_daten_laender(
 BEGIN
     DECLARE v_datum DATE;
     DECLARE v_wert DOUBLE;
+    DECLARE v_berechnet BOOLEAN;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
     DECLARE v_lizenzen INTEGER;
@@ -6578,6 +7142,7 @@ BEGIN
     SELECT 
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -6585,6 +7150,7 @@ BEGIN
     INTO
         v_datum,
         v_wert,
+        v_berechnet,
         v_laender,
         v_indikatoren,
         v_lizenzen,
@@ -6602,6 +7168,7 @@ BEGIN
         ersteller_nutzer_id,
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -6613,6 +7180,7 @@ BEGIN
         v_nutzer_id,
         v_datum,
         v_wert,
+        v_berechnet,
         value_in,
         v_indikatoren,
         v_lizenzen,
@@ -6634,6 +7202,7 @@ CREATE PROCEDURE update_value_daten_indikatoren(
 BEGIN
     DECLARE v_datum DATE;
     DECLARE v_wert DOUBLE;
+    DECLARE v_berechnet BOOLEAN;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
     DECLARE v_lizenzen INTEGER;
@@ -6655,6 +7224,7 @@ BEGIN
     SELECT 
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -6662,6 +7232,7 @@ BEGIN
     INTO
         v_datum,
         v_wert,
+        v_berechnet,
         v_laender,
         v_indikatoren,
         v_lizenzen,
@@ -6679,6 +7250,7 @@ BEGIN
         ersteller_nutzer_id,
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -6690,6 +7262,7 @@ BEGIN
         v_nutzer_id,
         v_datum,
         v_wert,
+        v_berechnet,
         v_laender,
         value_in,
         v_lizenzen,
@@ -6711,6 +7284,7 @@ CREATE PROCEDURE update_value_daten_lizenzen(
 BEGIN
     DECLARE v_datum DATE;
     DECLARE v_wert DOUBLE;
+    DECLARE v_berechnet BOOLEAN;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
     DECLARE v_lizenzen INTEGER;
@@ -6732,6 +7306,7 @@ BEGIN
     SELECT 
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -6739,6 +7314,7 @@ BEGIN
     INTO
         v_datum,
         v_wert,
+        v_berechnet,
         v_laender,
         v_indikatoren,
         v_lizenzen,
@@ -6756,6 +7332,7 @@ BEGIN
         ersteller_nutzer_id,
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -6767,6 +7344,7 @@ BEGIN
         v_nutzer_id,
         v_datum,
         v_wert,
+        v_berechnet,
         v_laender,
         v_indikatoren,
         value_in,
@@ -6788,6 +7366,7 @@ CREATE PROCEDURE update_value_daten_quellen(
 BEGIN
     DECLARE v_datum DATE;
     DECLARE v_wert DOUBLE;
+    DECLARE v_berechnet BOOLEAN;
     DECLARE v_laender INTEGER;
     DECLARE v_indikatoren INTEGER;
     DECLARE v_lizenzen INTEGER;
@@ -6809,6 +7388,7 @@ BEGIN
     SELECT 
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -6816,6 +7396,7 @@ BEGIN
     INTO
         v_datum,
         v_wert,
+        v_berechnet,
         v_laender,
         v_indikatoren,
         v_lizenzen,
@@ -6833,6 +7414,7 @@ BEGIN
         ersteller_nutzer_id,
         datum,
         wert,
+        berechnet,
         laender_id,
         indikatoren_id,
         lizenzen_id,
@@ -6844,6 +7426,7 @@ BEGIN
         v_nutzer_id,
         v_datum,
         v_wert,
+        v_berechnet,
         v_laender,
         v_indikatoren,
         v_lizenzen,
@@ -7077,6 +7660,234 @@ BEGIN
         v_daten,
         value_in,
         metadatenzuordnungen_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_quellenzuordnungen_daten(
+    IN quellenzuordnungen_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_daten INTEGER;
+    DECLARE v_quellen INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        daten_id,
+        quellen_id
+    INTO
+        v_daten,
+        v_quellen
+    FROM view_quellenzuordnungen_aktuell
+    WHERE quellenzuordnungen_id = quellenzuordnungen_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_quellenzuordnungen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        daten_id,
+        quellen_id,
+        quellenzuordnungen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        value_in,
+        v_quellen,
+        quellenzuordnungen_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_quellenzuordnungen_quellen(
+    IN quellenzuordnungen_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_daten INTEGER;
+    DECLARE v_quellen INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        daten_id,
+        quellen_id
+    INTO
+        v_daten,
+        v_quellen
+    FROM view_quellenzuordnungen_aktuell
+    WHERE quellenzuordnungen_id = quellenzuordnungen_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_quellenzuordnungen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        daten_id,
+        quellen_id,
+        quellenzuordnungen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_daten,
+        value_in,
+        quellenzuordnungen_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_downloadquellenzuordnungen_daten(
+    IN downloadquellenzuordnungen_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_daten INTEGER;
+    DECLARE v_quellen INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        daten_id,
+        quellen_id
+    INTO
+        v_daten,
+        v_quellen
+    FROM view_downloadquellenzuordnungen_aktuell
+    WHERE downloadquellenzuordnungen_id = downloadquellenzuordnungen_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_downloadquellenzuordnungen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        daten_id,
+        quellen_id,
+        downloadquellenzuordnungen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        value_in,
+        v_quellen,
+        downloadquellenzuordnungen_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_downloadquellenzuordnungen_quellen(
+    IN downloadquellenzuordnungen_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_daten INTEGER;
+    DECLARE v_quellen INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        daten_id,
+        quellen_id
+    INTO
+        v_daten,
+        v_quellen
+    FROM view_downloadquellenzuordnungen_aktuell
+    WHERE downloadquellenzuordnungen_id = downloadquellenzuordnungen_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_downloadquellenzuordnungen(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        daten_id,
+        quellen_id,
+        downloadquellenzuordnungen_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_daten,
+        value_in,
+        downloadquellenzuordnungen_id_in
     );
 
     TRUNCATE TABLE __insert_allowed__;
