@@ -1,0 +1,33 @@
+{
+    "table_name": "ugl_werte",
+    "description": "Tabelle zur Verwaltung der Werte der Untergliederungen von Indikatoren.",
+    "columns": [
+        {
+            "name": "name",
+            "type": "VARCHAR(64)",
+            "not_null": true,
+            "default": "''",
+            "description": "Name des Untergliederungwertes."
+        }
+    ],
+    "foreign_keys": [
+        {
+            "name": "untergliederungen",
+            "references": "ugl",
+            "min_1": false,
+            "description": "Optionalee Referenz auf die Untergliederung.",
+            "not_null": false,
+            "diagram_description": "gehört zu Untergliederung"
+        },
+        {
+            "name": "laender",
+            "references": "laender",
+            "min_1": false,
+            "description": "Referenz auf ein Land.",
+            "not_null": false,
+            "diagram_description": "gehört zu Land"
+        }
+    ],
+    "unique_sets": [
+    ]
+}

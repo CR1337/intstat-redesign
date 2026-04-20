@@ -1,6 +1,6 @@
 {
-    "table_name": "downloadquellenzuordnungen",
-    "description": "Diese Tabelle ordnet Datenpunkten ihre Download-Quellen zu.",
+    "table_name": "metadaten_zo",
+    "description": "Diese Tabelle ordnet Datenpunkten ihre Metadaten zu.",
     "columns": [],
     "foreign_keys": [
         {
@@ -12,18 +12,18 @@
             "diagram_description": "ordnet Datenpunkt zu"
         },
         {
-            "name": "quellen",
-            "references": "quellen",
+            "name": "metadaten",
+            "references": "metadaten",
             "min_1": false,
-            "description": "Verweis auf die zugeordnete Download-Quelle.",
+            "description": "Verweis auf das zugeordnete Metadatum.",
             "not_null": true,
-            "diagram_description": "ordnet Download-Quelle zu"
+            "diagram_description": "ordnet Metadatum zu"
         }
     ],
     "unique_sets": [
         [
             "daten_id",
-            "quellen_id"
+            "metadaten_id"
         ]
     ],
     "do_versioning": true

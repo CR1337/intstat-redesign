@@ -40,10 +40,13 @@ ORDERED_TABLE_NAMES: List[str] = [
     "indikatoren",
     "laender",
     "daten",
-    "laendergruppenzuordnungen",
-    "metadatenzuordnungen",
-    "quellenzuordnungen",
-    "downloadquellenzuordnungen",
+    "ugl",
+    "ugl_werte",
+    "ugl_zo",
+    "laendergruppen_zo",
+    "metadaten_zo",
+    "quellen_zo",
+    "downloadquellen_zo",
 ]
 
 

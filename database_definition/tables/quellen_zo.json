@@ -1,5 +1,5 @@
 {
-    "table_name": "quellenzuordnungen",
+    "table_name": "quellen_zo",
     "description": "Diese Tabelle ordnet Datenpunkten ihre Quellen zu.",
     "columns": [],
     "foreign_keys": [

@@ -134,3 +134,49 @@ erDiagram
     tab_einheiten ||--o{ tab_indikatoren : ""
     tab_einheiten ||--o{ tab_einheiten : ""
 ```
+
+### Untergliederungen (ugl)
+
+```mermaid
+erDiagram
+    tab_indikatoren {
+        INTEGER indikatoren_id PK
+    }
+
+    tab_daten {
+        INTEGER daten_id PK
+        INTEGER indikatoren_id FK
+        INTEGER laender_id FK
+    }
+
+    tab_laender {
+        INTEGER laender_id PK
+    }
+
+    tab_ugl {
+        INTEGER ugl_id PK
+        VARCHAR(64) name
+    }
+
+    tab_ugl_werte {
+        INTEGER ugl_werte_id PK
+        INTEGER ugl_id FK
+        VARCHAR(64) name
+        INTEGER laender_id FK
+    }
+
+    tab_ugl_zo {
+        INTEGER ugl_zo_id PK
+        INTEGER ugl_werte_id FK
+        INTEGER daten_id FK
+    }
+
+    tab_indikatoren ||--o{ tab_daten : ""
+    tab_laender ||--o{ tab_daten : ""
+
+    tab_ugl ||--o{ tab_ugl_werte : ""
+    tab_laender ||--o{ tab_ugl_werte : ""
+
+    tab_ugl_werte ||--o{ tab_ugl_zo: ""
+    tab_daten ||--o{ tab_ugl_zo: ""
+```

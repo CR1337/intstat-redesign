@@ -306,14 +306,77 @@ CREATE TABLE IF NOT EXISTS tab_daten (
     PRIMARY KEY (daten_id, gueltig_seit)
 );
 
-CREATE TABLE IF NOT EXISTS tab_laendergruppenzuordnungen (
+CREATE TABLE IF NOT EXISTS tab_ugl (
+    -- Tabelle zur Verwaltung der möglichen Untergliederungen eines Indikators.
+    gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ist_aktiv BOOL NOT NULL,
+
+    ersteller_nutzer_id INTEGER NOT NULL,
+
+    ugl_id INTEGER NOT NULL,
+
+
+    name VARCHAR(64) NOT NULL DEFAULT '',
+
+    FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
+        REFERENCES tab_nutzer(nutzer_id)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+
+    PRIMARY KEY (ugl_id, gueltig_seit)
+);
+
+CREATE TABLE IF NOT EXISTS tab_ugl_werte (
+    -- Tabelle zur Verwaltung der Werte der Untergliederungen von Indikatoren.
+    gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ist_aktiv BOOL NOT NULL,
+
+    ersteller_nutzer_id INTEGER NOT NULL,
+
+    ugl_werte_id INTEGER NOT NULL,
+
+    untergliederungen_id INTEGER ,
+    laender_id INTEGER ,
+
+    name VARCHAR(64) NOT NULL DEFAULT '',
+
+    FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
+        REFERENCES tab_nutzer(nutzer_id)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+
+    PRIMARY KEY (ugl_werte_id, gueltig_seit)
+);
+
+CREATE TABLE IF NOT EXISTS tab_ugl_zo (
+    -- Diese Tabelle ordnet Daten ihre Untergliederungswerte zu.
+    gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ist_aktiv BOOL NOT NULL,
+
+    ersteller_nutzer_id INTEGER NOT NULL,
+
+    ugl_zo_id INTEGER NOT NULL,
+
+    untergliederungswerte_id INTEGER NOT NULL,
+    daten_id INTEGER NOT NULL,
+
+
+    FOREIGN KEY (ersteller_nutzer_id)  -- erstellt von
+        REFERENCES tab_nutzer(nutzer_id)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+
+    PRIMARY KEY (ugl_zo_id, gueltig_seit)
+);
+
+CREATE TABLE IF NOT EXISTS tab_laendergruppen_zo (
     -- Tabelle zur Zuordnung von Ländern zu Ländergruppen (z.B. Mitgliedschaft eines Landes in einer Gruppe).
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
     ersteller_nutzer_id INTEGER NOT NULL,
 
-    laendergruppenzuordnungen_id INTEGER NOT NULL,
+    laendergruppen_zo_id INTEGER NOT NULL,
 
     laender_id INTEGER NOT NULL,
     laendergruppen_id INTEGER NOT NULL,
@@ -324,17 +387,17 @@ CREATE TABLE IF NOT EXISTS tab_laendergruppenzuordnungen (
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
 
-    PRIMARY KEY (laendergruppenzuordnungen_id, gueltig_seit)
+    PRIMARY KEY (laendergruppen_zo_id, gueltig_seit)
 );
 
-CREATE TABLE IF NOT EXISTS tab_metadatenzuordnungen (
+CREATE TABLE IF NOT EXISTS tab_metadaten_zo (
     -- Diese Tabelle ordnet Datenpunkten ihre Metadaten zu.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
     ersteller_nutzer_id INTEGER NOT NULL,
 
-    metadatenzuordnungen_id INTEGER NOT NULL,
+    metadaten_zo_id INTEGER NOT NULL,
 
     daten_id INTEGER NOT NULL,
     metadaten_id INTEGER NOT NULL,
@@ -345,17 +408,17 @@ CREATE TABLE IF NOT EXISTS tab_metadatenzuordnungen (
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
 
-    PRIMARY KEY (metadatenzuordnungen_id, gueltig_seit)
+    PRIMARY KEY (metadaten_zo_id, gueltig_seit)
 );
 
-CREATE TABLE IF NOT EXISTS tab_quellenzuordnungen (
+CREATE TABLE IF NOT EXISTS tab_quellen_zo (
     -- Diese Tabelle ordnet Datenpunkten ihre Quellen zu.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
     ersteller_nutzer_id INTEGER NOT NULL,
 
-    quellenzuordnungen_id INTEGER NOT NULL,
+    quellen_zo_id INTEGER NOT NULL,
 
     daten_id INTEGER NOT NULL,
     quellen_id INTEGER NOT NULL,
@@ -366,17 +429,17 @@ CREATE TABLE IF NOT EXISTS tab_quellenzuordnungen (
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
 
-    PRIMARY KEY (quellenzuordnungen_id, gueltig_seit)
+    PRIMARY KEY (quellen_zo_id, gueltig_seit)
 );
 
-CREATE TABLE IF NOT EXISTS tab_downloadquellenzuordnungen (
+CREATE TABLE IF NOT EXISTS tab_downloadquellen_zo (
     -- Diese Tabelle ordnet Datenpunkten ihre Download-Quellen zu.
     gueltig_seit TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ist_aktiv BOOL NOT NULL,
 
     ersteller_nutzer_id INTEGER NOT NULL,
 
-    downloadquellenzuordnungen_id INTEGER NOT NULL,
+    downloadquellen_zo_id INTEGER NOT NULL,
 
     daten_id INTEGER NOT NULL,
     quellen_id INTEGER NOT NULL,
@@ -387,119 +450,143 @@ CREATE TABLE IF NOT EXISTS tab_downloadquellenzuordnungen (
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
 
-    PRIMARY KEY (downloadquellenzuordnungen_id, gueltig_seit)
+    PRIMARY KEY (downloadquellen_zo_id, gueltig_seit)
 );
 
 ALTER TABLE tab_einheiten
-ADD CONSTRAINT fk_einheiten_einheiten_65364060914942b9b30c  --  Optionale Referenz auf eine Basiseinheit, falls die Einheit abgeleitet ist.
+ADD CONSTRAINT fk_einheiten_einheiten_9fad7e46d7d449aea7d7  --  Optionale Referenz auf eine Basiseinheit, falls die Einheit abgeleitet ist.
 FOREIGN KEY (basis_einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendernamen
-ADD CONSTRAINT fk_laendernamen_laender_7f689c85eee1444286d2  --  Verweis auf das Land, dem der Name zugeordnet ist. (optional)
+ADD CONSTRAINT fk_laendernamen_laender_d76db0759d524a958398  --  Verweis auf das Land, dem der Name zugeordnet ist. (optional)
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_themen_3f1e2bf7a02b463a8f21  --  Verweis auf das Thema, dem der Indikator zugeordnet ist.
+ADD CONSTRAINT fk_indikatoren_themen_4626fcf73346431b99d4  --  Verweis auf das Thema, dem der Indikator zugeordnet ist.
 FOREIGN KEY (themen_id) REFERENCES tab_themen(themen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_einheiten_ec3f0abad09d4ff3b947  --  Verweis auf die Einheit, in der der Indikator gemessen wird.
+ADD CONSTRAINT fk_indikatoren_einheiten_e2b2e810baa94ea0896e  --  Verweis auf die Einheit, in der der Indikator gemessen wird.
 FOREIGN KEY (einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_kontinente_15f591d6998d4effba63  --  Verweis auf den Kontinent, dem das Land zugeordnet ist.
+ADD CONSTRAINT fk_laender_kontinente_3112e16e80fc42e687c1  --  Verweis auf den Kontinent, dem das Land zugeordnet ist.
 FOREIGN KEY (kontinente_id) REFERENCES tab_kontinente(kontinente_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_d26a301d39704f8fb629  --  Verweis auf den deutschen Namen des Landes.
+ADD CONSTRAINT fk_laender_laendernamen_fb281ece622149d48b71  --  Verweis auf den deutschen Namen des Landes.
 FOREIGN KEY (laendernamen_de_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_78c17aa30f1949919290  --  Verweis auf den englischen Namen des Landes.
+ADD CONSTRAINT fk_laender_laendernamen_40fbf98787024ea88b2a  --  Verweis auf den englischen Namen des Landes.
 FOREIGN KEY (laendernamen_en_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_laender_38f74b343084445ebbf4  --  Verweis auf das Land, für das der Wert gilt.
+ADD CONSTRAINT fk_daten_laender_843799bf79e4481d8643  --  Verweis auf das Land, für das der Wert gilt.
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_indikatoren_a5af88888dc44c04a786  --  Verweis auf den Indikator, zu dem der Wert gehört.
+ADD CONSTRAINT fk_daten_indikatoren_394ba2f787cc408b8833  --  Verweis auf den Indikator, zu dem der Wert gehört.
 FOREIGN KEY (indikatoren_id) REFERENCES tab_indikatoren(indikatoren_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_lizenzen_18fd867005634dd49afc  --  Verweis auf die Lizenz, unter welcher der Wert steht.
+ADD CONSTRAINT fk_daten_lizenzen_396ed1f7253e4b0cb9d7  --  Verweis auf die Lizenz, unter welcher der Wert steht.
 FOREIGN KEY (lizenzen_id) REFERENCES tab_lizenzen(lizenzen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_quellen_a3d7975d9d0b4cfd8485  --  Verweis auf die Quelle, aus welcher der Wert stammt.
+ADD CONSTRAINT fk_daten_quellen_56855394c00647c1a2a7  --  Verweis auf die Quelle, aus welcher der Wert stammt.
 FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
-ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laender_be125c2e48b744338f23  --  Verweis auf das zugeordnete Land.
+ALTER TABLE tab_ugl_werte
+ADD CONSTRAINT fk_ugl_werte_ugl_a363544f42ad44f2938d  --  Optionalee Referenz auf die Untergliederung.
+FOREIGN KEY (untergliederungen_id) REFERENCES tab_ugl(ugl_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE tab_ugl_werte
+ADD CONSTRAINT fk_ugl_werte_laender_e6cd8e2d4e494b638b94  --  Referenz auf ein Land.
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
-ALTER TABLE tab_laendergruppenzuordnungen
-ADD CONSTRAINT fk_laendergruppenzuordnungen_laendergruppen_e0371581dd5749c1aecd  --  Verweis auf die zugeordnete Ländergruppe.
+ALTER TABLE tab_ugl_zo
+ADD CONSTRAINT fk_ugl_zo_ugl_werte_750190ce0b5a48c4ab92  --  Verweis auf den zugeordneten Untergliederungswert.
+FOREIGN KEY (untergliederungswerte_id) REFERENCES tab_ugl_werte(ugl_werte_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE tab_ugl_zo
+ADD CONSTRAINT fk_ugl_zo_daten_f2ecf1a1a13f4a868b00  --  Verweis auf den zugeordneten Datenpunkt.
+FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE tab_laendergruppen_zo
+ADD CONSTRAINT fk_laendergruppen_zo_laender_5015337d48924f9980e5  --  Verweis auf das zugeordnete Land.
+FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE tab_laendergruppen_zo
+ADD CONSTRAINT fk_laendergruppen_zo_laendergruppen_7a294100dde8421f9952  --  Verweis auf die zugeordnete Ländergruppe.
 FOREIGN KEY (laendergruppen_id) REFERENCES tab_laendergruppen(laendergruppen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
-ALTER TABLE tab_metadatenzuordnungen
-ADD CONSTRAINT fk_metadatenzuordnungen_daten_5dc6c6e5de974a2b9655  --  Verweis auf den zugeordneten Datenpunkt.
+ALTER TABLE tab_metadaten_zo
+ADD CONSTRAINT fk_metadaten_zo_daten_a173997238014aeaa3b0  --  Verweis auf den zugeordneten Datenpunkt.
 FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
-ALTER TABLE tab_metadatenzuordnungen
-ADD CONSTRAINT fk_metadatenzuordnungen_metadaten_a04f7c0d0a7e4258918d  --  Verweis auf das zugeordnete Metadatum.
+ALTER TABLE tab_metadaten_zo
+ADD CONSTRAINT fk_metadaten_zo_metadaten_5caf998dcd304bbdba27  --  Verweis auf das zugeordnete Metadatum.
 FOREIGN KEY (metadaten_id) REFERENCES tab_metadaten(metadaten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
-ALTER TABLE tab_quellenzuordnungen
-ADD CONSTRAINT fk_quellenzuordnungen_daten_e545ed8ae12544688e39  --  Verweis auf den zugeordneten Datenpunkt.
+ALTER TABLE tab_quellen_zo
+ADD CONSTRAINT fk_quellen_zo_daten_e8dd6120073f4c59a9a5  --  Verweis auf den zugeordneten Datenpunkt.
 FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
-ALTER TABLE tab_quellenzuordnungen
-ADD CONSTRAINT fk_quellenzuordnungen_quellen_697d98e01c4d478eb3b2  --  Verweis auf die zugeordnete Quelle.
+ALTER TABLE tab_quellen_zo
+ADD CONSTRAINT fk_quellen_zo_quellen_83110d8d936e45b59e01  --  Verweis auf die zugeordnete Quelle.
 FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
-ALTER TABLE tab_downloadquellenzuordnungen
-ADD CONSTRAINT fk_downloadquellenzuordnungen_daten_f0428b29088245988443  --  Verweis auf den zugeordneten Datenpunkt.
+ALTER TABLE tab_downloadquellen_zo
+ADD CONSTRAINT fk_downloadquellen_zo_daten_5cfe7ffae8de4504a142  --  Verweis auf den zugeordneten Datenpunkt.
 FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
-ALTER TABLE tab_downloadquellenzuordnungen
-ADD CONSTRAINT fk_downloadquellenzuordnungen_quellen_52bd3b38e9d142bfa0bd  --  Verweis auf die zugeordnete Download-Quelle.
+ALTER TABLE tab_downloadquellen_zo
+ADD CONSTRAINT fk_downloadquellen_zo_quellen_62c7c417ab654b179b2f  --  Verweis auf die zugeordnete Download-Quelle.
 FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
@@ -588,30 +675,51 @@ CREATE INDEX idx_daten_latest
     );
     
 
-CREATE INDEX idx_laendergruppenzuordnungen_latest 
-    ON tab_laendergruppenzuordnungen (
-        laendergruppenzuordnungen_id, 
+CREATE INDEX idx_ugl_latest 
+    ON tab_ugl (
+        ugl_id, 
         gueltig_seit DESC
     );
     
 
-CREATE INDEX idx_metadatenzuordnungen_latest 
-    ON tab_metadatenzuordnungen (
-        metadatenzuordnungen_id, 
+CREATE INDEX idx_ugl_werte_latest 
+    ON tab_ugl_werte (
+        ugl_werte_id, 
         gueltig_seit DESC
     );
     
 
-CREATE INDEX idx_quellenzuordnungen_latest 
-    ON tab_quellenzuordnungen (
-        quellenzuordnungen_id, 
+CREATE INDEX idx_ugl_zo_latest 
+    ON tab_ugl_zo (
+        ugl_zo_id, 
         gueltig_seit DESC
     );
     
 
-CREATE INDEX idx_downloadquellenzuordnungen_latest 
-    ON tab_downloadquellenzuordnungen (
-        downloadquellenzuordnungen_id, 
+CREATE INDEX idx_laendergruppen_zo_latest 
+    ON tab_laendergruppen_zo (
+        laendergruppen_zo_id, 
+        gueltig_seit DESC
+    );
+    
+
+CREATE INDEX idx_metadaten_zo_latest 
+    ON tab_metadaten_zo (
+        metadaten_zo_id, 
+        gueltig_seit DESC
+    );
+    
+
+CREATE INDEX idx_quellen_zo_latest 
+    ON tab_quellen_zo (
+        quellen_zo_id, 
+        gueltig_seit DESC
+    );
+    
+
+CREATE INDEX idx_downloadquellen_zo_latest 
+    ON tab_downloadquellen_zo (
+        downloadquellen_zo_id, 
         gueltig_seit DESC
     );
     
@@ -676,25 +784,40 @@ SELECT *
 FROM tab_daten
 ORDER BY daten_id, gueltig_seit DESC;
 
-CREATE OR REPLACE VIEW view_laendergruppenzuordnungen_historie AS
+CREATE OR REPLACE VIEW view_ugl_historie AS
 SELECT *
-FROM tab_laendergruppenzuordnungen
-ORDER BY laendergruppenzuordnungen_id, gueltig_seit DESC;
+FROM tab_ugl
+ORDER BY ugl_id, gueltig_seit DESC;
 
-CREATE OR REPLACE VIEW view_metadatenzuordnungen_historie AS
+CREATE OR REPLACE VIEW view_ugl_werte_historie AS
 SELECT *
-FROM tab_metadatenzuordnungen
-ORDER BY metadatenzuordnungen_id, gueltig_seit DESC;
+FROM tab_ugl_werte
+ORDER BY ugl_werte_id, gueltig_seit DESC;
 
-CREATE OR REPLACE VIEW view_quellenzuordnungen_historie AS
+CREATE OR REPLACE VIEW view_ugl_zo_historie AS
 SELECT *
-FROM tab_quellenzuordnungen
-ORDER BY quellenzuordnungen_id, gueltig_seit DESC;
+FROM tab_ugl_zo
+ORDER BY ugl_zo_id, gueltig_seit DESC;
 
-CREATE OR REPLACE VIEW view_downloadquellenzuordnungen_historie AS
+CREATE OR REPLACE VIEW view_laendergruppen_zo_historie AS
 SELECT *
-FROM tab_downloadquellenzuordnungen
-ORDER BY downloadquellenzuordnungen_id, gueltig_seit DESC;
+FROM tab_laendergruppen_zo
+ORDER BY laendergruppen_zo_id, gueltig_seit DESC;
+
+CREATE OR REPLACE VIEW view_metadaten_zo_historie AS
+SELECT *
+FROM tab_metadaten_zo
+ORDER BY metadaten_zo_id, gueltig_seit DESC;
+
+CREATE OR REPLACE VIEW view_quellen_zo_historie AS
+SELECT *
+FROM tab_quellen_zo
+ORDER BY quellen_zo_id, gueltig_seit DESC;
+
+CREATE OR REPLACE VIEW view_downloadquellen_zo_historie AS
+SELECT *
+FROM tab_downloadquellen_zo
+ORDER BY downloadquellen_zo_id, gueltig_seit DESC;
 
 CREATE OR REPLACE VIEW view_nutzer_aktuell AS
 SELECT t.*
@@ -840,51 +963,87 @@ ON t.daten_id = latest.daten_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 
-CREATE OR REPLACE VIEW view_laendergruppenzuordnungen_aktuell AS
+CREATE OR REPLACE VIEW view_ugl_aktuell AS
 SELECT t.*
-from tab_laendergruppenzuordnungen t
+from tab_ugl t
 INNER JOIN (
-    SELECT laendergruppenzuordnungen_id, MAX(gueltig_seit) AS max_gueltig_seit
-    FROM tab_laendergruppenzuordnungen
-    GROUP BY laendergruppenzuordnungen_id
+    SELECT ugl_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_ugl
+    GROUP BY ugl_id
 ) latest
-ON t.laendergruppenzuordnungen_id = latest.laendergruppenzuordnungen_id 
+ON t.ugl_id = latest.ugl_id 
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 
-CREATE OR REPLACE VIEW view_metadatenzuordnungen_aktuell AS
+CREATE OR REPLACE VIEW view_ugl_werte_aktuell AS
 SELECT t.*
-from tab_metadatenzuordnungen t
+from tab_ugl_werte t
 INNER JOIN (
-    SELECT metadatenzuordnungen_id, MAX(gueltig_seit) AS max_gueltig_seit
-    FROM tab_metadatenzuordnungen
-    GROUP BY metadatenzuordnungen_id
+    SELECT ugl_werte_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_ugl_werte
+    GROUP BY ugl_werte_id
 ) latest
-ON t.metadatenzuordnungen_id = latest.metadatenzuordnungen_id 
+ON t.ugl_werte_id = latest.ugl_werte_id 
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 
-CREATE OR REPLACE VIEW view_quellenzuordnungen_aktuell AS
+CREATE OR REPLACE VIEW view_ugl_zo_aktuell AS
 SELECT t.*
-from tab_quellenzuordnungen t
+from tab_ugl_zo t
 INNER JOIN (
-    SELECT quellenzuordnungen_id, MAX(gueltig_seit) AS max_gueltig_seit
-    FROM tab_quellenzuordnungen
-    GROUP BY quellenzuordnungen_id
+    SELECT ugl_zo_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_ugl_zo
+    GROUP BY ugl_zo_id
 ) latest
-ON t.quellenzuordnungen_id = latest.quellenzuordnungen_id 
+ON t.ugl_zo_id = latest.ugl_zo_id 
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 
-CREATE OR REPLACE VIEW view_downloadquellenzuordnungen_aktuell AS
+CREATE OR REPLACE VIEW view_laendergruppen_zo_aktuell AS
 SELECT t.*
-from tab_downloadquellenzuordnungen t
+from tab_laendergruppen_zo t
 INNER JOIN (
-    SELECT downloadquellenzuordnungen_id, MAX(gueltig_seit) AS max_gueltig_seit
-    FROM tab_downloadquellenzuordnungen
-    GROUP BY downloadquellenzuordnungen_id
+    SELECT laendergruppen_zo_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_laendergruppen_zo
+    GROUP BY laendergruppen_zo_id
 ) latest
-ON t.downloadquellenzuordnungen_id = latest.downloadquellenzuordnungen_id 
+ON t.laendergruppen_zo_id = latest.laendergruppen_zo_id 
+AND t.gueltig_seit = latest.max_gueltig_seit
+WHERE t.ist_aktiv;
+
+CREATE OR REPLACE VIEW view_metadaten_zo_aktuell AS
+SELECT t.*
+from tab_metadaten_zo t
+INNER JOIN (
+    SELECT metadaten_zo_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_metadaten_zo
+    GROUP BY metadaten_zo_id
+) latest
+ON t.metadaten_zo_id = latest.metadaten_zo_id 
+AND t.gueltig_seit = latest.max_gueltig_seit
+WHERE t.ist_aktiv;
+
+CREATE OR REPLACE VIEW view_quellen_zo_aktuell AS
+SELECT t.*
+from tab_quellen_zo t
+INNER JOIN (
+    SELECT quellen_zo_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_quellen_zo
+    GROUP BY quellen_zo_id
+) latest
+ON t.quellen_zo_id = latest.quellen_zo_id 
+AND t.gueltig_seit = latest.max_gueltig_seit
+WHERE t.ist_aktiv;
+
+CREATE OR REPLACE VIEW view_downloadquellen_zo_aktuell AS
+SELECT t.*
+from tab_downloadquellen_zo t
+INNER JOIN (
+    SELECT downloadquellen_zo_id, MAX(gueltig_seit) AS max_gueltig_seit
+    FROM tab_downloadquellen_zo
+    GROUP BY downloadquellen_zo_id
+) latest
+ON t.downloadquellen_zo_id = latest.downloadquellen_zo_id 
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 
@@ -960,28 +1119,46 @@ SELECT
 FROM tab_daten
 LIMIT 1;
 
-CREATE OR REPLACE VIEW view_laendergruppenzuordnungen_neue_id AS
+CREATE OR REPLACE VIEW view_ugl_neue_id AS
 SELECT
-    COALESCE(MAX(laendergruppenzuordnungen_id), 0) + 1 AS neue_laendergruppenzuordnungen_id
-FROM tab_laendergruppenzuordnungen
+    COALESCE(MAX(ugl_id), 0) + 1 AS neue_ugl_id
+FROM tab_ugl
 LIMIT 1;
 
-CREATE OR REPLACE VIEW view_metadatenzuordnungen_neue_id AS
+CREATE OR REPLACE VIEW view_ugl_werte_neue_id AS
 SELECT
-    COALESCE(MAX(metadatenzuordnungen_id), 0) + 1 AS neue_metadatenzuordnungen_id
-FROM tab_metadatenzuordnungen
+    COALESCE(MAX(ugl_werte_id), 0) + 1 AS neue_ugl_werte_id
+FROM tab_ugl_werte
 LIMIT 1;
 
-CREATE OR REPLACE VIEW view_quellenzuordnungen_neue_id AS
+CREATE OR REPLACE VIEW view_ugl_zo_neue_id AS
 SELECT
-    COALESCE(MAX(quellenzuordnungen_id), 0) + 1 AS neue_quellenzuordnungen_id
-FROM tab_quellenzuordnungen
+    COALESCE(MAX(ugl_zo_id), 0) + 1 AS neue_ugl_zo_id
+FROM tab_ugl_zo
 LIMIT 1;
 
-CREATE OR REPLACE VIEW view_downloadquellenzuordnungen_neue_id AS
+CREATE OR REPLACE VIEW view_laendergruppen_zo_neue_id AS
 SELECT
-    COALESCE(MAX(downloadquellenzuordnungen_id), 0) + 1 AS neue_downloadquellenzuordnungen_id
-FROM tab_downloadquellenzuordnungen
+    COALESCE(MAX(laendergruppen_zo_id), 0) + 1 AS neue_laendergruppen_zo_id
+FROM tab_laendergruppen_zo
+LIMIT 1;
+
+CREATE OR REPLACE VIEW view_metadaten_zo_neue_id AS
+SELECT
+    COALESCE(MAX(metadaten_zo_id), 0) + 1 AS neue_metadaten_zo_id
+FROM tab_metadaten_zo
+LIMIT 1;
+
+CREATE OR REPLACE VIEW view_quellen_zo_neue_id AS
+SELECT
+    COALESCE(MAX(quellen_zo_id), 0) + 1 AS neue_quellen_zo_id
+FROM tab_quellen_zo
+LIMIT 1;
+
+CREATE OR REPLACE VIEW view_downloadquellen_zo_neue_id AS
+SELECT
+    COALESCE(MAX(downloadquellen_zo_id), 0) + 1 AS neue_downloadquellen_zo_id
+FROM tab_downloadquellen_zo
 LIMIT 1;
 
 DELIMITER $$
@@ -1130,8 +1307,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER trg_laendergruppenzuordnungen_delete
-BEFORE DELETE ON tab_laendergruppenzuordnungen
+CREATE TRIGGER trg_ugl_delete
+BEFORE DELETE ON tab_ugl
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
@@ -1142,8 +1319,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER trg_metadatenzuordnungen_delete
-BEFORE DELETE ON tab_metadatenzuordnungen
+CREATE TRIGGER trg_ugl_werte_delete
+BEFORE DELETE ON tab_ugl_werte
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
@@ -1154,8 +1331,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER trg_quellenzuordnungen_delete
-BEFORE DELETE ON tab_quellenzuordnungen
+CREATE TRIGGER trg_ugl_zo_delete
+BEFORE DELETE ON tab_ugl_zo
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
@@ -1166,8 +1343,44 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER trg_downloadquellenzuordnungen_delete
-BEFORE DELETE ON tab_downloadquellenzuordnungen
+CREATE TRIGGER trg_laendergruppen_zo_delete
+BEFORE DELETE ON tab_laendergruppen_zo
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_metadaten_zo_delete
+BEFORE DELETE ON tab_metadaten_zo
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_quellen_zo_delete
+BEFORE DELETE ON tab_quellen_zo
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Loeschen (DELETE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_downloadquellen_zo_delete
+BEFORE DELETE ON tab_downloadquellen_zo
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
@@ -1322,8 +1535,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER trg_laendergruppenzuordnungen_update
-BEFORE UPDATE ON tab_laendergruppenzuordnungen
+CREATE TRIGGER trg_ugl_update
+BEFORE UPDATE ON tab_ugl
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
@@ -1334,8 +1547,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER trg_metadatenzuordnungen_update
-BEFORE UPDATE ON tab_metadatenzuordnungen
+CREATE TRIGGER trg_ugl_werte_update
+BEFORE UPDATE ON tab_ugl_werte
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
@@ -1346,8 +1559,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER trg_quellenzuordnungen_update
-BEFORE UPDATE ON tab_quellenzuordnungen
+CREATE TRIGGER trg_ugl_zo_update
+BEFORE UPDATE ON tab_ugl_zo
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
@@ -1358,8 +1571,44 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER trg_downloadquellenzuordnungen_update
-BEFORE UPDATE ON tab_downloadquellenzuordnungen
+CREATE TRIGGER trg_laendergruppen_zo_update
+BEFORE UPDATE ON tab_laendergruppen_zo
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_metadaten_zo_update
+BEFORE UPDATE ON tab_metadaten_zo
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_quellen_zo_update
+BEFORE UPDATE ON tab_quellen_zo
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Aktualisieren (UPDATE) von Eintraegen ist nicht erlaubt!';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_downloadquellen_zo_update
+BEFORE UPDATE ON tab_downloadquellen_zo
 FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
@@ -1793,8 +2042,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER trg_laendergruppenzuordnungen_insert
-BEFORE INSERT ON tab_laendergruppenzuordnungen
+CREATE TRIGGER trg_ugl_insert
+BEFORE INSERT ON tab_ugl
 FOR EACH ROW
 BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
@@ -1805,14 +2054,83 @@ BEGIN
 
     IF EXISTS (
         SELECT 1
-        FROM tab_laendergruppenzuordnungen
+        FROM tab_ugl
+        WHERE
+             name = NEW.name
+            AND ugl_id <> NEW.ugl_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( name ) in ugl ist nicht erlaubt!';
+    END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_ugl_werte_insert
+BEFORE INSERT ON tab_ugl_werte
+FOR EACH ROW
+BEGIN
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+    END IF;
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_ugl_zo_insert
+BEFORE INSERT ON tab_ugl_zo
+FOR EACH ROW
+BEGIN
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+    END IF;
+
+    IF EXISTS (
+        SELECT 1
+        FROM tab_ugl_zo
+        WHERE
+             daten_id = NEW.daten_id
+            AND untergliederungswerte_id = NEW.untergliederungswerte_id
+            AND ugl_zo_id <> NEW.ugl_zo_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( daten_id  untergliederungswerte_id ) in ugl_zo ist nicht erlaubt!';
+    END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_laendergruppen_zo_insert
+BEFORE INSERT ON tab_laendergruppen_zo
+FOR EACH ROW
+BEGIN
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    IF NOT EXISTS (SELECT 1 FROM __insert_allowed__) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) ist nur von der entsprechenden PROCEDURE aus erlaubt!';
+    END IF;
+
+    IF EXISTS (
+        SELECT 1
+        FROM tab_laendergruppen_zo
         WHERE
              laender_id = NEW.laender_id
             AND laendergruppen_id = NEW.laendergruppen_id
-            AND laendergruppenzuordnungen_id <> NEW.laendergruppenzuordnungen_id
+            AND laendergruppen_zo_id <> NEW.laendergruppen_zo_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( laender_id  laendergruppen_id ) in laendergruppenzuordnungen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( laender_id  laendergruppen_id ) in laendergruppen_zo ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1820,8 +2138,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER trg_metadatenzuordnungen_insert
-BEFORE INSERT ON tab_metadatenzuordnungen
+CREATE TRIGGER trg_metadaten_zo_insert
+BEFORE INSERT ON tab_metadaten_zo
 FOR EACH ROW
 BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
@@ -1832,14 +2150,14 @@ BEGIN
 
     IF EXISTS (
         SELECT 1
-        FROM tab_metadatenzuordnungen
+        FROM tab_metadaten_zo
         WHERE
              daten_id = NEW.daten_id
             AND metadaten_id = NEW.metadaten_id
-            AND metadatenzuordnungen_id <> NEW.metadatenzuordnungen_id
+            AND metadaten_zo_id <> NEW.metadaten_zo_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( daten_id  metadaten_id ) in metadatenzuordnungen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( daten_id  metadaten_id ) in metadaten_zo ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1847,8 +2165,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER trg_quellenzuordnungen_insert
-BEFORE INSERT ON tab_quellenzuordnungen
+CREATE TRIGGER trg_quellen_zo_insert
+BEFORE INSERT ON tab_quellen_zo
 FOR EACH ROW
 BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
@@ -1859,14 +2177,14 @@ BEGIN
 
     IF EXISTS (
         SELECT 1
-        FROM tab_quellenzuordnungen
+        FROM tab_quellen_zo
         WHERE
              daten_id = NEW.daten_id
             AND quellen_id = NEW.quellen_id
-            AND quellenzuordnungen_id <> NEW.quellenzuordnungen_id
+            AND quellen_zo_id <> NEW.quellen_zo_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( daten_id  quellen_id ) in quellenzuordnungen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( daten_id  quellen_id ) in quellen_zo ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1874,8 +2192,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER trg_downloadquellenzuordnungen_insert
-BEFORE INSERT ON tab_downloadquellenzuordnungen
+CREATE TRIGGER trg_downloadquellen_zo_insert
+BEFORE INSERT ON tab_downloadquellen_zo
 FOR EACH ROW
 BEGIN
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
@@ -1886,14 +2204,14 @@ BEGIN
 
     IF EXISTS (
         SELECT 1
-        FROM tab_downloadquellenzuordnungen
+        FROM tab_downloadquellen_zo
         WHERE
              daten_id = NEW.daten_id
             AND quellen_id = NEW.quellen_id
-            AND downloadquellenzuordnungen_id <> NEW.downloadquellenzuordnungen_id
+            AND downloadquellen_zo_id <> NEW.downloadquellen_zo_id
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( daten_id  quellen_id ) in downloadquellenzuordnungen ist nicht erlaubt!';
+        SET MESSAGE_TEXT = 'Einfuegen (INSERT) von Duplikaten ( daten_id  quellen_id ) in downloadquellen_zo ist nicht erlaubt!';
     END IF;
 END$$
 
@@ -1945,6 +2263,12 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+
+
+
+
 
 
 
@@ -2745,10 +3069,9 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE insert_into_laendergruppenzuordnungen(
-    IN laender_in INTEGER,
-    IN laendergruppen_in INTEGER,
-    OUT new_laendergruppenzuordnungen_id_out INTEGER
+CREATE PROCEDURE insert_into_ugl(
+    IN name_in VARCHAR(64),
+    OUT new_ugl_id_out INTEGER
 )
 BEGIN
     DECLARE v_new_id INTEGER;
@@ -2768,21 +3091,196 @@ BEGIN
     START TRANSACTION;
 
     SET v_new_id = (
-        SELECT neue_laendergruppenzuordnungen_id
-        FROM view_laendergruppenzuordnungen_neue_id
+        SELECT neue_ugl_id
+        FROM view_ugl_neue_id
     );
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_laendergruppenzuordnungen(
+    INSERT INTO tab_ugl(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name,
+        ugl_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        name_in,
+        v_new_id
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+
+    SET new_ugl_id_out = v_new_id;
+    
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE insert_into_ugl_werte(
+    IN name_in VARCHAR(64),
+    IN untergliederungen_in INTEGER,
+    IN laender_in INTEGER,
+    OUT new_ugl_werte_id_out INTEGER
+)
+BEGIN
+    DECLARE v_new_id INTEGER;
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    SET v_new_id = (
+        SELECT neue_ugl_werte_id
+        FROM view_ugl_werte_neue_id
+    );
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_ugl_werte(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name,
+        untergliederungen_id,
+        laender_id,
+        ugl_werte_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        name_in,
+        untergliederungen_in,
+        laender_in,
+        v_new_id
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+
+    SET new_ugl_werte_id_out = v_new_id;
+    
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE insert_into_ugl_zo(
+    IN untergliederungswerte_in INTEGER,
+    IN daten_in INTEGER,
+    OUT new_ugl_zo_id_out INTEGER
+)
+BEGIN
+    DECLARE v_new_id INTEGER;
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    SET v_new_id = (
+        SELECT neue_ugl_zo_id
+        FROM view_ugl_zo_neue_id
+    );
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_ugl_zo(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        untergliederungswerte_id,
+        daten_id,
+        ugl_zo_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        untergliederungswerte_in,
+        daten_in,
+        v_new_id
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+
+    SET new_ugl_zo_id_out = v_new_id;
+    
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE insert_into_laendergruppen_zo(
+    IN laender_in INTEGER,
+    IN laendergruppen_in INTEGER,
+    OUT new_laendergruppen_zo_id_out INTEGER
+)
+BEGIN
+    DECLARE v_new_id INTEGER;
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    START TRANSACTION;
+
+    SET v_new_id = (
+        SELECT neue_laendergruppen_zo_id
+        FROM view_laendergruppen_zo_neue_id
+    );
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_laendergruppen_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         laender_id,
         laendergruppen_id,
-        laendergruppenzuordnungen_id
+        laendergruppen_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
@@ -2794,7 +3292,7 @@ BEGIN
 
     TRUNCATE TABLE __insert_allowed__;
 
-    SET new_laendergruppenzuordnungen_id_out = v_new_id;
+    SET new_laendergruppen_zo_id_out = v_new_id;
     
     COMMIT;
 END$$
@@ -2803,10 +3301,10 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE insert_into_metadatenzuordnungen(
+CREATE PROCEDURE insert_into_metadaten_zo(
     IN daten_in INTEGER,
     IN metadaten_in INTEGER,
-    OUT new_metadatenzuordnungen_id_out INTEGER
+    OUT new_metadaten_zo_id_out INTEGER
 )
 BEGIN
     DECLARE v_new_id INTEGER;
@@ -2826,21 +3324,21 @@ BEGIN
     START TRANSACTION;
 
     SET v_new_id = (
-        SELECT neue_metadatenzuordnungen_id
-        FROM view_metadatenzuordnungen_neue_id
+        SELECT neue_metadaten_zo_id
+        FROM view_metadaten_zo_neue_id
     );
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_metadatenzuordnungen(
+    INSERT INTO tab_metadaten_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         daten_id,
         metadaten_id,
-        metadatenzuordnungen_id
+        metadaten_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
@@ -2852,7 +3350,7 @@ BEGIN
 
     TRUNCATE TABLE __insert_allowed__;
 
-    SET new_metadatenzuordnungen_id_out = v_new_id;
+    SET new_metadaten_zo_id_out = v_new_id;
     
     COMMIT;
 END$$
@@ -2861,10 +3359,10 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE insert_into_quellenzuordnungen(
+CREATE PROCEDURE insert_into_quellen_zo(
     IN daten_in INTEGER,
     IN quellen_in INTEGER,
-    OUT new_quellenzuordnungen_id_out INTEGER
+    OUT new_quellen_zo_id_out INTEGER
 )
 BEGIN
     DECLARE v_new_id INTEGER;
@@ -2884,21 +3382,21 @@ BEGIN
     START TRANSACTION;
 
     SET v_new_id = (
-        SELECT neue_quellenzuordnungen_id
-        FROM view_quellenzuordnungen_neue_id
+        SELECT neue_quellen_zo_id
+        FROM view_quellen_zo_neue_id
     );
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_quellenzuordnungen(
+    INSERT INTO tab_quellen_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         daten_id,
         quellen_id,
-        quellenzuordnungen_id
+        quellen_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
@@ -2910,7 +3408,7 @@ BEGIN
 
     TRUNCATE TABLE __insert_allowed__;
 
-    SET new_quellenzuordnungen_id_out = v_new_id;
+    SET new_quellen_zo_id_out = v_new_id;
     
     COMMIT;
 END$$
@@ -2919,10 +3417,10 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE insert_into_downloadquellenzuordnungen(
+CREATE PROCEDURE insert_into_downloadquellen_zo(
     IN daten_in INTEGER,
     IN quellen_in INTEGER,
-    OUT new_downloadquellenzuordnungen_id_out INTEGER
+    OUT new_downloadquellen_zo_id_out INTEGER
 )
 BEGIN
     DECLARE v_new_id INTEGER;
@@ -2942,21 +3440,21 @@ BEGIN
     START TRANSACTION;
 
     SET v_new_id = (
-        SELECT neue_downloadquellenzuordnungen_id
-        FROM view_downloadquellenzuordnungen_neue_id
+        SELECT neue_downloadquellen_zo_id
+        FROM view_downloadquellen_zo_neue_id
     );
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_downloadquellenzuordnungen(
+    INSERT INTO tab_downloadquellen_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         daten_id,
         quellen_id,
-        downloadquellenzuordnungen_id
+        downloadquellen_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
@@ -2968,7 +3466,7 @@ BEGIN
 
     TRUNCATE TABLE __insert_allowed__;
 
-    SET new_downloadquellenzuordnungen_id_out = v_new_id;
+    SET new_downloadquellen_zo_id_out = v_new_id;
     
     COMMIT;
 END$$
@@ -3776,8 +4274,179 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE delete_from_laendergruppenzuordnungen(
-    IN laendergruppenzuordnungen_id_to_delete INTEGER
+CREATE PROCEDURE delete_from_ugl(
+    IN ugl_id_to_delete INTEGER
+)
+BEGIN
+    DECLARE v_name VARCHAR(64);
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+    
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        name
+    INTO
+        v_name
+    FROM view_ugl_aktuell
+    WHERE ugl_id = ugl_id_to_delete;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_ugl(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name,
+        ugl_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        FALSE,
+        v_nutzer_id,
+        v_name,
+        ugl_id_to_delete
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+   
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE delete_from_ugl_werte(
+    IN ugl_werte_id_to_delete INTEGER
+)
+BEGIN
+    DECLARE v_name VARCHAR(64);
+    DECLARE v_untergliederungen INTEGER;
+    DECLARE v_laender INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+    
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        name,
+        untergliederungen_id,
+        laender_id
+    INTO
+        v_name,
+        v_untergliederungen,
+        v_laender
+    FROM view_ugl_werte_aktuell
+    WHERE ugl_werte_id = ugl_werte_id_to_delete;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_ugl_werte(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name,
+        untergliederungen_id,
+        laender_id,
+        ugl_werte_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        FALSE,
+        v_nutzer_id,
+        v_name,
+        v_untergliederungen,
+        v_laender,
+        ugl_werte_id_to_delete
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+   
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE delete_from_ugl_zo(
+    IN ugl_zo_id_to_delete INTEGER
+)
+BEGIN
+    DECLARE v_untergliederungswerte INTEGER;
+    DECLARE v_daten INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+    
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        untergliederungswerte_id,
+        daten_id
+    INTO
+        v_untergliederungswerte,
+        v_daten
+    FROM view_ugl_zo_aktuell
+    WHERE ugl_zo_id = ugl_zo_id_to_delete;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_ugl_zo(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        untergliederungswerte_id,
+        daten_id,
+        ugl_zo_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        FALSE,
+        v_nutzer_id,
+        v_untergliederungswerte,
+        v_daten,
+        ugl_zo_id_to_delete
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+   
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE delete_from_laendergruppen_zo(
+    IN laendergruppen_zo_id_to_delete INTEGER
 )
 BEGIN
     DECLARE v_laender INTEGER;
@@ -3802,27 +4471,27 @@ BEGIN
     INTO
         v_laender,
         v_laendergruppen
-    FROM view_laendergruppenzuordnungen_aktuell
-    WHERE laendergruppenzuordnungen_id = laendergruppenzuordnungen_id_to_delete;
+    FROM view_laendergruppen_zo_aktuell
+    WHERE laendergruppen_zo_id = laendergruppen_zo_id_to_delete;
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_laendergruppenzuordnungen(
+    INSERT INTO tab_laendergruppen_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         laender_id,
         laendergruppen_id,
-        laendergruppenzuordnungen_id
+        laendergruppen_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         FALSE,
         v_nutzer_id,
         v_laender,
         v_laendergruppen,
-        laendergruppenzuordnungen_id_to_delete
+        laendergruppen_zo_id_to_delete
     );
 
     TRUNCATE TABLE __insert_allowed__;
@@ -3833,8 +4502,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE delete_from_metadatenzuordnungen(
-    IN metadatenzuordnungen_id_to_delete INTEGER
+CREATE PROCEDURE delete_from_metadaten_zo(
+    IN metadaten_zo_id_to_delete INTEGER
 )
 BEGIN
     DECLARE v_daten INTEGER;
@@ -3859,27 +4528,27 @@ BEGIN
     INTO
         v_daten,
         v_metadaten
-    FROM view_metadatenzuordnungen_aktuell
-    WHERE metadatenzuordnungen_id = metadatenzuordnungen_id_to_delete;
+    FROM view_metadaten_zo_aktuell
+    WHERE metadaten_zo_id = metadaten_zo_id_to_delete;
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_metadatenzuordnungen(
+    INSERT INTO tab_metadaten_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         daten_id,
         metadaten_id,
-        metadatenzuordnungen_id
+        metadaten_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         FALSE,
         v_nutzer_id,
         v_daten,
         v_metadaten,
-        metadatenzuordnungen_id_to_delete
+        metadaten_zo_id_to_delete
     );
 
     TRUNCATE TABLE __insert_allowed__;
@@ -3890,8 +4559,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE delete_from_quellenzuordnungen(
-    IN quellenzuordnungen_id_to_delete INTEGER
+CREATE PROCEDURE delete_from_quellen_zo(
+    IN quellen_zo_id_to_delete INTEGER
 )
 BEGIN
     DECLARE v_daten INTEGER;
@@ -3916,27 +4585,27 @@ BEGIN
     INTO
         v_daten,
         v_quellen
-    FROM view_quellenzuordnungen_aktuell
-    WHERE quellenzuordnungen_id = quellenzuordnungen_id_to_delete;
+    FROM view_quellen_zo_aktuell
+    WHERE quellen_zo_id = quellen_zo_id_to_delete;
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_quellenzuordnungen(
+    INSERT INTO tab_quellen_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         daten_id,
         quellen_id,
-        quellenzuordnungen_id
+        quellen_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         FALSE,
         v_nutzer_id,
         v_daten,
         v_quellen,
-        quellenzuordnungen_id_to_delete
+        quellen_zo_id_to_delete
     );
 
     TRUNCATE TABLE __insert_allowed__;
@@ -3947,8 +4616,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE delete_from_downloadquellenzuordnungen(
-    IN downloadquellenzuordnungen_id_to_delete INTEGER
+CREATE PROCEDURE delete_from_downloadquellen_zo(
+    IN downloadquellen_zo_id_to_delete INTEGER
 )
 BEGIN
     DECLARE v_daten INTEGER;
@@ -3973,27 +4642,27 @@ BEGIN
     INTO
         v_daten,
         v_quellen
-    FROM view_downloadquellenzuordnungen_aktuell
-    WHERE downloadquellenzuordnungen_id = downloadquellenzuordnungen_id_to_delete;
+    FROM view_downloadquellen_zo_aktuell
+    WHERE downloadquellen_zo_id = downloadquellen_zo_id_to_delete;
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_downloadquellenzuordnungen(
+    INSERT INTO tab_downloadquellen_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         daten_id,
         quellen_id,
-        downloadquellenzuordnungen_id
+        downloadquellen_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         FALSE,
         v_nutzer_id,
         v_daten,
         v_quellen,
-        downloadquellenzuordnungen_id_to_delete
+        downloadquellen_zo_id_to_delete
     );
 
     TRUNCATE TABLE __insert_allowed__;
@@ -7441,8 +8110,353 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE update_value_laendergruppenzuordnungen_laender(
-    IN laendergruppenzuordnungen_id_in INTEGER,
+CREATE PROCEDURE update_value_ugl_name(
+    IN ugl_id_in INTEGER,
+    IN value_in VARCHAR(64)
+)
+BEGIN
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_ugl(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name,
+        ugl_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        value_in,
+        ugl_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_ugl_werte_name(
+    IN ugl_werte_id_in INTEGER,
+    IN value_in VARCHAR(64)
+)
+BEGIN
+    DECLARE v_name VARCHAR(64);
+    DECLARE v_untergliederungen INTEGER;
+    DECLARE v_laender INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        name,
+        untergliederungen_id,
+        laender_id
+    INTO
+        v_name,
+        v_untergliederungen,
+        v_laender
+    FROM view_ugl_werte_aktuell
+    WHERE ugl_werte_id = ugl_werte_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_ugl_werte(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name,
+        untergliederungen_id,
+        laender_id,
+        ugl_werte_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        value_in,
+        v_untergliederungen,
+        v_laender,
+        ugl_werte_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_ugl_werte_untergliederungen(
+    IN ugl_werte_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_name VARCHAR(64);
+    DECLARE v_untergliederungen INTEGER;
+    DECLARE v_laender INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        name,
+        untergliederungen_id,
+        laender_id
+    INTO
+        v_name,
+        v_untergliederungen,
+        v_laender
+    FROM view_ugl_werte_aktuell
+    WHERE ugl_werte_id = ugl_werte_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_ugl_werte(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name,
+        untergliederungen_id,
+        laender_id,
+        ugl_werte_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_name,
+        value_in,
+        v_laender,
+        ugl_werte_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_ugl_werte_laender(
+    IN ugl_werte_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_name VARCHAR(64);
+    DECLARE v_untergliederungen INTEGER;
+    DECLARE v_laender INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        name,
+        untergliederungen_id,
+        laender_id
+    INTO
+        v_name,
+        v_untergliederungen,
+        v_laender
+    FROM view_ugl_werte_aktuell
+    WHERE ugl_werte_id = ugl_werte_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_ugl_werte(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        name,
+        untergliederungen_id,
+        laender_id,
+        ugl_werte_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_name,
+        v_untergliederungen,
+        value_in,
+        ugl_werte_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_ugl_zo_untergliederungswerte(
+    IN ugl_zo_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_untergliederungswerte INTEGER;
+    DECLARE v_daten INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        untergliederungswerte_id,
+        daten_id
+    INTO
+        v_untergliederungswerte,
+        v_daten
+    FROM view_ugl_zo_aktuell
+    WHERE ugl_zo_id = ugl_zo_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_ugl_zo(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        untergliederungswerte_id,
+        daten_id,
+        ugl_zo_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        value_in,
+        v_daten,
+        ugl_zo_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_ugl_zo_daten(
+    IN ugl_zo_id_in INTEGER,
+    IN value_in INTEGER
+)
+BEGIN
+    DECLARE v_untergliederungswerte INTEGER;
+    DECLARE v_daten INTEGER;
+
+    DECLARE v_nutzer_id INTEGER;
+    DECLARE v_current_username VARCHAR(256);
+    
+    CALL insert_current_nutzer();
+
+    SET v_current_username = get_aktuellen_nutzer_namen();
+    SET v_nutzer_id = (
+        SELECT nutzer_id
+        FROM view_nutzer_aktuell
+        WHERE name = v_current_username
+        LIMIT 1
+    );
+
+    SELECT 
+        untergliederungswerte_id,
+        daten_id
+    INTO
+        v_untergliederungswerte,
+        v_daten
+    FROM view_ugl_zo_aktuell
+    WHERE ugl_zo_id = ugl_zo_id_in;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
+    TRUNCATE TABLE __insert_allowed__;
+    INSERT INTO __insert_allowed__ VALUES(TRUE);
+
+    INSERT INTO tab_ugl_zo(
+        gueltig_seit,
+        ist_aktiv,
+        ersteller_nutzer_id,
+        untergliederungswerte_id,
+        daten_id,
+        ugl_zo_id
+    ) VALUES (
+        CURRENT_TIMESTAMP(6),
+        TRUE,
+        v_nutzer_id,
+        v_untergliederungswerte,
+        value_in,
+        ugl_zo_id_in
+    );
+
+    TRUNCATE TABLE __insert_allowed__;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE update_value_laendergruppen_zo_laender(
+    IN laendergruppen_zo_id_in INTEGER,
     IN value_in INTEGER
 )
 BEGIN
@@ -7468,27 +8482,27 @@ BEGIN
     INTO
         v_laender,
         v_laendergruppen
-    FROM view_laendergruppenzuordnungen_aktuell
-    WHERE laendergruppenzuordnungen_id = laendergruppenzuordnungen_id_in;
+    FROM view_laendergruppen_zo_aktuell
+    WHERE laendergruppen_zo_id = laendergruppen_zo_id_in;
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_laendergruppenzuordnungen(
+    INSERT INTO tab_laendergruppen_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         laender_id,
         laendergruppen_id,
-        laendergruppenzuordnungen_id
+        laendergruppen_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
         v_nutzer_id,
         value_in,
         v_laendergruppen,
-        laendergruppenzuordnungen_id_in
+        laendergruppen_zo_id_in
     );
 
     TRUNCATE TABLE __insert_allowed__;
@@ -7498,8 +8512,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE update_value_laendergruppenzuordnungen_laendergruppen(
-    IN laendergruppenzuordnungen_id_in INTEGER,
+CREATE PROCEDURE update_value_laendergruppen_zo_laendergruppen(
+    IN laendergruppen_zo_id_in INTEGER,
     IN value_in INTEGER
 )
 BEGIN
@@ -7525,27 +8539,27 @@ BEGIN
     INTO
         v_laender,
         v_laendergruppen
-    FROM view_laendergruppenzuordnungen_aktuell
-    WHERE laendergruppenzuordnungen_id = laendergruppenzuordnungen_id_in;
+    FROM view_laendergruppen_zo_aktuell
+    WHERE laendergruppen_zo_id = laendergruppen_zo_id_in;
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_laendergruppenzuordnungen(
+    INSERT INTO tab_laendergruppen_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         laender_id,
         laendergruppen_id,
-        laendergruppenzuordnungen_id
+        laendergruppen_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
         v_nutzer_id,
         v_laender,
         value_in,
-        laendergruppenzuordnungen_id_in
+        laendergruppen_zo_id_in
     );
 
     TRUNCATE TABLE __insert_allowed__;
@@ -7555,8 +8569,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE update_value_metadatenzuordnungen_daten(
-    IN metadatenzuordnungen_id_in INTEGER,
+CREATE PROCEDURE update_value_metadaten_zo_daten(
+    IN metadaten_zo_id_in INTEGER,
     IN value_in INTEGER
 )
 BEGIN
@@ -7582,27 +8596,27 @@ BEGIN
     INTO
         v_daten,
         v_metadaten
-    FROM view_metadatenzuordnungen_aktuell
-    WHERE metadatenzuordnungen_id = metadatenzuordnungen_id_in;
+    FROM view_metadaten_zo_aktuell
+    WHERE metadaten_zo_id = metadaten_zo_id_in;
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_metadatenzuordnungen(
+    INSERT INTO tab_metadaten_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         daten_id,
         metadaten_id,
-        metadatenzuordnungen_id
+        metadaten_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
         v_nutzer_id,
         value_in,
         v_metadaten,
-        metadatenzuordnungen_id_in
+        metadaten_zo_id_in
     );
 
     TRUNCATE TABLE __insert_allowed__;
@@ -7612,8 +8626,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE update_value_metadatenzuordnungen_metadaten(
-    IN metadatenzuordnungen_id_in INTEGER,
+CREATE PROCEDURE update_value_metadaten_zo_metadaten(
+    IN metadaten_zo_id_in INTEGER,
     IN value_in INTEGER
 )
 BEGIN
@@ -7639,27 +8653,27 @@ BEGIN
     INTO
         v_daten,
         v_metadaten
-    FROM view_metadatenzuordnungen_aktuell
-    WHERE metadatenzuordnungen_id = metadatenzuordnungen_id_in;
+    FROM view_metadaten_zo_aktuell
+    WHERE metadaten_zo_id = metadaten_zo_id_in;
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_metadatenzuordnungen(
+    INSERT INTO tab_metadaten_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         daten_id,
         metadaten_id,
-        metadatenzuordnungen_id
+        metadaten_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
         v_nutzer_id,
         v_daten,
         value_in,
-        metadatenzuordnungen_id_in
+        metadaten_zo_id_in
     );
 
     TRUNCATE TABLE __insert_allowed__;
@@ -7669,8 +8683,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE update_value_quellenzuordnungen_daten(
-    IN quellenzuordnungen_id_in INTEGER,
+CREATE PROCEDURE update_value_quellen_zo_daten(
+    IN quellen_zo_id_in INTEGER,
     IN value_in INTEGER
 )
 BEGIN
@@ -7696,27 +8710,27 @@ BEGIN
     INTO
         v_daten,
         v_quellen
-    FROM view_quellenzuordnungen_aktuell
-    WHERE quellenzuordnungen_id = quellenzuordnungen_id_in;
+    FROM view_quellen_zo_aktuell
+    WHERE quellen_zo_id = quellen_zo_id_in;
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_quellenzuordnungen(
+    INSERT INTO tab_quellen_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         daten_id,
         quellen_id,
-        quellenzuordnungen_id
+        quellen_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
         v_nutzer_id,
         value_in,
         v_quellen,
-        quellenzuordnungen_id_in
+        quellen_zo_id_in
     );
 
     TRUNCATE TABLE __insert_allowed__;
@@ -7726,8 +8740,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE update_value_quellenzuordnungen_quellen(
-    IN quellenzuordnungen_id_in INTEGER,
+CREATE PROCEDURE update_value_quellen_zo_quellen(
+    IN quellen_zo_id_in INTEGER,
     IN value_in INTEGER
 )
 BEGIN
@@ -7753,27 +8767,27 @@ BEGIN
     INTO
         v_daten,
         v_quellen
-    FROM view_quellenzuordnungen_aktuell
-    WHERE quellenzuordnungen_id = quellenzuordnungen_id_in;
+    FROM view_quellen_zo_aktuell
+    WHERE quellen_zo_id = quellen_zo_id_in;
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_quellenzuordnungen(
+    INSERT INTO tab_quellen_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         daten_id,
         quellen_id,
-        quellenzuordnungen_id
+        quellen_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
         v_nutzer_id,
         v_daten,
         value_in,
-        quellenzuordnungen_id_in
+        quellen_zo_id_in
     );
 
     TRUNCATE TABLE __insert_allowed__;
@@ -7783,8 +8797,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE update_value_downloadquellenzuordnungen_daten(
-    IN downloadquellenzuordnungen_id_in INTEGER,
+CREATE PROCEDURE update_value_downloadquellen_zo_daten(
+    IN downloadquellen_zo_id_in INTEGER,
     IN value_in INTEGER
 )
 BEGIN
@@ -7810,27 +8824,27 @@ BEGIN
     INTO
         v_daten,
         v_quellen
-    FROM view_downloadquellenzuordnungen_aktuell
-    WHERE downloadquellenzuordnungen_id = downloadquellenzuordnungen_id_in;
+    FROM view_downloadquellen_zo_aktuell
+    WHERE downloadquellen_zo_id = downloadquellen_zo_id_in;
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_downloadquellenzuordnungen(
+    INSERT INTO tab_downloadquellen_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         daten_id,
         quellen_id,
-        downloadquellenzuordnungen_id
+        downloadquellen_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
         v_nutzer_id,
         value_in,
         v_quellen,
-        downloadquellenzuordnungen_id_in
+        downloadquellen_zo_id_in
     );
 
     TRUNCATE TABLE __insert_allowed__;
@@ -7840,8 +8854,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE update_value_downloadquellenzuordnungen_quellen(
-    IN downloadquellenzuordnungen_id_in INTEGER,
+CREATE PROCEDURE update_value_downloadquellen_zo_quellen(
+    IN downloadquellen_zo_id_in INTEGER,
     IN value_in INTEGER
 )
 BEGIN
@@ -7867,27 +8881,27 @@ BEGIN
     INTO
         v_daten,
         v_quellen
-    FROM view_downloadquellenzuordnungen_aktuell
-    WHERE downloadquellenzuordnungen_id = downloadquellenzuordnungen_id_in;
+    FROM view_downloadquellen_zo_aktuell
+    WHERE downloadquellen_zo_id = downloadquellen_zo_id_in;
 
     CREATE TEMPORARY TABLE IF NOT EXISTS __insert_allowed__ (is_allowed BOOLEAN);
     TRUNCATE TABLE __insert_allowed__;
     INSERT INTO __insert_allowed__ VALUES(TRUE);
 
-    INSERT INTO tab_downloadquellenzuordnungen(
+    INSERT INTO tab_downloadquellen_zo(
         gueltig_seit,
         ist_aktiv,
         ersteller_nutzer_id,
         daten_id,
         quellen_id,
-        downloadquellenzuordnungen_id
+        downloadquellen_zo_id
     ) VALUES (
         CURRENT_TIMESTAMP(6),
         TRUE,
         v_nutzer_id,
         v_daten,
         value_in,
-        downloadquellenzuordnungen_id_in
+        downloadquellen_zo_id_in
     );
 
     TRUNCATE TABLE __insert_allowed__;

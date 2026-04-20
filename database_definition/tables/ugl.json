@@ -1,0 +1,19 @@
+{
+    "table_name": "ugl",
+    "description": "Tabelle zur Verwaltung der möglichen Untergliederungen eines Indikators.",
+    "columns": [
+        {
+            "name": "name",
+            "type": "VARCHAR(64)",
+            "not_null": true,
+            "default": "''",
+            "description": "Name der Untergliederung."
+        }
+    ],
+    "foreign_keys": [],
+    "unique_sets": [
+        [
+            "name"
+        ]
+    ]
+}

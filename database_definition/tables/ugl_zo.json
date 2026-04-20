@@ -1,0 +1,30 @@
+{
+    "table_name": "ugl_zo",
+    "description": "Diese Tabelle ordnet Daten ihre Untergliederungswerte zu.",
+    "columns": [],
+    "foreign_keys": [
+        {
+            "name": "untergliederungswerte",
+            "references": "ugl_werte",
+            "min_1": false,
+            "description": "Verweis auf den zugeordneten Untergliederungswert.",
+            "not_null": true,
+            "diagram_description": "ordnet Untergliederungswert zu"
+        },
+        {
+            "name": "daten",
+            "references": "daten",
+            "min_1": false,
+            "description": "Verweis auf den zugeordneten Datenpunkt.",
+            "not_null": true,
+            "diagram_description": "ordnet Datenpunkt zu"
+        }
+    ],
+    "unique_sets": [
+        [
+            "daten_id",
+            "untergliederungswerte_id"
+        ]
+    ],
+    "do_versioning": true
+}
