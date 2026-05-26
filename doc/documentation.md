@@ -38,6 +38,7 @@
     - [Aktualisieren einer Zeile](#aktualisieren-einer-zeile)
     - [Löschen einer Zeile](#löschen-einer-zeile)
     - [Auslesen einer älteren Version einer Zeile](#auslesen-einer-älteren-version-einer-zeile)
+- [Abkürzungen](#abkürzungen)
 
 ## Funktionale Features
 
@@ -243,7 +244,7 @@ erDiagram
     tab_einheiten ||--o{ tab_einheiten : ""
 ```
 
-### Untergliederungen
+### Untergliederungen (ugl)
 
 ```mermaid
 erDiagram
@@ -261,32 +262,32 @@ erDiagram
         INTEGER laender_id PK
     }
 
-    tab_untergliederungen {
-        INTEGER untergliederungen_id PK
+    tab_ugl {
+        INTEGER ugl_id PK
         VARCHAR(64) name
     }
 
-    tab_untergliederungswerte {
-        INTEGER untergliederungswerte_id PK
-        INTEGER untergliederungen_id FK
+    tab_ugl_werte {
+        INTEGER ugl_werte_id PK
+        INTEGER ugl_id FK
         VARCHAR(64) name
         INTEGER laender_id FK
     }
 
-    tab_untergliederungszuordnungen {
-        INTEGER untergliederunggszuordnungen_id PK
-        INTEGER untergliederungswerte_id FK
+    tab_ugl_zo {
+        INTEGER ugl_zo_id PK
+        INTEGER ugl_werte_id FK
         INTEGER daten_id FK
     }
 
     tab_indikatoren ||--o{ tab_daten : ""
     tab_laender ||--o{ tab_daten : ""
 
-    tab_untergliederungen ||--o{ tab_untergliederungswerte : ""
-    tab_laender ||--o{ tab_untergliederungswerte : ""
+    tab_ugl ||--o{ tab_ugl_werte : ""
+    tab_laender ||--o{ tab_ugl_werte : ""
 
-    tab_untergliederungswerte ||--o{ tab_untergliederunggszuordnungen: ""
-    tab_daten ||--o{ tab_untergliederunggszuordnungen: ""
+    tab_ugl_werte ||--o{ tab_ugl_zo: ""
+    tab_daten ||--o{ tab_ugl_zo: ""
 ```
 
 
@@ -972,4 +973,11 @@ ON t.kontinente_id = latest.kontinente_id
 AND t.gueltig_seit = latest.max_gueltig_seit
 WHERE t.ist_aktiv;
 ```
+
+## Abkürzungen
+
+|Abkürzung|Bedeutung|
+|-|-|
+|ugl|Untergliederung|
+|zo|Zuordnung|
 
