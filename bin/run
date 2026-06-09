@@ -3,6 +3,6 @@
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")  # Format: YYYY-MM-DD_HH-MM-SS
 LOG_FILE="logs/mysql-container_${TIMESTAMP}.log"
 
-docker compose up -d
+docker compose up
 
 docker compose logs -f >> "$LOG_FILE" 2>&1 &

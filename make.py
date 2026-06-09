@@ -3,7 +3,7 @@ import os
 import json
 from sqlfmt.core import format as sql_format
 from uuid import uuid4
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 from jinja2 import Environment, PackageLoader, select_autoescape
 
@@ -47,6 +47,14 @@ ORDERED_TABLE_NAMES: List[str] = [
     "metadaten_zo",
     "quellen_zo",
     "downloadquellen_zo",
+]
+
+PY_TYPES: List[Tuple[str, str]] = [
+    ("VARCHAR", "str"),
+    ("TINYINT", "int"),
+    ("BOOLEAN", "bool"),
+    ("DOUBLE", "float"),
+    ("DATE", "datetime"),
 ]
 
 
@@ -116,7 +124,7 @@ def make_create_statement(
 
         for filename in per_db_filenames:
             template = env.get_template(os.path.join(per_db_directory, filename))
-            parameters = {"users": users}
+            parameters = {"users": users, "tables": table_definitions}
             statement = template.render(parameters)
             statements.append(statement)
 
@@ -167,6 +175,13 @@ def make_diagram(env: Environment, table_definitions: Dict[str, Dict[str, Any]])
     return diagram
 
 
+def make_models(env: Environment, table_definitions: Dict[str, Dict[str, Any]]) -> str:
+    template = env.get_template("py/models.py.jinja2")
+    parameters = {"tables": table_definitions.values()}
+    code = template.render(parameters)
+    return code
+
+
 def make_documentation(
     env: Environment, diagram: str, table_definitions: Dict[str, Dict[str, Any]]
 ) -> str:
@@ -199,6 +214,9 @@ def main() -> None:
         lstrip_blocks=True,
     )
     env.globals.update(uuid=lambda: "".join(s for s in str(uuid4()).split("-")[:-1]))
+    env.globals.update(
+        pytype=lambda t: next(filter(lambda t_: t.startswith(t_), PY_TYPES))[1]
+    )
 
     table_definitions = get_all_table_definitions()
     users = get_users()
@@ -210,6 +228,10 @@ def main() -> None:
 
     with open(output_filename, "w") as file:
         file.write(formatted_create_statement)
+
+    model_code = make_models(env, table_definitions)
+    with open("ui/models.py", "w", encoding="utf-8") as f:
+        f.write(model_code)
 
     diagram = make_diagram(env, table_definitions)
 

@@ -21,21 +21,24 @@
             "type": "TINYINT UNSIGNED",
             "not_null": true,
             "default": 0,
-            "description": "Rotwert der Farbzuordnung für das Thema (0-255)."
+            "description": "Rotwert der Farbzuordnung für das Thema (0-255).",
+            "part_of_compound": "farbe"
         },
         {
             "name": "farbe_g",
             "type": "TINYINT UNSIGNED",
             "not_null": true,
             "default": 0,
-            "description": "Grünwert der Farbzuordnung für das Thema (0-255)."
+            "description": "Grünwert der Farbzuordnung für das Thema (0-255).",
+            "part_of_compound": "farbe"
         },
         {
             "name": "farbe_b",
             "type": "TINYINT UNSIGNED",
             "not_null": true,
             "default": 0,
-            "description": "Blauwert der Farbzuordnung für das Thema (0-255)."
+            "description": "Blauwert der Farbzuordnung für das Thema (0-255).",
+            "part_of_compound": "farbe"
         }
     ],
     "foreign_keys": [],
@@ -46,5 +49,12 @@
         [
             "name_en"
         ]
+    ],
+    "compound_values": [
+        {
+            "name": "farbe",
+            "compounds": ["farbe_r", "farbe_g", "farbe_b"],
+            "type": "color"
+        }
     ]
 }

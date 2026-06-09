@@ -1,0 +1,32 @@
+from abc import ABC, abstractmethod
+import streamlit as st
+import models
+from typing import Optional
+import pandas as pd
+from sqlalchemy import text
+import db_connection
+
+
+class BaseEditor(ABC):
+
+    @abstractmethod
+    def get_table(self) -> pd.DataFrame:
+        pass
+
+    @abstractmethod
+    def render(self, x: Optional[models.BaseModel] = None) -> None:
+        pass
+
+
+{% for table in tables %}
+class {{ table.table_name|capitalize }}Editor:
+
+    def get_table(self) -> pd.DataFrame:
+        with db_connection.get_connection().session as s:
+            result = s.execute(text("SELECT * FROM view_{{ table.table_name }}_aktuell;"))
+            return pd.DataFrame.from_records(result.fetchall(), columns=result.keys())  # type: ignore
+
+    def render(self, x: Optional[models.{{ table.table_name|capitalize }}] = None) -> None:
+        pass
+
+{% endfor %}

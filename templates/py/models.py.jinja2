@@ -1,0 +1,32 @@
+from __future__ import annotations
+from pydantic import BaseModel
+from typing import Dict, Tuple
+from datetime import datetime
+
+
+{% for table in tables %}
+class {{ table.table_name|capitalize }}(BaseModel):
+    """
+    {{ table.description }}
+    """
+{% for col in table.columns %}
+{% if not "part_of_compound" in col%}
+    {{ col.name }}: {{ pytype(col.type) }}  # {{ col.description }}
+{% endif %}
+{% endfor %}
+{% for compound in table.compound_values %}
+{% if compound.type == "color" %}
+    {{ compound.name }}: Tuple[int, int, int]
+{% endif %}
+{% endfor %}
+{% for fk in table.foreign_keys %}
+    {{ fk.name }}: {{ fk.references|capitalize }}  # {{ fk.description }}
+{% endfor %}
+
+
+{% endfor %}
+MODELS: Dict[str, BaseModel] = {  # type: ignore
+{% for table in tables %}
+    "{{ table.table_name }}": {{ table.table_name|capitalize }},
+{% endfor %}
+}
