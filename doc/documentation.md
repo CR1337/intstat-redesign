@@ -13,25 +13,26 @@
     - [Einheiten](#einheiten)
 - [ER-Diagramm](#entity-relationship-diagramm)
 - [Tabellen](#tabellen)
-    - [tab_lizenzen](#tab_lizenzen)
-    - [tab_daten](#tab_daten)
-    - [tab_metadaten_zo](#tab_metadaten_zo)
-    - [tab_ugl_werte](#tab_ugl_werte)
-    - [tab_laendergruppen](#tab_laendergruppen)
-    - [tab_downloadquellen_zo](#tab_downloadquellen_zo)
-    - [tab_ugl_zo](#tab_ugl_zo)
-    - [tab_metadaten](#tab_metadaten)
-    - [tab_ugl](#tab_ugl)
-    - [tab_nutzer](#tab_nutzer)
-    - [tab_laendergruppen_zo](#tab_laendergruppen_zo)
+    - [tab_lizenzen_zo](#tab_lizenzen_zo)
     - [tab_quellen](#tab_quellen)
-    - [tab_indikatoren](#tab_indikatoren)
-    - [tab_themen](#tab_themen)
-    - [tab_laender](#tab_laender)
-    - [tab_einheiten](#tab_einheiten)
-    - [tab_laendernamen](#tab_laendernamen)
-    - [tab_kontinente](#tab_kontinente)
+    - [tab_metadaten](#tab_metadaten)
+    - [tab_lizenzen](#tab_lizenzen)
+    - [tab_laendergruppen](#tab_laendergruppen)
     - [tab_quellen_zo](#tab_quellen_zo)
+    - [tab_metadaten_zo](#tab_metadaten_zo)
+    - [tab_laendergruppen_zo](#tab_laendergruppen_zo)
+    - [tab_daten](#tab_daten)
+    - [tab_kontinente](#tab_kontinente)
+    - [tab_themen](#tab_themen)
+    - [tab_ugl_zo](#tab_ugl_zo)
+    - [tab_ugl_werte](#tab_ugl_werte)
+    - [tab_laender](#tab_laender)
+    - [tab_downloadquellen_zo](#tab_downloadquellen_zo)
+    - [tab_indikatoren](#tab_indikatoren)
+    - [tab_laendernamen](#tab_laendernamen)
+    - [tab_nutzer](#tab_nutzer)
+    - [tab_einheiten](#tab_einheiten)
+    - [tab_ugl](#tab_ugl)
 - [Benutzung der Datenbank](#benutzung-der-datenbank)
     - [Einfügen einer Zeile](#einfügen-einer-zeile)
     - [Auslesen einer aktuell gültigen Zeile](#auslesen-einer-aktuell-gültigen-zeile)
@@ -300,6 +301,53 @@ config:
 ---
 erDiagram
 
+        tab_lizenzen_zo {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK
+            INTEGER lizenzen_zo_id PK
+
+                INTEGER daten_id FK
+                INTEGER lizenzen_id FK
+
+        }
+
+            tab_daten ||--o{ tab_lizenzen_zo : "ordnet Datenpunkt zu"
+            tab_lizenzen ||--o{ tab_lizenzen_zo : "ordnet Lizenz zu"
+        tab_nutzer ||--o{ tab_lizenzen_zo : "erstellt von"
+
+
+        tab_quellen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK
+            INTEGER quellen_id PK
+
+
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
+                VARCHAR(16) name_kurz_de
+                VARCHAR(16) name_kurz_en
+                VARCHAR(512) url
+        }
+
+        tab_nutzer ||--o{ tab_quellen : "erstellt von"
+
+
+        tab_metadaten {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK
+            INTEGER metadaten_id PK
+
+
+                VARCHAR(8) kuerzel
+                VARCHAR(256) bezeichnung
+        }
+
+        tab_nutzer ||--o{ tab_metadaten : "erstellt von"
+
+
         tab_lizenzen {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
@@ -315,27 +363,34 @@ erDiagram
         tab_nutzer ||--o{ tab_lizenzen : "erstellt von"
 
 
-        tab_daten {
+        tab_laendergruppen {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
             INTEGER ersteller_nutzer_id FK
-            INTEGER daten_id PK
+            INTEGER laendergruppen_id PK
 
-                INTEGER laender_id FK
-                INTEGER indikatoren_id FK
-                INTEGER lizenzen_id FK
-                INTEGER quellen_id FK
 
-                DATE datum
-                DOUBLE wert
-                BOOLEAN berechnet
+                VARCHAR(256) name_de
+                VARCHAR(256) name_en
         }
 
-            tab_laender ||--o{ tab_daten : "für Land"
-            tab_indikatoren ||--o{ tab_daten : "für Indikator"
-            tab_lizenzen ||--o{ tab_daten : "hat Lizenz"
-            tab_quellen ||--o{ tab_daten : "hat Quelle"
-        tab_nutzer ||--o{ tab_daten : "erstellt von"
+        tab_nutzer ||--o{ tab_laendergruppen : "erstellt von"
+
+
+        tab_quellen_zo {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK
+            INTEGER quellen_zo_id PK
+
+                INTEGER daten_id FK
+                INTEGER quellen_id FK
+
+        }
+
+            tab_daten ||--o{ tab_quellen_zo : "ordnet Datenpunkt zu"
+            tab_quellen ||--o{ tab_quellen_zo : "ordnet Quelle zu"
+        tab_nutzer ||--o{ tab_quellen_zo : "erstellt von"
 
 
         tab_metadaten_zo {
@@ -352,6 +407,88 @@ erDiagram
             tab_daten ||--o{ tab_metadaten_zo : "ordnet Datenpunkt zu"
             tab_metadaten ||--o{ tab_metadaten_zo : "ordnet Metadatum zu"
         tab_nutzer ||--o{ tab_metadaten_zo : "erstellt von"
+
+
+        tab_laendergruppen_zo {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK
+            INTEGER laendergruppen_zo_id PK
+
+                INTEGER laender_id FK
+                INTEGER laendergruppen_id FK
+
+        }
+
+            tab_laender ||--o{ tab_laendergruppen_zo : "ordnet Land zu"
+            tab_laendergruppen ||--o{ tab_laendergruppen_zo : "ordnet Länderguppe zu"
+        tab_nutzer ||--o{ tab_laendergruppen_zo : "erstellt von"
+
+
+        tab_daten {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK
+            INTEGER daten_id PK
+
+                INTEGER laender_id FK
+                INTEGER indikatoren_id FK
+
+                DATE datum
+                DOUBLE wert
+                BOOLEAN berechnet
+        }
+
+            tab_laender ||--o{ tab_daten : "für Land"
+            tab_indikatoren ||--o{ tab_daten : "für Indikator"
+        tab_nutzer ||--o{ tab_daten : "erstellt von"
+
+
+        tab_kontinente {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK
+            INTEGER kontinente_id PK
+
+
+                VARCHAR(64) name_de
+                VARCHAR(64) name_en
+        }
+
+        tab_nutzer ||--o{ tab_kontinente : "erstellt von"
+
+
+        tab_themen {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK
+            INTEGER themen_id PK
+
+
+                VARCHAR(64) name_de
+                VARCHAR(64) name_en
+                TINYINT_UNSIGNED farbe_r
+                TINYINT_UNSIGNED farbe_g
+                TINYINT_UNSIGNED farbe_b
+        }
+
+        tab_nutzer ||--o{ tab_themen : "erstellt von"
+
+
+        tab_ugl_zo {
+            TIMESTAMP gueltig_seit PK
+            BOOL ist_aktiv
+            INTEGER ersteller_nutzer_id FK
+            INTEGER ugl_zo_id PK
+
+                INTEGER untergliederungswerte_id FK
+                INTEGER daten_id FK
+
+        }
+
+            tab_ugl_werte ||--o{ tab_ugl_zo : "ordnet Untergliederungswert zu"
+            tab_daten ||--o{ tab_ugl_zo : "ordnet Datenpunkt zu"
+        tab_nutzer ||--o{ tab_ugl_zo : "erstellt von"
 
 
         tab_ugl_werte {
@@ -371,18 +508,24 @@ erDiagram
         tab_nutzer ||--o{ tab_ugl_werte : "erstellt von"
 
 
-        tab_laendergruppen {
+        tab_laender {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
             INTEGER ersteller_nutzer_id FK
-            INTEGER laendergruppen_id PK
+            INTEGER laender_id PK
 
+                INTEGER kontinente_id FK
+                INTEGER laendernamen_de_id FK
+                INTEGER laendernamen_en_id FK
 
-                VARCHAR(256) name_de
-                VARCHAR(256) name_en
+                VARCHAR(2) iso2
+                VARCHAR(3) iso3
         }
 
-        tab_nutzer ||--o{ tab_laendergruppen : "erstellt von"
+            tab_kontinente ||--o{ tab_laender : "gehört zu Kontinent"
+            tab_laendernamen ||--o{ tab_laender : "hat dt. Namen"
+            tab_laendernamen ||--o{ tab_laender : "hat en. Namen"
+        tab_nutzer ||--o{ tab_laender : "erstellt von"
 
 
         tab_downloadquellen_zo {
@@ -399,95 +542,6 @@ erDiagram
             tab_daten ||--o{ tab_downloadquellen_zo : "ordnet Datenpunkt zu"
             tab_quellen ||--o{ tab_downloadquellen_zo : "ordnet Download-Quelle zu"
         tab_nutzer ||--o{ tab_downloadquellen_zo : "erstellt von"
-
-
-        tab_ugl_zo {
-            TIMESTAMP gueltig_seit PK
-            BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK
-            INTEGER ugl_zo_id PK
-
-                INTEGER untergliederungswerte_id FK
-                INTEGER daten_id FK
-
-        }
-
-            tab_ugl_werte ||--o{ tab_ugl_zo : "ordnet Untergliederungswert zu"
-            tab_daten ||--o{ tab_ugl_zo : "ordnet Datenpunkt zu"
-        tab_nutzer ||--o{ tab_ugl_zo : "erstellt von"
-
-
-        tab_metadaten {
-            TIMESTAMP gueltig_seit PK
-            BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK
-            INTEGER metadaten_id PK
-
-
-                VARCHAR(8) kuerzel
-                VARCHAR(256) bezeichnung
-        }
-
-        tab_nutzer ||--o{ tab_metadaten : "erstellt von"
-
-
-        tab_ugl {
-            TIMESTAMP gueltig_seit PK
-            BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK
-            INTEGER ugl_id PK
-
-
-                VARCHAR(64) name
-        }
-
-        tab_nutzer ||--o{ tab_ugl : "erstellt von"
-
-
-        tab_nutzer {
-            TIMESTAMP gueltig_seit PK
-            BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK
-            INTEGER nutzer_id PK
-
-
-                VARCHAR(256) name
-        }
-
-        tab_nutzer ||--o{ tab_nutzer : "erstellt von"
-
-
-        tab_laendergruppen_zo {
-            TIMESTAMP gueltig_seit PK
-            BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK
-            INTEGER laendergruppen_zo_id PK
-
-                INTEGER laender_id FK
-                INTEGER laendergruppen_id FK
-
-        }
-
-            tab_laender ||--o{ tab_laendergruppen_zo : "ordnet Land zu"
-            tab_laendergruppen ||--o{ tab_laendergruppen_zo : "ordnet Länderguppe zu"
-        tab_nutzer ||--o{ tab_laendergruppen_zo : "erstellt von"
-
-
-        tab_quellen {
-            TIMESTAMP gueltig_seit PK
-            BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK
-            INTEGER quellen_id PK
-
-
-                VARCHAR(256) name_de
-                VARCHAR(256) name_en
-                VARCHAR(16) name_kurz_de
-                VARCHAR(16) name_kurz_en
-                VARCHAR(512) url
-        }
-
-        tab_nutzer ||--o{ tab_quellen : "erstellt von"
 
 
         tab_indikatoren {
@@ -513,41 +567,32 @@ erDiagram
         tab_nutzer ||--o{ tab_indikatoren : "erstellt von"
 
 
-        tab_themen {
+        tab_laendernamen {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
             INTEGER ersteller_nutzer_id FK
-            INTEGER themen_id PK
+            INTEGER laendernamen_id PK
 
+                INTEGER laender_id FK
 
-                VARCHAR(64) name_de
-                VARCHAR(64) name_en
-                TINYINT_UNSIGNED farbe_r
-                TINYINT_UNSIGNED farbe_g
-                TINYINT_UNSIGNED farbe_b
+                VARCHAR(256) name
         }
 
-        tab_nutzer ||--o{ tab_themen : "erstellt von"
+            tab_laender ||--o{ tab_laendernamen : "gehört zu Land"
+        tab_nutzer ||--o{ tab_laendernamen : "erstellt von"
 
 
-        tab_laender {
+        tab_nutzer {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
             INTEGER ersteller_nutzer_id FK
-            INTEGER laender_id PK
+            INTEGER nutzer_id PK
 
-                INTEGER kontinente_id FK
-                INTEGER laendernamen_de_id FK
-                INTEGER laendernamen_en_id FK
 
-                VARCHAR(2) iso2
-                VARCHAR(3) iso3
+                VARCHAR(256) name
         }
 
-            tab_kontinente ||--o{ tab_laender : "gehört zu Kontinent"
-            tab_laendernamen ||--o{ tab_laender : "hat dt. Namen"
-            tab_laendernamen ||--o{ tab_laender : "hat en. Namen"
-        tab_nutzer ||--o{ tab_laender : "erstellt von"
+        tab_nutzer ||--o{ tab_nutzer : "erstellt von"
 
 
         tab_einheiten {
@@ -567,54 +612,61 @@ erDiagram
         tab_nutzer ||--o{ tab_einheiten : "erstellt von"
 
 
-        tab_laendernamen {
+        tab_ugl {
             TIMESTAMP gueltig_seit PK
             BOOL ist_aktiv
             INTEGER ersteller_nutzer_id FK
-            INTEGER laendernamen_id PK
+            INTEGER ugl_id PK
 
-                INTEGER laender_id FK
 
-                VARCHAR(256) name
+                VARCHAR(64) name
         }
 
-            tab_laender ||--o{ tab_laendernamen : "gehört zu Land"
-        tab_nutzer ||--o{ tab_laendernamen : "erstellt von"
-
-
-        tab_kontinente {
-            TIMESTAMP gueltig_seit PK
-            BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK
-            INTEGER kontinente_id PK
-
-
-                VARCHAR(64) name_de
-                VARCHAR(64) name_en
-        }
-
-        tab_nutzer ||--o{ tab_kontinente : "erstellt von"
-
-
-        tab_quellen_zo {
-            TIMESTAMP gueltig_seit PK
-            BOOL ist_aktiv
-            INTEGER ersteller_nutzer_id FK
-            INTEGER quellen_zo_id PK
-
-                INTEGER daten_id FK
-                INTEGER quellen_id FK
-
-        }
-
-            tab_daten ||--o{ tab_quellen_zo : "ordnet Datenpunkt zu"
-            tab_quellen ||--o{ tab_quellen_zo : "ordnet Quelle zu"
-        tab_nutzer ||--o{ tab_quellen_zo : "erstellt von"
+        tab_nutzer ||--o{ tab_ugl : "erstellt von"
 
 
 ```
 
 ## Tabellen
+
+### tab_lizenzen_zo
+
+Diese Tabelle ordnet Datenpunkten ihre Lizenzen zu.
+
+
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|daten|tab_daten|True|Verweis auf den zugeordneten Datenpunkt.|
+|lizenzen|tab_lizenzen|True|Verweis auf die zugeordnet Lizenz.|
+
+### tab_quellen
+
+Tabelle zur Verwaltung von Datenquellen.
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|name_de|VARCHAR(256)|True|''|Vollständiger Name der Quelle auf Deutsch.|
+|name_en|VARCHAR(256)|True|''|Vollständiger Name der Quelle auf Englisch.|
+|name_kurz_de|VARCHAR(16)|True|''|Kurzer Name der Quelle auf Deutsch.|
+|name_kurz_en|VARCHAR(16)|True|''|Kurzer Name der Quelle auf Englisch.|
+|url|VARCHAR(512)|True|''|Link zu der Quelle.|
+
+
+### tab_metadaten
+
+Tabelle zur Verwaltung von Metadaten, die Datenpunkten zugeordnet werden können (z.B. methodische Hinweise, Fußnoten).
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|kuerzel|VARCHAR(8)|True|''|Kürzel für das Metadatum.|
+|bezeichnung|VARCHAR(256)|True|''|Ausführliche Bezeichnung des Metadatums.|
+
 
 ### tab_lizenzen
 
@@ -628,6 +680,54 @@ Tabelle zur Verwaltung der Lizenzen, unter denen die statistischen Daten veröff
 |url|VARCHAR(512)|True|''|URL zur vollständigen Lizenzbeschreibung.|
 |extra_bedingungen|BOOLEAN|True|0|Gibt an, ob zusätzliche Bedingungen für die Nutzung der Daten bestehen.|
 
+
+### tab_laendergruppen
+
+Tabelle zur Verwaltung von Ländergruppen (z.B. EU, OECD, G7).
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|name_de|VARCHAR(256)|True|''|Name der Ländergruppe auf Deutsch.|
+|name_en|VARCHAR(256)|True|''|Name der Ländergruppe auf Englisch.|
+
+
+### tab_quellen_zo
+
+Diese Tabelle ordnet Datenpunkten ihre Quellen zu.
+
+
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|daten|tab_daten|True|Verweis auf den zugeordneten Datenpunkt.|
+|quellen|tab_quellen|True|Verweis auf die zugeordnete Quelle.|
+
+### tab_metadaten_zo
+
+Diese Tabelle ordnet Datenpunkten ihre Metadaten zu.
+
+
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|daten|tab_daten|True|Verweis auf den zugeordneten Datenpunkt.|
+|metadaten|tab_metadaten|True|Verweis auf das zugeordnete Metadatum.|
+
+### tab_laendergruppen_zo
+
+Tabelle zur Zuordnung von Ländern zu Ländergruppen (z.B. Mitgliedschaft eines Landes in einer Gruppe).
+
+
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|laender|tab_laender|True|Verweis auf das zugeordnete Land.|
+|laendergruppen|tab_laendergruppen|True|Verweis auf die zugeordnete Ländergruppe.|
 
 ### tab_daten
 
@@ -647,20 +747,45 @@ Tabelle für die Speicherung von statistischen Einzelwerten (Zeitreihen) zu Län
 |----|---------------|----------|------------|
 |laender|tab_laender|True|Verweis auf das Land, für das der Wert gilt.|
 |indikatoren|tab_indikatoren|True|Verweis auf den Indikator, zu dem der Wert gehört.|
-|lizenzen|tab_lizenzen|False|Verweis auf die Lizenz, unter welcher der Wert steht.|
-|quellen|tab_quellen|False|Verweis auf die Quelle, aus welcher der Wert stammt.|
 
-### tab_metadaten_zo
+### tab_kontinente
 
-Diese Tabelle ordnet Datenpunkten ihre Metadaten zu.
+Tabelle zur Verwaltung der Kontinente, denen Länder zugeordnet werden können.
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|name_de|VARCHAR(64)|True|''|Name des Kontinents auf Deutsch.|
+|name_en|VARCHAR(64)|True|''|Name des Kontinents auf Englisch.|
+
+
+### tab_themen
+
+Tabelle welche Themen verwaltet, denen Indikatoren zugeordnet sind.
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|name_de|VARCHAR(64)|True|''|Name des Themas auf Deutsch.|
+|name_en|VARCHAR(64)|True|''|Name des Themas auf Englisch.|
+|farbe_r|TINYINT UNSIGNED|True|0|Rotwert der Farbzuordnung für das Thema (0-255).|
+|farbe_g|TINYINT UNSIGNED|True|0|Grünwert der Farbzuordnung für das Thema (0-255).|
+|farbe_b|TINYINT UNSIGNED|True|0|Blauwert der Farbzuordnung für das Thema (0-255).|
+
+
+### tab_ugl_zo
+
+Diese Tabelle ordnet Daten ihre Untergliederungswerte zu.
 
 
 #### Fremdschlüssel
 
 |Name|Referenztabelle|Nicht NULL|Beschreibung|
 |----|---------------|----------|------------|
+|untergliederungswerte|tab_ugl_werte|True|Verweis auf den zugeordneten Untergliederungswert.|
 |daten|tab_daten|True|Verweis auf den zugeordneten Datenpunkt.|
-|metadaten|tab_metadaten|True|Verweis auf das zugeordnete Metadatum.|
 
 ### tab_ugl_werte
 
@@ -679,17 +804,24 @@ Tabelle zur Verwaltung der Werte der Untergliederungen von Indikatoren.
 |untergliederungen|tab_ugl|False|Optionalee Referenz auf die Untergliederung.|
 |laender|tab_laender|False|Referenz auf ein Land.|
 
-### tab_laendergruppen
+### tab_laender
 
-Tabelle zur Verwaltung von Ländergruppen (z.B. EU, OECD, G7).
+Tabelle zur Verwaltung der Länder mit ISO-Codes und Namensreferenzen.
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|name_de|VARCHAR(256)|True|''|Name der Ländergruppe auf Deutsch.|
-|name_en|VARCHAR(256)|True|''|Name der Ländergruppe auf Englisch.|
+|iso2|VARCHAR(2)|True|''|ISO-2-Ländercode gemäß internationalem Standard (z.B. 'DE' für Deutschland).|
+|iso3|VARCHAR(3)|True|''|ISO-3-Ländercode gemäß internationalem Standard (z.B. 'DEU' für Deutschland).|
 
+#### Fremdschlüssel
+
+|Name|Referenztabelle|Nicht NULL|Beschreibung|
+|----|---------------|----------|------------|
+|kontinente|tab_kontinente|True|Verweis auf den Kontinent, dem das Land zugeordnet ist.|
+|laendernamen_de|tab_laendernamen|True|Verweis auf den deutschen Namen des Landes.|
+|laendernamen_en|tab_laendernamen|True|Verweis auf den englischen Namen des Landes.|
 
 ### tab_downloadquellen_zo
 
@@ -702,79 +834,6 @@ Diese Tabelle ordnet Datenpunkten ihre Download-Quellen zu.
 |----|---------------|----------|------------|
 |daten|tab_daten|True|Verweis auf den zugeordneten Datenpunkt.|
 |quellen|tab_quellen|True|Verweis auf die zugeordnete Download-Quelle.|
-
-### tab_ugl_zo
-
-Diese Tabelle ordnet Daten ihre Untergliederungswerte zu.
-
-
-#### Fremdschlüssel
-
-|Name|Referenztabelle|Nicht NULL|Beschreibung|
-|----|---------------|----------|------------|
-|untergliederungswerte|tab_ugl_werte|True|Verweis auf den zugeordneten Untergliederungswert.|
-|daten|tab_daten|True|Verweis auf den zugeordneten Datenpunkt.|
-
-### tab_metadaten
-
-Tabelle zur Verwaltung von Metadaten, die Datenpunkten zugeordnet werden können (z.B. methodische Hinweise, Fußnoten).
-
-#### Spalten
-
-|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
-|----|---|----------|------------|------------|
-|kuerzel|VARCHAR(8)|True|''|Kürzel für das Metadatum.|
-|bezeichnung|VARCHAR(256)|True|''|Ausführliche Bezeichnung des Metadatums.|
-
-
-### tab_ugl
-
-Tabelle zur Verwaltung der möglichen Untergliederungen eines Indikators.
-
-#### Spalten
-
-|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
-|----|---|----------|------------|------------|
-|name|VARCHAR(64)|True|''|Name der Untergliederung.|
-
-
-### tab_nutzer
-
-Diese Tabelle speichert alle Nutzer.
-
-#### Spalten
-
-|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
-|----|---|----------|------------|------------|
-|name|VARCHAR(256)|True|''|Name des Nutzers.|
-
-
-### tab_laendergruppen_zo
-
-Tabelle zur Zuordnung von Ländern zu Ländergruppen (z.B. Mitgliedschaft eines Landes in einer Gruppe).
-
-
-#### Fremdschlüssel
-
-|Name|Referenztabelle|Nicht NULL|Beschreibung|
-|----|---------------|----------|------------|
-|laender|tab_laender|True|Verweis auf das zugeordnete Land.|
-|laendergruppen|tab_laendergruppen|True|Verweis auf die zugeordnete Ländergruppe.|
-
-### tab_quellen
-
-Tabelle zur Verwaltung von Datenquellen.
-
-#### Spalten
-
-|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
-|----|---|----------|------------|------------|
-|name_de|VARCHAR(256)|True|''|Vollständiger Name der Quelle auf Deutsch.|
-|name_en|VARCHAR(256)|True|''|Vollständiger Name der Quelle auf Englisch.|
-|name_kurz_de|VARCHAR(16)|True|''|Kurzer Name der Quelle auf Deutsch.|
-|name_kurz_en|VARCHAR(16)|True|''|Kurzer Name der Quelle auf Englisch.|
-|url|VARCHAR(512)|True|''|Link zu der Quelle.|
-
 
 ### tab_indikatoren
 
@@ -799,39 +858,32 @@ Tabelle zur Verwaltung der statistischen Indikatoren.
 |themen|tab_themen|True|Verweis auf das Thema, dem der Indikator zugeordnet ist.|
 |einheiten|tab_einheiten|True|Verweis auf die Einheit, in der der Indikator gemessen wird.|
 
-### tab_themen
+### tab_laendernamen
 
-Tabelle welche Themen verwaltet, denen Indikatoren zugeordnet sind.
-
-#### Spalten
-
-|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
-|----|---|----------|------------|------------|
-|name_de|VARCHAR(64)|True|''|Name des Themas auf Deutsch.|
-|name_en|VARCHAR(64)|True|''|Name des Themas auf Englisch.|
-|farbe_r|TINYINT UNSIGNED|True|0|Rotwert der Farbzuordnung für das Thema (0-255).|
-|farbe_g|TINYINT UNSIGNED|True|0|Grünwert der Farbzuordnung für das Thema (0-255).|
-|farbe_b|TINYINT UNSIGNED|True|0|Blauwert der Farbzuordnung für das Thema (0-255).|
-
-
-### tab_laender
-
-Tabelle zur Verwaltung der Länder mit ISO-Codes und Namensreferenzen.
+Tabelle zuer Verwaltung von Ländernamen. Ein Land kann mehrere Ländernamen haben. Jedes Land hat einen deutschen und einen englischen Namen.
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|iso2|VARCHAR(2)|True|''|ISO-2-Ländercode gemäß internationalem Standard (z.B. 'DE' für Deutschland).|
-|iso3|VARCHAR(3)|True|''|ISO-3-Ländercode gemäß internationalem Standard (z.B. 'DEU' für Deutschland).|
+|name|VARCHAR(256)|True|''|Name eines Landes.|
 
 #### Fremdschlüssel
 
 |Name|Referenztabelle|Nicht NULL|Beschreibung|
 |----|---------------|----------|------------|
-|kontinente|tab_kontinente|True|Verweis auf den Kontinent, dem das Land zugeordnet ist.|
-|laendernamen_de|tab_laendernamen|True|Verweis auf den deutschen Namen des Landes.|
-|laendernamen_en|tab_laendernamen|True|Verweis auf den englischen Namen des Landes.|
+|laender|tab_laender|False|Verweis auf das Land, dem der Name zugeordnet ist. (optional)|
+
+### tab_nutzer
+
+Diese Tabelle speichert alle Nutzer.
+
+#### Spalten
+
+|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
+|----|---|----------|------------|------------|
+|name|VARCHAR(256)|True|''|Name des Nutzers.|
+
 
 ### tab_einheiten
 
@@ -851,45 +903,16 @@ Tabelle zur Verwaltung der Einheiten, in denen statistische Werte angegeben werd
 |----|---------------|----------|------------|
 |basis_einheiten|tab_einheiten|False|Optionale Referenz auf eine Basiseinheit, falls die Einheit abgeleitet ist.|
 
-### tab_laendernamen
+### tab_ugl
 
-Tabelle zuer Verwaltung von Ländernamen. Ein Land kann mehrere Ländernamen haben. Jedes Land hat einen deutschen und einen englischen Namen.
-
-#### Spalten
-
-|Name|Typ|Nicht NULL|Standardwert|Beschreibung|
-|----|---|----------|------------|------------|
-|name|VARCHAR(256)|True|''|Name eines Landes.|
-
-#### Fremdschlüssel
-
-|Name|Referenztabelle|Nicht NULL|Beschreibung|
-|----|---------------|----------|------------|
-|laender|tab_laender|False|Verweis auf das Land, dem der Name zugeordnet ist. (optional)|
-
-### tab_kontinente
-
-Tabelle zur Verwaltung der Kontinente, denen Länder zugeordnet werden können.
+Tabelle zur Verwaltung der möglichen Untergliederungen eines Indikators.
 
 #### Spalten
 
 |Name|Typ|Nicht NULL|Standardwert|Beschreibung|
 |----|---|----------|------------|------------|
-|name_de|VARCHAR(64)|True|''|Name des Kontinents auf Deutsch.|
-|name_en|VARCHAR(64)|True|''|Name des Kontinents auf Englisch.|
+|name|VARCHAR(64)|True|''|Name der Untergliederung.|
 
-
-### tab_quellen_zo
-
-Diese Tabelle ordnet Datenpunkten ihre Quellen zu.
-
-
-#### Fremdschlüssel
-
-|Name|Referenztabelle|Nicht NULL|Beschreibung|
-|----|---------------|----------|------------|
-|daten|tab_daten|True|Verweis auf den zugeordneten Datenpunkt.|
-|quellen|tab_quellen|True|Verweis auf die zugeordnete Quelle.|
 
 
 

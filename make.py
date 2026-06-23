@@ -47,6 +47,7 @@ ORDERED_TABLE_NAMES: List[str] = [
     "metadaten_zo",
     "quellen_zo",
     "downloadquellen_zo",
+    "lizenzen_zo"
 ]
 
 PY_TYPES: List[Tuple[str, str]] = [

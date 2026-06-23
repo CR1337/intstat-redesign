@@ -1,4 +1,44 @@
-from __future__ import annotations
+from pydantic import BaseModel
+from typing import List
+
+
+class Zo(BaseModel):
+    pass
+
+
+{% for table in tables %}
+
+class {{ table.table_name|capitalize }}({% if table.is_zo %}BaseModel{% else %}Zo{% endif %}):
+    """
+    {{ table.description }}
+    """
+
+{# columns #}
+{% for col in table.columns %}
+    {{ col.name }}: {{ pytype(col.type) }}  # {{ col.description }}
+{% endfor %} {# table.columns #}
+
+{# attribute lists #}
+{% for alist in table.attribute_lists %}
+    {{ alist.name }}: {{ pytype(alist.zo_table|capitalize )}}
+{% endfor %} {# table.attribute_lists #}
+
+{# foreign keys #}
+{% for fk in table.foreign_keys %}
+    {{ fk.name }}: {{ fk.references|capitalize }}  # {{ fk.description }}
+{% endfor %} {# table.foreign_keys #}
+
+{% if table.is_zo %}
+    def get_values(self) -> List[{{ table.main_table|capitalize }}]:
+        pass  # TODO
+
+{% endif %} {# table.is_zo #}
+
+
+{% endfor %} {# tables #}
+
+
+{# from __future__ import annotations
 from pydantic import BaseModel
 from typing import Dict, Tuple
 from datetime import datetime
@@ -29,4 +69,4 @@ MODELS: Dict[str, BaseModel] = {  # type: ignore
 {% for table in tables %}
     "{{ table.table_name }}": {{ table.table_name|capitalize }},
 {% endfor %}
-}
+} #}
