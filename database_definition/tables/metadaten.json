@@ -23,5 +23,6 @@
             "kuerzel"
         ]
     ],
-    "do_versioning": true
+    "attribute_lists": [],
+    "is_zo": false
 }

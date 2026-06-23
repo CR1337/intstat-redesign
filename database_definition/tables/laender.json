@@ -56,5 +56,13 @@
         [
             "iso3"
         ]
-    ]
+    ],
+    "attribute_lists": [
+        {
+            "name": "laendergruppen",
+            "zo_table": "laendergruppen_zo",
+            "references": "laendergruppen"
+        }
+    ],
+    "is_zo": false
 }

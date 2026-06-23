@@ -25,5 +25,8 @@
             "laender_id",
             "laendergruppen_id"
         ]
-    ]
+    ],
+    "attribute_lists": [],
+    "is_zo": true,
+    "main_table": "laender"
 }

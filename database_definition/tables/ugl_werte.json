@@ -28,6 +28,7 @@
             "diagram_description": "gehört zu Land"
         }
     ],
-    "unique_sets": [
-    ]
+    "unique_sets": [],
+    "attribute_lists": [],
+    "is_zo": false
 }

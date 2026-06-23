@@ -1,16 +1,8 @@
 {
-    "table_name": "ugl_zo",
-    "description": "Diese Tabelle ordnet Daten ihre Untergliederungswerte zu.",
+    "table_name": "lizenzen_zo",
+    "description": "Diese Tabelle ordnet Datenpunkten ihre Lizenzen zu.",
     "columns": [],
     "foreign_keys": [
-        {
-            "name": "untergliederungswerte",
-            "references": "ugl_werte",
-            "min_1": false,
-            "description": "Verweis auf den zugeordneten Untergliederungswert.",
-            "not_null": true,
-            "diagram_description": "ordnet Untergliederungswert zu"
-        },
         {
             "name": "daten",
             "references": "daten",
@@ -18,12 +10,20 @@
             "description": "Verweis auf den zugeordneten Datenpunkt.",
             "not_null": true,
             "diagram_description": "ordnet Datenpunkt zu"
+        },
+        {
+            "name": "lizenzen",
+            "references": "lizenzen",
+            "min_1": false,
+            "description": "Verweis auf die zugeordnet Lizenz.",
+            "not_null": true,
+            "diagram_description": "ordnet Lizenz zu"
         }
     ],
     "unique_sets": [
         [
             "daten_id",
-            "untergliederungswerte_id"
+            "lizenzen_id"
         ]
     ],
     "attribute_lists": [],

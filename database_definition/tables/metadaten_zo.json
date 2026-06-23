@@ -26,5 +26,7 @@
             "metadaten_id"
         ]
     ],
-    "do_versioning": true
+    "attribute_lists": [],
+    "is_zo": true,
+    "main_table": "daten"
 }
