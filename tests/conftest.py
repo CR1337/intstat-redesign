@@ -5,7 +5,7 @@ from string import ascii_letters
 import pytest
 import mysql.connector
 from mysql.connector import Error
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Set
 
 USERNAME: str = "super"
 
@@ -78,33 +78,55 @@ def table_definition(request):
     definition = request.param
     yield definition
 
+used_random_values: Dict[str, Set[Any]] = {
+    "INTEGER": set(),
+    "DATE": set(),
+    "DOUBLE": set(),
+    "VARCHAR": set(),
+    "TINYINT UNSIGNED": set()
+}
 
 def get_random_value(type_: str = "INTEGER", quote_text: bool = False) -> Any:
     match type_:
         case "INTEGER":
-            return randint(-(2**31), -1)
+            while (v := randint(-(2**31), -1)) in used_random_values["INTEGER"]:
+                pass
+            used_random_values["INTEGER"].add(v)
+            return v
 
         case "DATE":
-            year = randint(1970, 2000)
-            month = randint(1, 12)
-            day = randint(1, 28)
-            result = f"{year:04}-{month:02}-{day:02}"
-            if quote_text:
-                result = f"'{result}'"
-            return result
+            v = None
+            while v is None or v in used_random_values["DATE"]:
+                year = randint(1970, 2000)
+                month = randint(1, 12)
+                day = randint(1, 28)
+                v = f"{year:04}-{month:02}-{day:02}"
+                if quote_text:
+                    v = f"'{v}'"
+            used_random_values["DATE"].add(v)
+            return v
 
         case "DOUBLE":
-            return random()
+            while (v := random()) in used_random_values["DOUBLE"]:
+                pass
+            used_random_values["DOUBLE"].add(v)
+            return v
 
         case _ if type_.startswith("VARCHAR(") and type_.endswith(")"):
-            length = int(type_[8:-1])
-            result = "".join(choice(ascii_letters) for _ in range(length))
-            if quote_text:
-                result = f"'{result}'"
-            return result
+            v = None
+            while v is None or v in used_random_values["VARCHAR"]:
+                length = int(type_[8:-1])
+                v = "".join(choice(ascii_letters) for _ in range(length))
+                if quote_text:
+                    v = f"'{v}'"
+            used_random_values["VARCHAR"].add(v)
+            return v
 
         case "TINYINT UNSIGNED":
-            return randint(0, 255)
+            while (v := randint(0, 255)) in used_random_values["TINYINT UNSIGNED"]:
+                pass
+            used_random_values["TINYINT UNSIGNED"].add(v)
+            return v
 
         case "BOOL" | "BOOLEAN":
             return randint(0, 1)
