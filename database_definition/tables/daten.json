@@ -72,7 +72,7 @@
         {
             "name": "ugl",
             "zo_table": "ugl_zo",
-            "references": "ugl_"
+            "references": "ugl_werte"
         }
     ],
     "is_zo": false

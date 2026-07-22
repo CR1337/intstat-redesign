@@ -3,9 +3,10 @@ import json
 from random import random, randint, choice
 from string import ascii_letters
 import pytest
+import json
 import mysql.connector
 from mysql.connector import Error
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List
 
 USERNAME: str = "super"
 
@@ -22,6 +23,53 @@ DATABASES: List[Dict[str, str | int]] = [
 USER_TABLE_NAME: str = "nutzer"
 
 TABLE_DEFINITIONS_DIRECTORY: str = os.path.join("database_definition", "tables")
+
+USED_RADNOM_VALUES_FILENAME: str = os.path.join("tests", "tmp", "used_random_values.json")
+
+
+def pytest_sessionstart(session):
+    used_random_values = {
+        "INTEGER": [],
+        "DATE": [],
+        "DOUBLE": [],
+        "VARCHAR": [],
+        "TINYINT UNSIGNED": []
+    }
+    with open(USED_RADNOM_VALUES_FILENAME, 'w') as f:
+        json.dump(used_random_values, f, indent=4)
+
+
+def pytest_sessionfinish(session, exitstatus):
+    database_config = DATABASES[0]
+    connection = mysql.connector.connect(**database_config)
+
+    rows_to_delete = {}
+
+    table_definitions = get_table_definitions()
+    for td in table_definitions:
+        table_name = td["table_name"]
+        if table_name == "nutzer":
+            continue
+        rows_to_delete[table_name] = []
+        view_name = f"tab_{table_name}"
+
+        result = fetch(connection, f"SELECT {table_name}_id, gueltig_seit, ist_aktiv from {view_name};")
+        result = sorted(result, key=lambda x: x[1])
+
+        for id_, _, ist_aktiv in result:
+            if id_ in rows_to_delete[table_name] and not ist_aktiv:
+                rows_to_delete[table_name].remove(id_)
+            elif id_ not in rows_to_delete[table_name] and ist_aktiv:
+                rows_to_delete[table_name].append(id_)
+
+    for table_name, ids in rows_to_delete.items():
+        for id_ in ids:
+            cursor = connection.cursor()
+            arguments = [id_]
+            cursor.callproc(f"delete_from_{table_name}", arguments)
+            cursor.close()
+
+    connection.close()
 
 
 def fetch(connection, statement) -> Any:
@@ -78,21 +126,18 @@ def table_definition(request):
     definition = request.param
     yield definition
 
-used_random_values: Dict[str, Set[Any]] = {
-    "INTEGER": set(),
-    "DATE": set(),
-    "DOUBLE": set(),
-    "VARCHAR": set(),
-    "TINYINT UNSIGNED": set()
-}
-
 def get_random_value(type_: str = "INTEGER", quote_text: bool = False) -> Any:
+    with open(USED_RADNOM_VALUES_FILENAME, 'r') as f:
+        used_random_values = json.load(f)
+
+    result = None
+
     match type_:
         case "INTEGER":
             while (v := randint(-(2**31), -1)) in used_random_values["INTEGER"]:
                 pass
-            used_random_values["INTEGER"].add(v)
-            return v
+            used_random_values["INTEGER"].append(v)
+            result = v
 
         case "DATE":
             v = None
@@ -103,14 +148,14 @@ def get_random_value(type_: str = "INTEGER", quote_text: bool = False) -> Any:
                 v = f"{year:04}-{month:02}-{day:02}"
                 if quote_text:
                     v = f"'{v}'"
-            used_random_values["DATE"].add(v)
-            return v
+            used_random_values["DATE"].append(v.replace("'", ""))
+            result = v
 
         case "DOUBLE":
             while (v := random()) in used_random_values["DOUBLE"]:
                 pass
-            used_random_values["DOUBLE"].add(v)
-            return v
+            used_random_values["DOUBLE"].append(v)
+            result = v
 
         case _ if type_.startswith("VARCHAR(") and type_.endswith(")"):
             v = None
@@ -119,20 +164,25 @@ def get_random_value(type_: str = "INTEGER", quote_text: bool = False) -> Any:
                 v = "".join(choice(ascii_letters) for _ in range(length))
                 if quote_text:
                     v = f"'{v}'"
-            used_random_values["VARCHAR"].add(v)
-            return v
+            used_random_values["VARCHAR"].append(v.replace("'", ""))
+            result = v
 
         case "TINYINT UNSIGNED":
             while (v := randint(0, 255)) in used_random_values["TINYINT UNSIGNED"]:
                 pass
-            used_random_values["TINYINT UNSIGNED"].add(v)
-            return v
+            used_random_values["TINYINT UNSIGNED"].append(v)
+            result = v
 
         case "BOOL" | "BOOLEAN":
-            return randint(0, 1)
+            result = randint(0, 1)
 
         case _:
             raise ValueError(f"Unknown type: {type_}")
+
+    with open(USED_RADNOM_VALUES_FILENAME, 'w') as f:
+        json.dump(used_random_values, f, indent=4)
+
+    return result
 
 
 def procedure_insert(connection, table_name, arguments=None) -> List[Any]:

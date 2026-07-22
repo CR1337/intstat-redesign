@@ -473,139 +473,139 @@ CREATE TABLE IF NOT EXISTS tab_lizenzen_zo (
 );
 
 ALTER TABLE tab_einheiten
-ADD CONSTRAINT fk_einheiten_einheiten_8407eb00cf5e4578a434  --  Optionale Referenz auf eine Basiseinheit, falls die Einheit abgeleitet ist.
+ADD CONSTRAINT fk_einheiten_einheiten_d075b984b4c444fa8cca  --  Optionale Referenz auf eine Basiseinheit, falls die Einheit abgeleitet ist.
 FOREIGN KEY (basis_einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendernamen
-ADD CONSTRAINT fk_laendernamen_laender_e04e55f36b0c47088432  --  Verweis auf das Land, dem der Name zugeordnet ist. (optional)
+ADD CONSTRAINT fk_laendernamen_laender_ec8565f1b9e54f48b734  --  Verweis auf das Land, dem der Name zugeordnet ist. (optional)
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_themen_e2e81357e71b40eca786  --  Verweis auf das Thema, dem der Indikator zugeordnet ist.
+ADD CONSTRAINT fk_indikatoren_themen_0ccf4d043b2e45cbbd63  --  Verweis auf das Thema, dem der Indikator zugeordnet ist.
 FOREIGN KEY (themen_id) REFERENCES tab_themen(themen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_indikatoren
-ADD CONSTRAINT fk_indikatoren_einheiten_8f53136fd15645d8b884  --  Verweis auf die Einheit, in der der Indikator gemessen wird.
+ADD CONSTRAINT fk_indikatoren_einheiten_ddf0ede8110346d7bd70  --  Verweis auf die Einheit, in der der Indikator gemessen wird.
 FOREIGN KEY (einheiten_id) REFERENCES tab_einheiten(einheiten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_kontinente_eb1a619248774ed0b838  --  Verweis auf den Kontinent, dem das Land zugeordnet ist.
+ADD CONSTRAINT fk_laender_kontinente_a4980cf334d345ada9da  --  Verweis auf den Kontinent, dem das Land zugeordnet ist.
 FOREIGN KEY (kontinente_id) REFERENCES tab_kontinente(kontinente_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_ba0978f2072a4b2a8065  --  Verweis auf den deutschen Namen des Landes.
+ADD CONSTRAINT fk_laender_laendernamen_2a18d90944524c9c859d  --  Verweis auf den deutschen Namen des Landes.
 FOREIGN KEY (laendernamen_de_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laender
-ADD CONSTRAINT fk_laender_laendernamen_44bd08734db2456a9f0c  --  Verweis auf den englischen Namen des Landes.
+ADD CONSTRAINT fk_laender_laendernamen_284b7bf2b3324e098279  --  Verweis auf den englischen Namen des Landes.
 FOREIGN KEY (laendernamen_en_id) REFERENCES tab_laendernamen(laendernamen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_laender_ba6eb6c8c7914d8ab1f2  --  Verweis auf das Land, für das der Wert gilt.
+ADD CONSTRAINT fk_daten_laender_fa92db97cb83440087bc  --  Verweis auf das Land, für das der Wert gilt.
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_daten
-ADD CONSTRAINT fk_daten_indikatoren_622f7a4291e744a89e11  --  Verweis auf den Indikator, zu dem der Wert gehört.
+ADD CONSTRAINT fk_daten_indikatoren_25451bc15b874b93a7c0  --  Verweis auf den Indikator, zu dem der Wert gehört.
 FOREIGN KEY (indikatoren_id) REFERENCES tab_indikatoren(indikatoren_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_ugl_werte
-ADD CONSTRAINT fk_ugl_werte_ugl_e3c320eeea934a2e9fb7  --  Optionalee Referenz auf die Untergliederung.
+ADD CONSTRAINT fk_ugl_werte_ugl_c8e51f9c17c54e4ca5ab  --  Optionalee Referenz auf die Untergliederung.
 FOREIGN KEY (untergliederungen_id) REFERENCES tab_ugl(ugl_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_ugl_werte
-ADD CONSTRAINT fk_ugl_werte_laender_5aad33a1989347e48752  --  Referenz auf ein Land.
+ADD CONSTRAINT fk_ugl_werte_laender_f8a2163fe769472186cf  --  Referenz auf ein Land.
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_ugl_zo
-ADD CONSTRAINT fk_ugl_zo_ugl_werte_676291ed10b448a48923  --  Verweis auf den zugeordneten Untergliederungswert.
+ADD CONSTRAINT fk_ugl_zo_ugl_werte_992d912fc99f4ee4b7fa  --  Verweis auf den zugeordneten Untergliederungswert.
 FOREIGN KEY (untergliederungswerte_id) REFERENCES tab_ugl_werte(ugl_werte_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_ugl_zo
-ADD CONSTRAINT fk_ugl_zo_daten_297071e6b59e43d3a606  --  Verweis auf den zugeordneten Datenpunkt.
+ADD CONSTRAINT fk_ugl_zo_daten_3e17c577f99b48c0a77e  --  Verweis auf den zugeordneten Datenpunkt.
 FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppen_zo
-ADD CONSTRAINT fk_laendergruppen_zo_laender_d3095235471246f280a0  --  Verweis auf das zugeordnete Land.
+ADD CONSTRAINT fk_laendergruppen_zo_laender_ccb412b0c4ea4a80b8b0  --  Verweis auf das zugeordnete Land.
 FOREIGN KEY (laender_id) REFERENCES tab_laender(laender_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_laendergruppen_zo
-ADD CONSTRAINT fk_laendergruppen_zo_laendergruppen_aeefad6e98b445bf8142  --  Verweis auf die zugeordnete Ländergruppe.
+ADD CONSTRAINT fk_laendergruppen_zo_laendergruppen_554bdc81ab6e49fd91b3  --  Verweis auf die zugeordnete Ländergruppe.
 FOREIGN KEY (laendergruppen_id) REFERENCES tab_laendergruppen(laendergruppen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_metadaten_zo
-ADD CONSTRAINT fk_metadaten_zo_daten_bec5cd6eb80b4b9fa2bd  --  Verweis auf den zugeordneten Datenpunkt.
+ADD CONSTRAINT fk_metadaten_zo_daten_25c0b57a376d4043a8a5  --  Verweis auf den zugeordneten Datenpunkt.
 FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_metadaten_zo
-ADD CONSTRAINT fk_metadaten_zo_metadaten_f288231c97d54447a267  --  Verweis auf das zugeordnete Metadatum.
+ADD CONSTRAINT fk_metadaten_zo_metadaten_9241d776f84c4015bb52  --  Verweis auf das zugeordnete Metadatum.
 FOREIGN KEY (metadaten_id) REFERENCES tab_metadaten(metadaten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_quellen_zo
-ADD CONSTRAINT fk_quellen_zo_daten_b190108dcbdc45a1abda  --  Verweis auf den zugeordneten Datenpunkt.
+ADD CONSTRAINT fk_quellen_zo_daten_0b0568bc4c554102ab7e  --  Verweis auf den zugeordneten Datenpunkt.
 FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_quellen_zo
-ADD CONSTRAINT fk_quellen_zo_quellen_3f446552f3d643e0aab5  --  Verweis auf die zugeordnete Quelle.
+ADD CONSTRAINT fk_quellen_zo_quellen_484ed37872d2447cb46d  --  Verweis auf die zugeordnete Quelle.
 FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_downloadquellen_zo
-ADD CONSTRAINT fk_downloadquellen_zo_daten_e009d549418b4b5c9ebf  --  Verweis auf den zugeordneten Datenpunkt.
+ADD CONSTRAINT fk_downloadquellen_zo_daten_617f9c5f65564541b716  --  Verweis auf den zugeordneten Datenpunkt.
 FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_downloadquellen_zo
-ADD CONSTRAINT fk_downloadquellen_zo_quellen_b21f4ec987f147ca996b  --  Verweis auf die zugeordnete Download-Quelle.
+ADD CONSTRAINT fk_downloadquellen_zo_quellen_c6a197626b594caca346  --  Verweis auf die zugeordnete Download-Quelle.
 FOREIGN KEY (quellen_id) REFERENCES tab_quellen(quellen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_lizenzen_zo
-ADD CONSTRAINT fk_lizenzen_zo_daten_cbb70e9061714364b509  --  Verweis auf den zugeordneten Datenpunkt.
+ADD CONSTRAINT fk_lizenzen_zo_daten_4b25dbbc478345238faf  --  Verweis auf den zugeordneten Datenpunkt.
 FOREIGN KEY (daten_id) REFERENCES tab_daten(daten_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
 
 ALTER TABLE tab_lizenzen_zo
-ADD CONSTRAINT fk_lizenzen_zo_lizenzen_4d106bf318bd40a999f7  --  Verweis auf die zugeordnet Lizenz.
+ADD CONSTRAINT fk_lizenzen_zo_lizenzen_ef4078c8d0e2427a92ed  --  Verweis auf die zugeordnet Lizenz.
 FOREIGN KEY (lizenzen_id) REFERENCES tab_lizenzen(lizenzen_id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;

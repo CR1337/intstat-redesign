@@ -1,0 +1,65 @@
+daten
+    laender
+    indikatoren
+    !downloadquellen(downloadquellen_zo)
+    !quellen(quellen_zo)
+    !lizenzen(lizenzen_zo)
+    ?metadaten(metadaten_zo)
+    ?ugl_werte(ugl_zo)
+
+einheiten
+    &einheiten
+
+indikatoren
+    themen
+    einheiten
+
+kontinente
+
+laender
+    kontinente
+    laendernamen
+    ?laendergruppen(laendergruppen_zo)
+
+laendergruppen
+
+laendernamen
+    laender
+
+lizenzen
+
+metadaten
+
+nutzer
+
+quellen
+
+themen
+
+ugl_werte
+    ugl
+    laender
+
+ugl
+
+
+
+--------------------------------------------------------------------------
+
+daten
+    laender
+        kontinente
+        laendernamen
+            laender...
+        ?laendergruppen(laendergruppen_zo)
+    indikatoren
+        themen
+        einheiten
+            &einheiten
+    !downloadquellen(downloadquellen_zo)
+    !quellen(quellen_zo)
+    !lizenzen(lizenzen_zo)
+    ?metadaten(metadaten_zo)
+    ?ugl_werte(ugl_zo)
+        ugl
+        laender...
